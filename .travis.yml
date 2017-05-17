@@ -10,19 +10,25 @@ branches:
   only:
     - master
 
-# command to install requirements
+env:
+  - DJANGO="django>=1.10,<1.11"
+  - DJANGO="django>=1.11,<1.12"
+
+before_install:
+  - pip install --no-cache-dir -U -r requirements-test.txt
+  - ./runflake8
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then ./runisort; fi
+
 install:
-  # temporary
-  - pip install https://github.com/openwisp/django-netjsonconfig/tarball/master
+  - pip install $DJANGO
   - python setup.py -q develop
-  - pip install -r requirements-test.txt
 
 before_script:
   - ./runflake8
 
 # command to run tests, e.g. python setup.py test
 script:
-  - coverage run --source=openwisp_controller runtests.py
+  - coverage run --source=django_freeradius runtests.py
 
 after_success:
   coveralls
