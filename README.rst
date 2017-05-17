@@ -71,7 +71,7 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``django_x509`` to ``INSTALLED_APPS``:
+Add ``django_freeradius`` to ``INSTALLED_APPS``:
 
 .. code-block:: python
 

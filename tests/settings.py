@@ -9,7 +9,7 @@ ALLOWED_HOSTS = []
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'freeardius.db',
+        'NAME': 'freeradius.db',
     }
 }
 
@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'django_freeardius'
+    'django_freeradius'
 ]
 
 MIDDLEWARE_CLASSES = [

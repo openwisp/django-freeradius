@@ -7,9 +7,9 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    # django-x509 urls
+    # django_freeradius urls
     # keep the namespace argument unchanged
-    url(r'^', include('django_freeardius.urls', namespace='freeardius')),
+    #url(r'^', include('django_freeradius.urls', namespace='freeradius')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
