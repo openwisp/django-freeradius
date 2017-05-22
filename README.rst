@@ -149,7 +149,7 @@ Settings
 TODO
 
 Extending django-freeradius
----------------------
+---------------------------
 
 *django-freeradius* provides a set of models and admin classes which can be imported,
 extended and reused by third party apps.
