@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     # django_freeradius urls
     # keep the namespace argument unchanged
-    #url(r'^', include('django_freeradius.urls', namespace='freeradius')),
+    # url(r'^', include('django_freeradius.urls', namespace='freeradius')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
