@@ -10,12 +10,6 @@ class RadiusGroup(models.Model):
     modification_date = models.DateField(null=True)
     notes = models.CharField(max_length=64, blank=True)
 
-    def __unicode__(self):
-        return self.group_name
-
-    class Meta:
-        ordering = ['group_name']
-
 
 class RadiusGroupUsers(models.Model):
     username = models.CharField(max_length=64, unique=True)
