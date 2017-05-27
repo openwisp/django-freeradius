@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import (Nas, RadiusAccounting, RadiusChecks, RadiusGroup,
-                     RadiusGroupUsers, RadiusReplies)
+from .models import (Nas, RadiusAccounting, RadiusChecks, RadiusGroup, RadiusGroupUsers, RadiusReplies)
 
 
 @admin.register(RadiusGroup)
