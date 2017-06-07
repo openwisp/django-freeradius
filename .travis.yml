@@ -1,5 +1,12 @@
 language: python
 sudo: false
+services:
+  - riak
+  - rabbitmq
+  - memcached
+  - mysql
+  - postgresql
+
 cache: pip
 
 python:
@@ -14,6 +21,10 @@ env:
   - DJANGO="django>=1.10,<1.11"
   - DJANGO="django>=1.11,<1.12"
 
+matrix:
+  - DB=mysql
+  - DB=postgres
+
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
@@ -25,6 +36,8 @@ install:
 
 before_script:
   - ./runflake8
+  - mysql -e 'create database freeradius;'
+  - psql -c 'create database freeradius;' -U postgres
 
 # command to run tests, e.g. python setup.py test
 script:
