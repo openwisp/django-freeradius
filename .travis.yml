@@ -22,8 +22,9 @@ env:
   - DJANGO="django>=1.11,<1.12"
 
 matrix:
-  - DB=mysql
-  - DB=postgres
+  - DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+  - DATABASE_URL='postgres://root@127.0.0.1/djangocms_test'
+
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
@@ -36,8 +37,8 @@ install:
 
 before_script:
   - ./runflake8
-  - mysql -e 'create database freeradius;'
-  - psql -c 'create database freeradius;' -U postgres
+  - mysql -e 'create database django_freeradus;'
+  - psql -c 'create database django_freeradius;'  
 
 # command to run tests, e.g. python setup.py test
 script:
