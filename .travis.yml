@@ -1,9 +1,6 @@
 language: python
 sudo: false
 services:
-  - riak
-  - rabbitmq
-  - memcached
   - mysql
   - postgresql
 
@@ -38,7 +35,7 @@ install:
 before_script:
   - ./runflake8
   - mysql -e 'create database django_freeradus;'
-  - psql -c 'create database django_freeradius;'  
+  - psql -c 'create database django_freeradius;'
 
 # command to run tests, e.g. python setup.py test
 script:
