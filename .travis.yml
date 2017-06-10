@@ -17,8 +17,6 @@ branches:
 env:
   - DJANGO="django>=1.10,<1.11"
   - DJANGO="django>=1.11,<1.12"
-
-matrix:
   - DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
   - DATABASE_URL='postgres://root@127.0.0.1/djangocms_test'
 
