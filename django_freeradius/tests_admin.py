@@ -78,7 +78,7 @@ class UserTest(TestCase):
         User.objects.create_superuser(username='fiorella', password='ciao', email='giggi_fiore@gmail.it' )
         reply = RadiusReply.objects.create(user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob')
         check = RadiusCheck.objects.create(user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob')
-        obj = RadiusGroupUsers.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',user_name='bob', group_name='students', radius_reply=[reply.pk], radius_check=[check.pk])
+        obj = RadiusGroupUsers.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',user_name='bob', group_name='students')
         obj.radius_reply.add(reply)
         obj.radius_check.add(check)
         self.client.login(username='fiorella', password='ciao')
