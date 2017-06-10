@@ -15,10 +15,10 @@ branches:
     - master
 
 env:
-  - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-  - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-  - DJANGO="django>=1.10,<1.11" DATABASE_URL='postgres://root@127.0.0.1/djangocms_test'
-  - DJANGO="django>=1.11,<1.12" DATABASE_URL='postgres://root@127.0.0.1/djangocms_test'
+  - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.10,<1.11" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.11,<1.12" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
