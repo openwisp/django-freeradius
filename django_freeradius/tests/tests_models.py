@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
-                     RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-                     RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
+                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
+                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
 class NasModelTest(TestCase):
