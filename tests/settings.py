@@ -1,4 +1,5 @@
 import os
+
 import environ
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -10,8 +11,6 @@ environ.Env.read_env()
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-#if 'TRAVIS' in os.environ:
 
 DATABASES = {
     'default': env.db(),
