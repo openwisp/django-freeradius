@@ -13,7 +13,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    'default': env.db(),
+    'default': env.db(default='sqlite:///django-freeradius.db'),
 }
 
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
