@@ -2,3 +2,6 @@ coverage
 coveralls
 isort
 flake8
+django-environ
+mysqlclient
+psycopg2

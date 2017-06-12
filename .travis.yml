@@ -1,5 +1,9 @@
 language: python
 sudo: false
+services:
+  - mysql
+  - postgresql
+
 cache: pip
 
 python:
@@ -11,8 +15,10 @@ branches:
     - master
 
 env:
-  - DJANGO="django>=1.10,<1.11"
-  - DJANGO="django>=1.11,<1.12"
+  - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.10,<1.11" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
+  - DJANGO="django>=1.11,<1.12" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
@@ -25,6 +31,8 @@ install:
 
 before_script:
   - ./runflake8
+  - mysql -e 'create database django_freeradus;'
+  - psql -c 'create database django_freeradius;' -U postgres
 
 # command to run tests, e.g. python setup.py test
 script:
