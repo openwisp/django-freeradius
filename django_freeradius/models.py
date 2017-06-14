@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+
+
 # Create your models here.
 
 RADOP_CHECK_TYPES = (
@@ -31,7 +33,7 @@ RADOP_REPLY_TYPES = (
 class RadiusGroup(models.Model):
     id = models.UUIDField(primary_key=True, db_column='id')
     group_name = models.CharField(
-            verbose_name=_('groupname'), max_length=255, unique=True, db_column='username', db_index=True)
+            verbose_name=_('groupname'), max_length=255, unique=True, db_column='groupname', db_index=True)
     priority = models.IntegerField(verbose_name=_('priority'), default=1, db_column='priority')
     creation_date = models.DateField(verbose_name=_('creation date'), null=True, db_column='created_at')
     modification_date = models.DateField(
