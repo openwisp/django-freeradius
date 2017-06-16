@@ -1,6 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
-from .base import TimeStampedEditableAdmin
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from .base import TimeStampedEditableAdmin
 
 RADOP_CHECK_TYPES = (
     ('=', '='),
