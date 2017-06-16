@@ -27,6 +27,7 @@ RADOP_REPLY_TYPES = (
 
 
 class AbstractRadiusGroup(TimeStampedEditableAdmin):
+    id = models.UUIDField(primary_key=True, db_column='id')
     group_name = models.CharField(
             verbose_name=_('groupname'), max_length=255, unique=True, db_column='groupname', db_index=True)
     priority = models.IntegerField(verbose_name=_('priority'), default=1)
@@ -47,6 +48,7 @@ class AbstractRadiusGroup(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusGroupUsers(TimeStampedEditableAdmin):
+    id = models.UUIDField(primary_key=True, db_column='id')
     user_name = models.CharField(
             verbose_name=_('username'), max_length=64, unique=True, db_column='username')
     group_name = models.CharField(

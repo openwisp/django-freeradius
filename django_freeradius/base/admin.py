@@ -6,45 +6,45 @@ class TimeStampedEditableAdmin(ModelAdmin):
     ModelAdmin for TimeStampedEditableModel
     """
     def __init__(self, *args, **kwargs):
-        self.readonly_fields += ('modified')
+        self.readonly_fields += ('created', 'modified',)
         super(TimeStampedEditableAdmin, self).__init__(*args, **kwargs)
 
 
-class AbstractRadiusGroupAdmin(ModelAdmin):
+class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusGroupUsersAdmin(ModelAdmin):
+class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusCheckAdmin(ModelAdmin):
+class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusReplyAdmin(ModelAdmin):
+class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusAccountingAdmin(ModelAdmin):
+class AbstractRadiusAccountingAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractNasAdmin(ModelAdmin):
+class AbstractNasAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusUserGroupAdmin(ModelAdmin):
+class AbstractRadiusUserGroupAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusGroupReplyAdmin(ModelAdmin):
+class AbstractRadiusGroupReplyAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusGroupCheckAdmin(ModelAdmin):
+class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusPostAuthenticationAdmin(ModelAdmin):
+class AbstractRadiusPostAuthenticationAdmin(TimeStampedEditableAdmin):
     pass

@@ -13,53 +13,51 @@ from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
+@admin.register(RadiusGroup)
 class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
     model = RadiusGroup
 
 
+@admin.register(RadiusGroupUsers)
 class RadiusGroupUsersAdmin(AbstractRadiusGroupUsersAdmin):
     model = RadiusGroupUsers
 
 
+@admin.register(RadiusCheck)
 class RadiusCheckAdmin(AbstractRadiusCheckAdmin):
     model = RadiusCheck
 
 
+@admin.register(RadiusReply)
 class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
     model = RadiusReply
 
 
+@admin.register(RadiusAccounting)
 class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
     model = RadiusAccounting
 
 
+@admin.register(Nas)
 class NasAdmin(AbstractNasAdmin):
     model = Nas
 
 
+@admin.register(RadiusUserGroup)
 class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
     model = RadiusUserGroup
 
 
+@admin.register(RadiusGroupReply)
 class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
     model = RadiusGroupReply
 
 
+@admin.register(RadiusGroupCheck)
 class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
     model = RadiusGroupCheck
 
 
+@admin.register(RadiusPostAuthentication)
 class RadiusPostAuthenticationAdmin(AbstractRadiusPostAuthenticationAdmin):
     model = RadiusPostAuthentication
-
-
-admin.site.register(RadiusPostAuthentication, RadiusPostAuthenticationAdmin)
-admin.site.register(RadiusGroupCheck, RadiusGroupCheckAdmin)
-admin.site.register(RadiusGroupReply, RadiusGroupReplyAdmin)
-admin.site.register(RadiusUserGroup, RadiusUserGroupAdmin)
-admin.site.register(Nas, NasAdmin)
-admin.site.register(RadiusAccounting, RadiusAccountingAdmin)
-admin.site.register(RadiusReply, RadiusReplyAdmin)
-admin.site.register(RadiusCheck, RadiusCheckAdmin)
-admin.site.register(RadiusGroupUsers, RadiusGroupUsersAdmin)
-admin.site.register(RadiusGroup, RadiusGroupAdmin)
