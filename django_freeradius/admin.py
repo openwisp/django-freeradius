@@ -4,52 +4,60 @@ from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
-
-@admin.register(RadiusGroup)
-class RadiusGroupAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(RadiusGroupUsers)
-class RadiusGroupUsers(admin.ModelAdmin):
-    pass
+from .base.admin import (AbstractRadiusGroupAdmin, AbstractRadiusGroupUsersAdmin,
+                         AbstractRadiusCheckAdmin, AbstractRadiusAccountingAdmin,
+                         AbstractRadiusReplyAdmin, AbstractNasAdmin,
+                         AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
+                         AbstractRadiusPostAuthenticationAdmin, AbstractRadiusUserGroupAdmin)
 
 
-@admin.register(RadiusCheck)
-class RadiusCheck(admin.ModelAdmin):
-    pass
+class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
+    model = RadiusGroup
 
 
-@admin.register(RadiusReply)
-class RadiusReply(admin.ModelAdmin):
-    pass
+class RadiusGroupUsersAdmin(AbstractRadiusGroupUsersAdmin):
+    model = RadiusGroupUsers
 
 
-@admin.register(RadiusAccounting)
-class RadiusAccounting(admin.ModelAdmin):
-    pass
+class RadiusCheckAdmin(AbstractRadiusCheckAdmin):
+    model = RadiusCheck
 
 
-@admin.register(Nas)
-class Nas(admin.ModelAdmin):
-    pass
+class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
+    model = RadiusReply
 
 
-@admin.register(RadiusUserGroup)
-class RadiusUserGroup(admin.ModelAdmin):
-    pass
+class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
+    model = RadiusAccounting
 
 
-@admin.register(RadiusGroupReply)
-class RadiusGroupReply(admin.ModelAdmin):
-    pass
+class NasAdmin(AbstractNasAdmin):
+    model = Nas
 
 
-@admin.register(RadiusGroupCheck)
-class RadiusGroupCheck(admin.ModelAdmin):
-    pass
+class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
+    model = RadiusUserGroup
 
 
-@admin.register(RadiusPostAuthentication)
-class RadiusPostAuthentication(admin.ModelAdmin):
-    pass
+class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
+    model = RadiusGroupReply
+
+
+class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
+    model = RadiusGroupCheck
+
+
+class RadiusPostAuthenticationAdmin(AbstractRadiusPostAuthenticationAdmin):
+    model = RadiusPostAuthentication
+
+
+admin.site.register(RadiusPostAuthentication, RadiusPostAuthenticationAdmin)
+admin.site.register(RadiusGroupCheck, RadiusGroupCheckAdmin)
+admin.site.register(RadiusGroupReply, RadiusGroupReplyAdmin)
+admin.site.register(RadiusUserGroup, RadiusUserGroupAdmin)
+admin.site.register(Nas, NasAdmin)
+admin.site.register(RadiusAccounting, RadiusAccountingAdmin)
+admin.site.register(RadiusReply, RadiusReplyAdmin)
+admin.site.register(RadiusCheck, RadiusCheckAdmin)
+admin.site.register(RadiusGroupUsers, RadiusGroupUsersAdmin)
+admin.site.register(RadiusGroup, RadiusGroupAdmin)
