@@ -5,9 +5,10 @@ class TimeStampedEditableAdmin(ModelAdmin):
     """
     ModelAdmin for TimeStampedEditableModel
     """
-    def __init__(self, *args, **kwargs):
-        self.readonly_fields += ('created', 'modified',)
-        super(TimeStampedEditableAdmin, self).__init__(*args, **kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super(TimeStampedEditableAdmin, self).get_readonly_fields(request, obj)
+        return readonly_fields + ('created', 'modified')
 
 
 class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
