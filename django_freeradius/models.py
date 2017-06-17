@@ -9,58 +9,58 @@ import swapper
 class RadiusGroup(AbstractRadiusGroup):
 
      class Meta:
-       swappable = swapper.swappable_setting('reusableapp', 'RadiusGroup')
+       swappable = swapper.swappable_setting('django_freeradius', 'RadiusGroup')
 
 
 class RadiusGroupUsers(AbstractRadiusGroupUsers):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupUsers')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusGroupUsers')
 
 
 class RadiusCheck(AbstractRadiusCheck):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusCheck')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusCheck')
 
 
 class RadiusAccounting(AbstractRadiusAccounting):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusAccounting')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusAccounting')
 
 
 class RadiusReply(AbstractRadiusReply):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusReply')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusReply')
 
 
 class Nas(AbstractNas):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'Nas')
+      swappable = swapper.swappable_setting('django_freeradius', 'Nas')
 
 
 class RadiusGroupCheck(AbstractRadiusGroupCheck):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupCheck')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusGroupCheck')
 
 
 class RadiusGroupReply(AbstractRadiusGroupReply):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupReply')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusGroupReply')
 
 
 class RadiusPostAuthentication(AbstractRadiusPostAuthentication):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusPostAuthentication')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusPostAuthentication')
 
 
 class RadiusUserGroup(AbstractRadiusUserGroup):
 
     class Meta:
-      swappable = swapper.swappable_setting('reusableapp', 'RadiusUserGroup')
+      swappable = swapper.swappable_setting('django_freeradius', 'RadiusUserGroup')
