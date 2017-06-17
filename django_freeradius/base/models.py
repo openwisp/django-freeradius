@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from .base import TimeStampedEditableAdmin
+from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 RADOP_CHECK_TYPES = (
     ('=', '='),
@@ -26,7 +25,19 @@ RADOP_REPLY_TYPES = (
 )
 
 
-class AbstractRadiusGroup(TimeStampedEditableAdmin):
+class TimeStampedEditableModel(models.Model):
+    """
+    An abstract base class model that provides self-updating
+    ``created`` and ``modified`` fields.
+    """
+    created = AutoCreatedField(_('created'), editable=True)
+    modified = AutoLastModifiedField(_('modified'), editable=True)
+
+    class Meta:
+        abstract = True
+
+
+class AbstractRadiusGroup(TimeStampedEditableModel):
     id = models.UUIDField(primary_key=True, db_column='id')
     group_name = models.CharField(
             verbose_name=_('groupname'), max_length=255, unique=True, db_column='groupname', db_index=True)
@@ -47,7 +58,7 @@ class AbstractRadiusGroup(TimeStampedEditableAdmin):
         return self.group_name
 
 
-class AbstractRadiusGroupUsers(TimeStampedEditableAdmin):
+class AbstractRadiusGroupUsers(TimeStampedEditableModel):
     id = models.UUIDField(primary_key=True, db_column='id')
     user_name = models.CharField(
             verbose_name=_('username'), max_length=64, unique=True, db_column='username')
@@ -68,7 +79,7 @@ class AbstractRadiusGroupUsers(TimeStampedEditableAdmin):
         return self.user_name
 
 
-class AbstractRadiusReply(TimeStampedEditableAdmin):
+class AbstractRadiusReply(TimeStampedEditableModel):
     user_name = models.CharField(
             verbose_name=_('username'), max_length=64, db_column='username', db_index=True)
     value = models.CharField(verbose_name=_('value'), max_length=253)
@@ -86,7 +97,7 @@ class AbstractRadiusReply(TimeStampedEditableAdmin):
         return self.user_name
 
 
-class AbstractRadiusCheck(TimeStampedEditableAdmin):
+class AbstractRadiusCheck(TimeStampedEditableModel):
     user_name = models.CharField(
             verbose_name=_('username'), max_length=64, db_column='username', db_index=True)
     value = models.CharField(verbose_name=_('radiusvalue'), max_length=253)
@@ -105,7 +116,7 @@ class AbstractRadiusCheck(TimeStampedEditableAdmin):
         return self.user_name
 
 
-class AbstractRadiusAccounting(TimeStampedEditableAdmin):
+class AbstractRadiusAccounting(TimeStampedEditableModel):
     rad_acct_id = models.BigIntegerField(primary_key=True, db_column='radacctid')
     acct_session_id = models.CharField(max_length=64, db_column='acctsessionid', db_index=True)
     acct_unique_id = models.CharField(max_length=32, db_column='acctuniqueid', unique=True)
@@ -161,7 +172,7 @@ class AbstractRadiusAccounting(TimeStampedEditableAdmin):
         return self.acct_unique_id
 
 
-class AbstractNas(TimeStampedEditableAdmin):
+class AbstractNas(TimeStampedEditableModel):
     nas_name = models.CharField(
             verbose_name=_('nas name'), max_length=128, unique=True, help_text=_('NAS Name (or IP address)'),
             db_index=True, db_column='nasname')
@@ -187,7 +198,7 @@ class AbstractNas(TimeStampedEditableAdmin):
         return self.nas_name
 
 
-class AbstractRadiusUserGroup(TimeStampedEditableAdmin):
+class AbstractRadiusUserGroup(TimeStampedEditableModel):
     user_name = models.CharField(
             verbose_name=_('username'), max_length=64, db_column='username', db_index=True)
     group_name = models.CharField(verbose_name=_('groupname'), max_length=64, db_column='groupname')
@@ -203,7 +214,7 @@ class AbstractRadiusUserGroup(TimeStampedEditableAdmin):
         return str(self.user_name)
 
 
-class AbstractRadiusGroupReply(TimeStampedEditableAdmin):
+class AbstractRadiusGroupReply(TimeStampedEditableModel):
     group_name = models.CharField(
             verbose_name=_('groupname'), max_length=64, db_column='groupname', db_index=True)
     attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
@@ -221,7 +232,7 @@ class AbstractRadiusGroupReply(TimeStampedEditableAdmin):
         return str(self.group_name)
 
 
-class AbstractRadiusGroupCheck(TimeStampedEditableAdmin):
+class AbstractRadiusGroupCheck(TimeStampedEditableModel):
     group_name = models.CharField(
             verbose_name=_('groupname'), max_length=64,  db_column='groupname', db_index=True)
     attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
@@ -239,7 +250,7 @@ class AbstractRadiusGroupCheck(TimeStampedEditableAdmin):
         return str(self.group_name)
 
 
-class AbstractRadiusPostAuthentication(TimeStampedEditableAdmin):
+class AbstractRadiusPostAuthentication(TimeStampedEditableModel):
     user_name = models.CharField(verbose_name=_('username'), max_length=64, db_column='username')
     password = models.CharField(verbose_name=_('password'), max_length=64,  db_column='pass')
     reply = models.CharField(verbose_name=_('reply'), max_length=32)
