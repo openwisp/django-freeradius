@@ -1,5 +1,6 @@
-from django.contrib import admin
 import swapper
+from django.contrib import admin
+
 from .base.admin import (AbstractNasAdmin, AbstractRadiusAccountingAdmin,
                          AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
                          AbstractRadiusGroupCheckAdmin,
@@ -16,7 +17,7 @@ RadiusUserGroup = swapper.load_model("django_freeradius", "RadiusUserGroup")
 RadiusReply = swapper.load_model("django_freeradius", "RadiusReply")
 RadiusCheck = swapper.load_model("django_freeradius", "RadiusCheck")
 RadiusPostAuthentication = swapper.load_model("django_freeradius", "RadiusPostAuthentication")
-Nas  = swapper.load_model("django_freeradius", "Nas")
+Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 
