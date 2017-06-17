@@ -4,43 +4,63 @@ from .base.models import (AbstractNas, AbstractRadiusAccounting,
                           AbstractRadiusGroupUsers,
                           AbstractRadiusPostAuthentication,
                           AbstractRadiusReply, AbstractRadiusUserGroup)
-
+import swapper
 
 class RadiusGroup(AbstractRadiusGroup):
-    pass
+
+     class Meta:
+       swappable = swapper.swappable_setting('reusableapp', 'RadiusGroup')
 
 
 class RadiusGroupUsers(AbstractRadiusGroupUsers):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupUsers')
 
 
 class RadiusCheck(AbstractRadiusCheck):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusCheck')
 
 
 class RadiusAccounting(AbstractRadiusAccounting):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusAccounting')
 
 
 class RadiusReply(AbstractRadiusReply):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusReply')
 
 
 class Nas(AbstractNas):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'Nas')
 
 
 class RadiusGroupCheck(AbstractRadiusGroupCheck):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupCheck')
 
 
 class RadiusGroupReply(AbstractRadiusGroupReply):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusGroupReply')
 
 
 class RadiusPostAuthentication(AbstractRadiusPostAuthentication):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusPostAuthentication')
 
 
 class RadiusUserGroup(AbstractRadiusUserGroup):
-    pass
+
+    class Meta:
+      swappable = swapper.swappable_setting('reusableapp', 'RadiusUserGroup')

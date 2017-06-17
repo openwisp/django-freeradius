@@ -2,6 +2,19 @@ import os
 
 import environ
 
+import swapper
+
+DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "django_freeradius.RadiusReply"
+DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "django_freeradius.RadiusCheck"
+DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "django_freeradius.RadiusUserGroup"
+DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "django_freeradius.RadiusGroup"
+DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "django_freeradius.RadiusAccounting"
+DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "django_freeradius.RadiusPostAuthentication"
+DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "django_freeradius.RadiusGroupReply"
+DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "django_freeradius.RadiusGroupCheck"
+DJANGO_FREERADIUS_RADIUSGROUPUSER_MODEL = "django_freeradius.RadiusGroupUser"
+DJANGO_FREERADIUS_NAS_MODEL = "django_freeradius.RadiusReply"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 root = environ.Path(__file__) - 2
