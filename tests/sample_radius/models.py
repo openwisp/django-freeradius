@@ -49,6 +49,11 @@ class RadiusUserGroup(AbstractRadiusUserGroup):
             verbose_name=_('details'), max_length=64, blank=True, null=True)
 
 
-class RadiusNas(AbstractNas):
+class Nas(AbstractNas):
+    details = models.CharField(
+            verbose_name=_('details'), max_length=64, blank=True, null=True)
+
+
+class RadiusGroupUsers(AbstractNas):
     details = models.CharField(
             verbose_name=_('details'), max_length=64, blank=True, null=True)

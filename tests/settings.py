@@ -2,16 +2,16 @@ import os
 
 import environ
 
-DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "django_freeradius.RadiusReply"
-DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "django_freeradius.RadiusGroupReply"
-DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "django_freeradius.RadiusCheck"
-DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "django_freeradius.RadiusGroupCheck"
-DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "django_freeradius.RadiusAccounting"
-DJANGO_FREERADIUS_NAS_MODEL = "django_freeradius.Nas"
-DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "django_freeradius.RadiusGroupUsers"
-DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "django_freeradius.RadiusUserGroup"
-DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "django_freeradius.RadiusPostAuthentication"
-DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "django_freeradius.RadiusGroup"
+DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
+DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"
+DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "sample_radius.RadiusCheck"
+DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
+DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
+DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
+DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
+DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
+DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
