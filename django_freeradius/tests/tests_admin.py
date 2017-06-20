@@ -1,10 +1,19 @@
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
+import swapper
 
-from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
-                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
+
+RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
+RadiusGroupCheck = swapper.load_model("django_freeradius", "RadiusGroupCheck")
+RadiusGroupUsers = swapper.load_model("django_freeradius", "RadiusGroupUsers")
+RadiusUserGroup = swapper.load_model("django_freeradius", "RadiusUserGroup")
+RadiusReply = swapper.load_model("django_freeradius", "RadiusReply")
+RadiusCheck = swapper.load_model("django_freeradius", "RadiusCheck")
+RadiusPostAuthentication = swapper.load_model("django_freeradius", "RadiusPostAuthentication")
+Nas = swapper.load_model("django_freeradius", "Nas")
+RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
+RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 
 
 class UserTest(TestCase):
