@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 
-from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
+from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                       RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
                       RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
