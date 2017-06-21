@@ -24,13 +24,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sample_radius',
-        'USER': 'root',
-        'PASSWORD': 'milafiore91',
-    },
-     #'default': env.db(default='sqlite:///django-freeradius.db'),
+
+     'default': env.db(default='sqlite:///django-freeradius.db'),
      }
 
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
