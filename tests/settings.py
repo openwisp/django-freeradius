@@ -2,6 +2,17 @@ import os
 
 import environ
 
+DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
+DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"
+DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "sample_radius.RadiusCheck"
+DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
+DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
+DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
+DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
+DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
+DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 root = environ.Path(__file__) - 2
@@ -13,8 +24,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    'default': env.db(default='sqlite:///django-freeradius.db'),
-}
+
+     'default': env.db(default='sqlite:///django-freeradius.db'),
+     }
 
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
@@ -25,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'django_freeradius'
+    'django_freeradius',
+    'sample_radius',
 ]
 
 MIDDLEWARE_CLASSES = [

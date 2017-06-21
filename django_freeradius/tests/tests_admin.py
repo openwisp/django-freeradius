@@ -96,7 +96,7 @@ class UserTest(TestCase):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         ola = RadiusAccounting.objects.create(
             acct_unique_id='-2', user_name='bob', nas_ip_address='ff', acct_start_time='2017-06-10 10:50:00',
-            acct_stop_time='2017-06-10 12:10:00', acct_session_time='5', acct_authentic='kj',
+            acct_stop_time='2017-06-10 11:50:00', acct_session_time='5', acct_authentic='kj',
             connection_info_start='f', connection_info_stop='hgh',
             acct_input_octets='1', acct_output_octets='4', rad_acct_id='123')
         self.client.login(username='gino', password='cic')
