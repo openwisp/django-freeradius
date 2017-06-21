@@ -1,10 +1,7 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.test import Client
-from django.urls import reverse
-
 import swapper
-
+from django.contrib.auth.models import User
+from django.test import Client, TestCase
+from django.urls import reverse
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
 RadiusGroupCheck = swapper.load_model("django_freeradius", "RadiusGroupCheck")
