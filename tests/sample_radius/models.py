@@ -3,12 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_freeradius.models import (AbstractNas, AbstractRadiusAccounting,
                                       AbstractRadiusCheck, AbstractRadiusGroup,
-                                      AbstractRadiusGroupCheck,
-                                      AbstractRadiusGroupReply,
+                                      AbstractRadiusGroupCheck, AbstractRadiusGroupReply,
                                       AbstractRadiusGroupUsers,
                                       AbstractRadiusPostAuthentication,
-                                      AbstractRadiusReply,
-                                      AbstractRadiusUserGroup)
+                                      AbstractRadiusReply, AbstractRadiusUserGroup)
 
 
 class RadiusGroup(AbstractRadiusGroup):
