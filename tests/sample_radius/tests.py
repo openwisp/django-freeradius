@@ -2,7 +2,8 @@ import swapper
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
-
+from unittest import skipIf
+import os
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
 RadiusGroupCheck = swapper.load_model("django_freeradius", "RadiusGroupCheck")
@@ -15,6 +16,9 @@ Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 
+
+@skipIf(True, "env = DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'")
+@skipIf(True, "env = DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'")
 
 class NasModelTest(TestCase):
 
