@@ -1,6 +1,6 @@
-import swapper
 from django.contrib import admin
 
+import swapper
 from django_freeradius.admin import (AbstractNasAdmin,
                                      AbstractRadiusAccountingAdmin,
                                      AbstractRadiusCheckAdmin,
