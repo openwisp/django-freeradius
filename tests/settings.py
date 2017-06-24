@@ -2,17 +2,6 @@ import os
 
 import environ
 
-DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
-DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"
-DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "sample_radius.RadiusCheck"
-DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
-DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
-DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
-DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
-DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
-DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
-DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 root = environ.Path(__file__) - 2
@@ -38,12 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_freeradius',
-    
-
 ]
-
-if os.environ.get('SAMPLE_RADIUS', True):
-     INSTALLED_APPS.append('sample_radius')
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -86,3 +70,16 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+    if os.environ.get('SAMPLE_APP', True):
+        INSTALLED_APPS.append('sample_radius')
+        DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
+        DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"
+        DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "sample_radius.RadiusCheck"
+        DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
+        DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
+        DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
+        DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
+        DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
+        DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+        DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"

@@ -3,12 +3,12 @@ from unittest import skipIf
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
-
+import os
 from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
                       RadiusGroupUsers, RadiusPostAuthentication, RadiusReply, RadiusUserGroup,)
 
 
-@skipIf(True, "env = DATABASE_URL='mysql://mysql@127.0.0.1/sample_test' SAMPLE_APP=1")
+@skipIf(os.environ.get('SAMPLE_APP', True), 'Running tests on SAMPLE_APP')
 class UserTest(TestCase):
 
     def setUp(self):
