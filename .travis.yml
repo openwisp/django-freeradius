@@ -19,8 +19,8 @@ env:
   - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
   - DJANGO="django>=1.10,<1.11" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
   - DJANGO="django>=1.11,<1.12" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
-  - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://mysql@127.0.0.1/sample_test' SAMPLE_APP=1
-  - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://mysql@127.0.0.1/sample_test' SAMPLE_APP=1
+  - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
+  - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
 
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
