@@ -16,7 +16,7 @@ DATABASES = {
 
      'default': env.db(default='sqlite:///django-freeradius.db'),
      }
-
+     
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 INSTALLED_APPS = [
@@ -65,13 +65,14 @@ TEMPLATES = [
     },
 ]
 
-# local settings must be imported before test runner otherwise they'll be ignored
+ local settings must be imported before test runner otherwise they'll be ignored
 try:
     from local_settings import *
 except ImportError:
     pass
 
-    if os.environ.get('SAMPLE_APP', True):
+
+if os.environ.get('SAMPLE_APP', True):
         INSTALLED_APPS.append('sample_radius')
         DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
         DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"

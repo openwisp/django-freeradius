@@ -7,7 +7,7 @@ from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                       RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
-@skipIf(True, "env = DATABASE_URL='mysql://mysql@127.0.0.1/sample_test' SAMPLE_APP=1")
+@skipIf(os.environ.get('SAMPLE_APP', True), 'Running tests on SAMPLE_APP')
 class NasModelTest(TestCase):
 
     def test_string_representation(self):
