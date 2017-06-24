@@ -1,12 +1,16 @@
 from django.contrib import admin
 
-from .base.admin import (AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusCheckAdmin,
-                         AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin,
-                         AbstractRadiusGroupReplyAdmin, AbstractRadiusGroupUsersAdmin,
-                         AbstractRadiusPostAuthenticationAdmin, AbstractRadiusReplyAdmin,
-                         AbstractRadiusUserGroupAdmin,)
-from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-                     RadiusGroupUsers, RadiusPostAuthentication, RadiusReply, RadiusUserGroup,)
+from .base.admin import (AbstractNasAdmin, AbstractRadiusAccountingAdmin,
+                         AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
+                         AbstractRadiusGroupCheckAdmin,
+                         AbstractRadiusGroupReplyAdmin,
+                         AbstractRadiusGroupUsersAdmin,
+                         AbstractRadiusPostAuthenticationAdmin,
+                         AbstractRadiusReplyAdmin,
+                         AbstractRadiusUserGroupAdmin)
+from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
+                     RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
+                     RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
 @admin.register(RadiusGroup)

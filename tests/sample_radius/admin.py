@@ -1,15 +1,16 @@
-from django.contrib import admin
 import swapper
+from django.contrib import admin
 
-from django_freeradius.admin import (AbstractNasAdmin, AbstractRadiusAccountingAdmin,
-                                     AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
+from django_freeradius.admin import (AbstractNasAdmin,
+                                     AbstractRadiusAccountingAdmin,
+                                     AbstractRadiusCheckAdmin,
+                                     AbstractRadiusGroupAdmin,
                                      AbstractRadiusGroupCheckAdmin,
                                      AbstractRadiusGroupReplyAdmin,
                                      AbstractRadiusGroupUsersAdmin,
                                      AbstractRadiusPostAuthenticationAdmin,
                                      AbstractRadiusReplyAdmin,
                                      AbstractRadiusUserGroupAdmin)
-
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
 RadiusGroupCheck = swapper.load_model("django_freeradius", "RadiusGroupCheck")

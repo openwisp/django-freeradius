@@ -1,8 +1,11 @@
 import swapper
 
-from .base.models import (AbstractNas, AbstractRadiusAccounting, AbstractRadiusCheck, AbstractRadiusGroup,
-                          AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers,
-                          AbstractRadiusPostAuthentication, AbstractRadiusReply, AbstractRadiusUserGroup,)
+from .base.models import (AbstractNas, AbstractRadiusAccounting,
+                          AbstractRadiusCheck, AbstractRadiusGroup,
+                          AbstractRadiusGroupCheck, AbstractRadiusGroupReply,
+                          AbstractRadiusGroupUsers,
+                          AbstractRadiusPostAuthentication,
+                          AbstractRadiusReply, AbstractRadiusUserGroup)
 
 
 class RadiusGroup(AbstractRadiusGroup):

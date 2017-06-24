@@ -2,8 +2,9 @@ from unittest import skipIf
 
 from django.test import TestCase
 
-from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-                      RadiusGroupUsers, RadiusPostAuthentication, RadiusReply, RadiusUserGroup,)
+from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
+                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
+                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
 @skipIf(True, "env = DATABASE_URL='mysql://mysql@127.0.0.1/sample_test' SAMPLE_APP=1")

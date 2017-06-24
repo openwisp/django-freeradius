@@ -1,9 +1,10 @@
+import os
+from unittest import skipUnless
+
 import swapper
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
-from unittest import skipUnless
-import os
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
 RadiusGroupCheck = swapper.load_model("django_freeradius", "RadiusGroupCheck")
