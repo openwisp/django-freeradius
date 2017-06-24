@@ -16,7 +16,7 @@ DATABASES = {
 
      'default': env.db(default='sqlite:///django-freeradius.db'),
      }
-     
+
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 INSTALLED_APPS = [
@@ -65,7 +65,7 @@ TEMPLATES = [
     },
 ]
 
- local settings must be imported before test runner otherwise they'll be ignored
+#local settings must be imported before test runner otherwise they'll be ignored
 try:
     from local_settings import *
 except ImportError:

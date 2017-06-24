@@ -25,70 +25,70 @@ class NasModelTest(TestCase):
         nas = Nas(nas_name='entry nasname')
         self.assertEqual(str(nas), nas.nas_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusAccountingModelTest(TestCase):
 
     def test_string_representation(self):
         radiusaccounting = RadiusAccounting(acct_unique_id='entry acctuniqueid')
         self.assertEqual(str(radiusaccounting), radiusaccounting.acct_unique_id)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusCheckModelTest(TestCase):
 
     def test_string_representation(self):
         radiuscheck = RadiusCheck(user_name='entry username')
         self.assertEqual(str(radiuscheck), radiuscheck.user_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusReplyModelTest(TestCase):
 
     def test_string_representation(self):
         radiusreply = RadiusReply(user_name='entry username')
         self.assertEqual(str(radiusreply), radiusreply.user_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusGroupReplyModelTest(TestCase):
 
     def test_string_representation(self):
         radiusgroupreply = RadiusGroupReply(group_name='entry groupname')
         self.assertEqual(str(radiusgroupreply), radiusgroupreply.group_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusGroupCheckModelTest(TestCase):
 
     def test_string_representation(self):
         radiusgroupcheck = RadiusGroupCheck(group_name='entry groupname')
         self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.group_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusUserGroupModelTest(TestCase):
 
     def test_string_representation(self):
         radiususergroup = RadiusUserGroup(user_name='entry username')
         self.assertEqual(str(radiususergroup), radiususergroup.user_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusPostAuthenticationModelTest(TestCase):
 
     def test_string_representation(self):
         radiuspostauthentication = RadiusPostAuthentication(user_name='entry username')
         self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.user_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusGroupModelTest(TestCase):
 
     def test_string_representation(self):
         radiusgroup = RadiusGroup(group_name='entry groupname')
         self.assertEqual(str(radiusgroup), radiusgroup.group_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class RadiusGroupUsersModelTest(TestCase):
 
     def test_string_representation(self):
         radiusgroupusers = RadiusGroupUsers(user_name='entry groupname')
         self.assertEqual(str(radiusgroupusers), radiusgroupusers.user_name)
 
-
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class UserTest(TestCase):
 
     def setUp(self):
