@@ -72,7 +72,7 @@ except ImportError:
     pass
 
 
-if os.environ.get('SAMPLE_APP', True):
+if os.environ.get('SAMPLE_APP', False):
         INSTALLED_APPS.append('sample_radius')
         DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
         DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"

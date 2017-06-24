@@ -10,11 +10,12 @@ from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                       RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
-@skipIf(os.environ.get('SAMPLE_APP', True), 'Running tests on SAMPLE_APP')
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class UserTest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        super(UserTest, self).setUp()
 
     def test_users_not_login(self):
         resp = self.client.get('/admin/auth/')
