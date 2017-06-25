@@ -13,8 +13,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 DATABASES = {
-    'default': env.db(default='sqlite:///django-freeradius.db'),
-}
+
+     'default': env.db(default='sqlite:///django-freeradius.db'),
+     }
 
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
@@ -25,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'django_freeradius'
+    'django_freeradius',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -64,8 +65,22 @@ TEMPLATES = [
     },
 ]
 
-# local settings must be imported before test runner otherwise they'll be ignored
+#local settings must be imported before test runner otherwise they'll be ignored
 try:
     from local_settings import *
 except ImportError:
     pass
+
+
+if os.environ.get('SAMPLE_APP', False):
+        INSTALLED_APPS.append('sample_radius')
+        DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "sample_radius.RadiusReply"
+        DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "sample_radius.RadiusGroupReply"
+        DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "sample_radius.RadiusCheck"
+        DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
+        DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
+        DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
+        DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
+        DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
+        DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+        DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"

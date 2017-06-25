@@ -1,3 +1,6 @@
+import os
+from unittest import skipIf
+
 from django.test import TestCase
 
 from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
@@ -5,6 +8,7 @@ from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                       RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class NasModelTest(TestCase):
 
     def test_string_representation(self):
@@ -12,6 +16,7 @@ class NasModelTest(TestCase):
         self.assertEqual(str(nas), nas.nas_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusAccountingModelTest(TestCase):
 
     def test_string_representation(self):
@@ -19,6 +24,7 @@ class RadiusAccountingModelTest(TestCase):
         self.assertEqual(str(radiusaccounting), radiusaccounting.acct_unique_id)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusCheckModelTest(TestCase):
 
     def test_string_representation(self):
@@ -26,6 +32,7 @@ class RadiusCheckModelTest(TestCase):
         self.assertEqual(str(radiuscheck), radiuscheck.user_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusReplyModelTest(TestCase):
 
     def test_string_representation(self):
@@ -33,6 +40,7 @@ class RadiusReplyModelTest(TestCase):
         self.assertEqual(str(radiusreply), radiusreply.user_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusGroupReplyModelTest(TestCase):
 
     def test_string_representation(self):
@@ -40,6 +48,7 @@ class RadiusGroupReplyModelTest(TestCase):
         self.assertEqual(str(radiusgroupreply), radiusgroupreply.group_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusGroupCheckModelTest(TestCase):
 
     def test_string_representation(self):
@@ -47,6 +56,7 @@ class RadiusGroupCheckModelTest(TestCase):
         self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.group_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusUserGroupModelTest(TestCase):
 
     def test_string_representation(self):
@@ -54,6 +64,7 @@ class RadiusUserGroupModelTest(TestCase):
         self.assertEqual(str(radiususergroup), radiususergroup.user_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusPostAuthenticationModelTest(TestCase):
 
     def test_string_representation(self):
@@ -61,6 +72,7 @@ class RadiusPostAuthenticationModelTest(TestCase):
         self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.user_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusGroupModelTest(TestCase):
 
     def test_string_representation(self):
@@ -68,6 +80,7 @@ class RadiusGroupModelTest(TestCase):
         self.assertEqual(str(radiusgroup), radiusgroup.group_name)
 
 
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class RadiusGroupUsersModelTest(TestCase):
 
     def test_string_representation(self):

@@ -1,55 +1,63 @@
 from django.contrib import admin
 
+from .base.admin import (AbstractNasAdmin, AbstractRadiusAccountingAdmin,
+                         AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
+                         AbstractRadiusGroupCheckAdmin,
+                         AbstractRadiusGroupReplyAdmin,
+                         AbstractRadiusGroupUsersAdmin,
+                         AbstractRadiusPostAuthenticationAdmin,
+                         AbstractRadiusReplyAdmin,
+                         AbstractRadiusUserGroupAdmin)
 from .models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
 
 
 @admin.register(RadiusGroup)
-class RadiusGroupAdmin(admin.ModelAdmin):
-    pass
+class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
+    model = RadiusGroup
 
 
 @admin.register(RadiusGroupUsers)
-class RadiusGroupUsers(admin.ModelAdmin):
-    pass
+class RadiusGroupUsersAdmin(AbstractRadiusGroupUsersAdmin):
+    model = RadiusGroupUsers
 
 
 @admin.register(RadiusCheck)
-class RadiusCheck(admin.ModelAdmin):
-    pass
+class RadiusCheckAdmin(AbstractRadiusCheckAdmin):
+    model = RadiusCheck
 
 
 @admin.register(RadiusReply)
-class RadiusReply(admin.ModelAdmin):
-    pass
+class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
+    model = RadiusReply
 
 
 @admin.register(RadiusAccounting)
-class RadiusAccounting(admin.ModelAdmin):
-    pass
+class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
+    model = RadiusAccounting
 
 
 @admin.register(Nas)
-class Nas(admin.ModelAdmin):
-    pass
+class NasAdmin(AbstractNasAdmin):
+    model = Nas
 
 
 @admin.register(RadiusUserGroup)
-class RadiusUserGroup(admin.ModelAdmin):
-    pass
+class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
+    model = RadiusUserGroup
 
 
 @admin.register(RadiusGroupReply)
-class RadiusGroupReply(admin.ModelAdmin):
-    pass
+class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
+    model = RadiusGroupReply
 
 
 @admin.register(RadiusGroupCheck)
-class RadiusGroupCheck(admin.ModelAdmin):
-    pass
+class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
+    model = RadiusGroupCheck
 
 
 @admin.register(RadiusPostAuthentication)
-class RadiusPostAuthentication(admin.ModelAdmin):
-    pass
+class RadiusPostAuthenticationAdmin(AbstractRadiusPostAuthenticationAdmin):
+    model = RadiusPostAuthentication
