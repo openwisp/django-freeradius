@@ -3,9 +3,10 @@ from unittest import skipIf
 
 from django.test import TestCase
 
-from ..models import (Nas, RadiusAccounting, RadiusCheck, RadiusGroup,
-                      RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-                      RadiusPostAuthentication, RadiusReply, RadiusUserGroup)
+from ..models import (
+    Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
+    RadiusPostAuthentication, RadiusReply, RadiusUserGroup,
+)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
