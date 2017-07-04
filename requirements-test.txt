@@ -5,3 +5,4 @@ flake8
 django-environ
 mysqlclient
 psycopg2
+sphinx

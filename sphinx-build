@@ -1,0 +1,3 @@
+#!/bin/bash
+set -e
+sphinx-build -W -b html  docs/source  docs || exit 1
