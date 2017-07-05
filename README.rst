@@ -16,25 +16,22 @@ django-freeradius
 
 ------------
 
-TODO:
+Django-freeradius is part of the `OpenWISP project <http://openwrt.org>`_.
 
-------------
+.. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
+  :target: http://openwisp.org
+
+**django-freeradius** is Django reusable app that provides an admin interface to a `freeradius <http://freeradius.org/>`_ database.
 
 .. contents:: **Table of Contents**:
    :backlinks: none
    :depth: 3
 
-------------
-
-Current features
-----------------
-
-* TODO
-
 Project goals
 -------------
 
-* TODO
+* provide a web interface to manage a freeradius database.
+* provide abstract models and admin classes that can be imported, extended and reused in third party apps.
 
 Install stable version from pypi
 --------------------------------
@@ -143,42 +140,6 @@ Run tests with:
 
     ./runtests.py
 
-Settings
---------
-
-TODO
-
-Extending django-freeradius
----------------------------
-
-*django-freeradius* provides a set of models and admin classes which can be imported,
-extended and reused by third party apps.
-
-To extend *django-freeradius*, **you MUST NOT** add it to ``settings.INSTALLED_APPS``,
-but you must create your own app (which goes into ``settings.INSTALLED_APPS``), import the
-base classes from django-freeradius and add your customizations.
-
-Extending models
-~~~~~~~~~~~~~~~~
-
-This example provides an example of how to extend the base models of
-*django-freeradius* by adding a relation to another django model named `Organization`.
-
-.. code-block:: python
-
-    # TODO
-
-Extending the admin
-~~~~~~~~~~~~~~~~~~~
-
-Following the previous `Organization` example, you can avoid duplicating the admin
-code by importing the base admin classes and registering your models with.
-
-.. code-block:: python
-
-    # TODO
-
-
 Contributing
 ------------
 
@@ -194,17 +155,8 @@ Contributing
 
 .. _PEP8, Style Guide for Python Code: http://www.python.org/dev/peps/pep-0008/
 
-Changelog
----------
-
-See `CHANGES <https://github.com/openwisp/django-freeradius/blob/master/CHANGES.rst>`_.
-
-License
--------
-
-See `LICENSE <https://github.com/openwisp/django-freeradius/blob/master/LICENSE>`_.
-
-Support
--------
-
-See `OpenWISP Support Channels <http://openwisp.org/support.html>`_.
+`Documentation <https://github.com/openwisp/django-freeradius/tree/master/docs>`_ |
+`Change log <https://github.com/openwisp/django-freeradius/blob/master/CHANGES.rst>`_ |
+`Support channels <http://openwisp.org/support.html>`_ |
+`Issue Tracker <https://github.com/openwisp/django-freeradius/issues>`_ |
+`License <https://github.com/openwisp/django-freeradius/blob/master/LICENSE>`_
