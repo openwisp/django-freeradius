@@ -47,12 +47,6 @@ class AbstractRadiusGroup(TimeStampedEditableModel):
                                   db_column='groupname',
                                   db_index=True)
     priority = models.IntegerField(verbose_name=_('priority'), default=1)
-    creation_date = models.DateField(verbose_name=_('creation date'),
-                                     null=True,
-                                     db_column='created_at')
-    modification_date = models.DateField(verbose_name=_('modification date'),
-                                         null=True,
-                                         db_column='updated_at')
     notes = models.CharField(verbose_name=_('notes'),
                              max_length=64,
                              blank=True,

@@ -71,8 +71,7 @@ class UserTest(TestCase):
     def test_users_group(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusGroup.objects.create(
-            id='870df8e8-3107-4487-8316-81e089b8c2cf', group_name='students', priority='1',
-            creation_date='2017-09-02', modification_date='2017-08-03', notes='hh')
+            id='870df8e8-3107-4487-8316-81e089b8c2cf', group_name='students', priority='1', notes='hh')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:django_freeradius_radiusgroup_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
