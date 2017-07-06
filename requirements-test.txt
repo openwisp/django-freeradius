@@ -6,3 +6,4 @@ django-environ
 mysqlclient
 psycopg2
 sphinx
+sphinx_rtd_theme
