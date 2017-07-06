@@ -39,7 +39,7 @@ class TimeStampedEditableModel(models.Model):
 
 class AbstractRadiusGroup(TimeStampedEditableModel):
     id = models.UUIDField(primary_key=True, db_column='id')
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=255,
                                   unique=True,
                                   db_column='groupname',
@@ -58,8 +58,8 @@ class AbstractRadiusGroup(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radiusgroup'
-        verbose_name = _('radiusgroup')
-        verbose_name_plural = _('radiusgroups')
+        verbose_name = _('radius group')
+        verbose_name_plural = _('radius groups')
         abstract = True
 
     def __str__(self):
@@ -73,7 +73,7 @@ class AbstractRadiusGroupUsers(TimeStampedEditableModel):
                                  max_length=64,
                                  unique=True,
                                  db_column='username')
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=255,
                                   unique=True,
                                   db_column='groupname')
@@ -88,8 +88,8 @@ class AbstractRadiusGroupUsers(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radiusgroupusers'
-        verbose_name = _('radiusgroupusers')
-        verbose_name_plural = _('radiusgroupusers')
+        verbose_name = _('radius group users')
+        verbose_name_plural = _('radius group users')
         abstract = True
 
     def __str__(self):
@@ -110,8 +110,8 @@ class AbstractRadiusReply(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radreply'
-        verbose_name = _('radiusreply')
-        verbose_name_plural = _('radiusreplies')
+        verbose_name = _('radius reply')
+        verbose_name_plural = _('radius replies')
         abstract = True
 
     def __str__(self):
@@ -123,7 +123,7 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                                  max_length=64,
                                  db_column='username',
                                  db_index=True)
-    value = models.CharField(verbose_name=_('radiusvalue'), max_length=253)
+    value = models.CharField(verbose_name=_('value'), max_length=253)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
                           choices=RADOP_CHECK_TYPES,
@@ -133,8 +133,8 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radcheck'
-        verbose_name = _('radiuscheck')
-        verbose_name_plural = _('radiuschecks')
+        verbose_name = _('radius check')
+        verbose_name_plural = _('radius checks')
         abstract = True
 
     def __str__(self):
@@ -142,44 +142,50 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
 
 
 class AbstractRadiusAccounting(TimeStampedEditableModel):
-    rad_acct_id = models.BigIntegerField(primary_key=True, db_column='radacctid')
-    acct_session_id = models.CharField(max_length=64,
+    rad_acct_id = models.BigIntegerField(verbose_name=_('RADIUS accounting ID'),
+                                         primary_key=True,
+                                         db_column='radacctid')
+    acct_session_id = models.CharField(verbose_name=_('accounting session ID'),
+                                       max_length=64,
                                        db_column='acctsessionid',
                                        db_index=True)
-    acct_unique_id = models.CharField(max_length=32,
+    acct_unique_id = models.CharField(verbose_name=_('accounting unique ID'),
+                                      max_length=32,
                                       db_column='acctuniqueid',
                                       unique=True)
     user_name = models.CharField(verbose_name=_('username'),
                                  max_length=64,
                                  db_column='username',
                                  db_index=True)
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=64,
                                   db_column='groupname')
     realm = models.CharField(verbose_name=_('realm'),
                              max_length=64,
                              null=True)
-    nas_ip_address = models.CharField(max_length=15,
+    nas_ip_address = models.CharField(verbose_name=_('NAS IP address'),
+                                      max_length=15,
                                       db_column='nasipaddress',
                                       db_index=True)
-    nas_port_id = models.CharField(max_length=15,
+    nas_port_id = models.CharField(verbose_name=_('NAS port ID'),
+                                   max_length=15,
                                    null=True,
                                    db_column='nasportid')
-    nas_port_type = models.CharField(verbose_name=_('nas port type'),
+    nas_port_type = models.CharField(verbose_name=_('NAS port type'),
                                      max_length=32,
                                      db_column='nasporttype')
-    acct_start_time = models.DateTimeField(verbose_name=_('acct start time'),
+    acct_start_time = models.DateTimeField(verbose_name=_('Accounting start time'),
                                            db_column='acctstarttime',
                                            db_index=True)
-    acct_stop_time = models.DateTimeField(verbose_name=_('acct stop time'),
+    acct_stop_time = models.DateTimeField(verbose_name=_('Accounting stop time'),
                                           null=True,
                                           db_column='acctstoptime',
                                           db_index=True)
-    acct_session_time = models.IntegerField(verbose_name=_('acct session time'),
+    acct_session_time = models.IntegerField(verbose_name=_('Accounting session time'),
                                             null=True,
                                             db_column='acctsessiontime',
                                             db_index=True)
-    acct_authentic = models.CharField(verbose_name=_('acct authentic'),
+    acct_authentic = models.CharField(verbose_name=_('Accounting authentication'),
                                       max_length=32,
                                       null=True,
                                       db_column='acctauthentic')
@@ -191,17 +197,19 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
                                             max_length=50,
                                             null=True,
                                             db_column='connectinfo_stop')
-    acct_input_octets = models.BigIntegerField(verbose_name=_('acct input octets'),
+    acct_input_octets = models.BigIntegerField(verbose_name=_('accounting input octets'),
                                                null=True,
                                                db_column='acctinputoctets')
-    acct_output_octets = models.BigIntegerField(verbose_name=_('acct output octets'),
+    acct_output_octets = models.BigIntegerField(verbose_name=_('accounting output octets'),
                                                 null=True,
                                                 db_column='acctoutputoctets')
-    callingStationId = models.CharField(max_length=50,
+    callingStationId = models.CharField(verbose_name=_('calling station ID'),
+                                        max_length=50,
                                         db_column='calledstationid')
-    calledStationId = models.CharField(max_length=50,
+    calledStationId = models.CharField(verbose_name=_('called station ID'),
+                                       max_length=50,
                                        db_column='callingstationid')
-    acct_terminate_cause = models.CharField(verbose_name=_('acct terminate cause'),
+    acct_terminate_cause = models.CharField(verbose_name=_('accounting termination cause'),
                                             max_length=32,
                                             db_column='acctterminatecause')
     service_type = models.CharField(verbose_name=_('service type'),
@@ -212,13 +220,14 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
                                        max_length=32,
                                        null=True,
                                        db_column='framedprotocol')
-    framed_ip_address = models.CharField(max_length=15,
+    framed_ip_address = models.CharField(verbose_name=_('framed IP address'),
+                                         max_length=15,
                                          db_column='framedipaddress',
                                          db_index=True)
-    acct_start_delay = models.IntegerField(verbose_name=_('acct start delay'),
+    acct_start_delay = models.IntegerField(verbose_name=_('accounting start delay'),
                                            null=True,
                                            db_column='acctstartdelay')
-    acct_stop_delay = models.IntegerField(verbose_name=_('acct stop delay'),
+    acct_stop_delay = models.IntegerField(verbose_name=_('accounting stop delay'),
                                           null=True,
                                           db_column='acctstopdelay')
     xascend_session_svrkey = models.CharField(verbose_name=_('xascend session svrkey'),
@@ -237,7 +246,7 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
 
 
 class AbstractNas(TimeStampedEditableModel):
-    nas_name = models.CharField(verbose_name=_('nas name'),
+    nas_name = models.CharField(verbose_name=_('name'),
                                 max_length=128,
                                 unique=True,
                                 help_text=_('NAS Name (or IP address)'),
@@ -266,8 +275,8 @@ class AbstractNas(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'nas'
-        verbose_name = _('nas')
-        verbose_name_plural = _('nas')
+        verbose_name = _('NAS')
+        verbose_name_plural = _('NAS')
         abstract = True
 
     def __str__(self):
@@ -279,15 +288,15 @@ class AbstractRadiusUserGroup(TimeStampedEditableModel):
                                  max_length=64,
                                  db_column='username',
                                  db_index=True)
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=64,
                                   db_column='groupname')
     priority = models.IntegerField(verbose_name=_('priority'), default=1)
 
     class Meta:
         db_table = 'radusergroup'
-        verbose_name = _('radiususergroup')
-        verbose_name_plural = _('radiususergroup')
+        verbose_name = _('radius user group association')
+        verbose_name_plural = _('radius user group associations')
         abstract = True
 
     def __str__(self):
@@ -295,7 +304,7 @@ class AbstractRadiusUserGroup(TimeStampedEditableModel):
 
 
 class AbstractRadiusGroupReply(TimeStampedEditableModel):
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=64,
                                   db_column='groupname',
                                   db_index=True)
@@ -308,8 +317,8 @@ class AbstractRadiusGroupReply(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radgroupreply'
-        verbose_name = _('radiusgroupreply')
-        verbose_name_plural = _('radiusgroupreplies')
+        verbose_name = _('radius group reply')
+        verbose_name_plural = _('radius group replies')
         abstract = True
 
     def __str__(self):
@@ -317,7 +326,7 @@ class AbstractRadiusGroupReply(TimeStampedEditableModel):
 
 
 class AbstractRadiusGroupCheck(TimeStampedEditableModel):
-    group_name = models.CharField(verbose_name=_('groupname'),
+    group_name = models.CharField(verbose_name=_('group name'),
                                   max_length=64,
                                   db_column='groupname',
                                   db_index=True)
@@ -330,8 +339,8 @@ class AbstractRadiusGroupCheck(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radgroupcheck'
-        verbose_name = _('radiusgroupcheck')
-        verbose_name_plural = _('radiusgroupcheck')
+        verbose_name = _('radius group check')
+        verbose_name_plural = _('radius group checks')
         abstract = True
 
     def __str__(self):
@@ -353,8 +362,8 @@ class AbstractRadiusPostAuthentication(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radpostauth'
-        verbose_name = _('radiuspostauthentication')
-        verbose_name_plural = _('radiuspostauthentication')
+        verbose_name = _('radius post authentication log')
+        verbose_name_plural = _('radius post authentication logs')
         abstract = True
 
     def __str__(self):
