@@ -25,15 +25,14 @@ env:
 before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then ./sphinx-build; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then ./runisort; fi
+  - ./runisort
 
 install:
   - pip install $DJANGO
   - python setup.py -q develop
 
 before_script:
-  - ./runflake8
+  - ./runsphinx-build
   - mysql -e 'create database django_freeradus;'
   - psql -c 'create database django_freeradius;' -U postgres
 
