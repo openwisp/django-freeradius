@@ -47,5 +47,5 @@ class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusPostAuthenticationAdmin(TimeStampedEditableAdmin):
+class AbstractRadiusPostAuthenticationAdmin(ModelAdmin):
     pass
