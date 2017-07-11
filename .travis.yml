@@ -1,8 +1,5 @@
 language: python
 sudo: false
-services:
-  - mysql
-  - postgresql
 
 cache: pip
 
@@ -15,6 +12,7 @@ branches:
     - master
 
 env:
+ matrix:
   - DJANGO="django>=1.10,<1.11" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
   - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
   - DJANGO="django>=1.10,<1.11" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
@@ -33,8 +31,8 @@ install:
 
 before_script:
   - ./runsphinx-build
-  - mysql -e 'create database django_freeradus;'
-  - psql -c 'create database django_freeradius;' -U postgres
+  - if [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/freeradius_test' ]; then psql -c "create database freeradius_test;" -U postgres; fi
+  - if [ "$DATABASE_URL" == 'mysql://root@127.0.0.1/freeradius_test']; then mysql -e "create database IF NOT EXISTS freeradius_test;"; fi
 
 # command to run tests, e.g. python setup.py test
 script:
