@@ -352,7 +352,7 @@ class AbstractRadiusGroupCheck(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusPostAuthentication(TimeStampedEditableModel):
+class AbstractRadiusPostAuthentication(models.Model):
     user_name = models.CharField(verbose_name=_('username'),
                                  max_length=64,
                                  db_column='username')
