@@ -1,3 +1,4 @@
 django>=1.10,<1.12
 django-model-utils
 swapper
+djangorestframework>=3.3,<3.7
