@@ -10,80 +10,70 @@ from ..models import (
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class NasModelTest(TestCase):
-
+class TestNas(TestCase):
     def test_string_representation(self):
-        nas = Nas(nas_name='entry nasname')
-        self.assertEqual(str(nas), nas.nas_name)
+        nas = Nas(name='entry nasname')
+        self.assertEqual(str(nas), nas.name)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusAccountingModelTest(TestCase):
-
+class TestRadiusAccounting(TestCase):
     def test_string_representation(self):
         radiusaccounting = RadiusAccounting(acct_unique_id='entry acctuniqueid')
         self.assertEqual(str(radiusaccounting), radiusaccounting.acct_unique_id)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusCheckModelTest(TestCase):
-
+class TestRadiusCheck(TestCase):
     def test_string_representation(self):
-        radiuscheck = RadiusCheck(user_name='entry username')
-        self.assertEqual(str(radiuscheck), radiuscheck.user_name)
+        radiuscheck = RadiusCheck(username='entry username')
+        self.assertEqual(str(radiuscheck), radiuscheck.username)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusReplyModelTest(TestCase):
-
+class TestRadiusReply(TestCase):
     def test_string_representation(self):
-        radiusreply = RadiusReply(user_name='entry username')
-        self.assertEqual(str(radiusreply), radiusreply.user_name)
+        radiusreply = RadiusReply(username='entry username')
+        self.assertEqual(str(radiusreply), radiusreply.username)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusGroupReplyModelTest(TestCase):
-
+class TestRadiusGroupReply(TestCase):
     def test_string_representation(self):
-        radiusgroupreply = RadiusGroupReply(group_name='entry groupname')
-        self.assertEqual(str(radiusgroupreply), radiusgroupreply.group_name)
+        radiusgroupreply = RadiusGroupReply(groupname='entry groupname')
+        self.assertEqual(str(radiusgroupreply), radiusgroupreply.groupname)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusGroupCheckModelTest(TestCase):
-
+class TestRadiusGroupCheck(TestCase):
     def test_string_representation(self):
-        radiusgroupcheck = RadiusGroupCheck(group_name='entry groupname')
-        self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.group_name)
+        radiusgroupcheck = RadiusGroupCheck(groupname='entry groupname')
+        self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.groupname)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusUserGroupModelTest(TestCase):
-
+class TestRadiusUserGroup(TestCase):
     def test_string_representation(self):
-        radiususergroup = RadiusUserGroup(user_name='entry username')
-        self.assertEqual(str(radiususergroup), radiususergroup.user_name)
+        radiususergroup = RadiusUserGroup(username='entry username')
+        self.assertEqual(str(radiususergroup), radiususergroup.username)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusPostAuthenticationModelTest(TestCase):
-
+class TestRadiusPostAuthentication(TestCase):
     def test_string_representation(self):
-        radiuspostauthentication = RadiusPostAuthentication(user_name='entry username')
-        self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.user_name)
+        radiuspostauthentication = RadiusPostAuthentication(username='entry username')
+        self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.username)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusGroupModelTest(TestCase):
-
+class TestRadiusGroup(TestCase):
     def test_string_representation(self):
-        radiusgroup = RadiusGroup(group_name='entry groupname')
-        self.assertEqual(str(radiusgroup), radiusgroup.group_name)
+        radiusgroup = RadiusGroup(groupname='entry groupname')
+        self.assertEqual(str(radiusgroup), radiusgroup.groupname)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class RadiusGroupUsersModelTest(TestCase):
-
+class TestRadiusGroupUsersModel(TestCase):
     def test_string_representation(self):
-        radiusgroupusers = RadiusGroupUsers(user_name='entry groupname')
-        self.assertEqual(str(radiusgroupusers), radiusgroupusers.user_name)
+        radiusgroupusers = RadiusGroupUsers(username='entry groupname')
+        self.assertEqual(str(radiusgroupusers), radiusgroupusers.username)

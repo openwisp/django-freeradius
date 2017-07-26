@@ -19,92 +19,77 @@ RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class NasModelTest(TestCase):
-
+class TestNas(TestCase):
     def test_string_representation(self):
-        nas = Nas(nas_name='entry nasname')
-        self.assertEqual(str(nas), nas.nas_name)
+        nas = Nas(name='entry nasname')
+        self.assertEqual(str(nas), nas.name)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusAccountingModelTest(TestCase):
-
+class TestRadiusAccounting(TestCase):
     def test_string_representation(self):
         radiusaccounting = RadiusAccounting(acct_unique_id='entry acctuniqueid')
         self.assertEqual(str(radiusaccounting), radiusaccounting.acct_unique_id)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusCheckModelTest(TestCase):
-
+class TestRadiusCheckModelTest(TestCase):
     def test_string_representation(self):
-        radiuscheck = RadiusCheck(user_name='entry username')
-        self.assertEqual(str(radiuscheck), radiuscheck.user_name)
+        radiuscheck = RadiusCheck(username='entry username')
+        self.assertEqual(str(radiuscheck), radiuscheck.username)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusReplyModelTest(TestCase):
-
+class TestRadiusReplyModelTest(TestCase):
     def test_string_representation(self):
-        radiusreply = RadiusReply(user_name='entry username')
-        self.assertEqual(str(radiusreply), radiusreply.user_name)
+        radiusreply = RadiusReply(username='entry username')
+        self.assertEqual(str(radiusreply), radiusreply.username)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusGroupReplyModelTest(TestCase):
-
+class TestRadiusGroupReplyModelTest(TestCase):
     def test_string_representation(self):
-        radiusgroupreply = RadiusGroupReply(group_name='entry groupname')
-        self.assertEqual(str(radiusgroupreply), radiusgroupreply.group_name)
+        radiusgroupreply = RadiusGroupReply(groupname='entry groupname')
+        self.assertEqual(str(radiusgroupreply), radiusgroupreply.groupname)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusGroupCheckModelTest(TestCase):
-
+class TestRadiusGroupCheckModelTest(TestCase):
     def test_string_representation(self):
-        radiusgroupcheck = RadiusGroupCheck(group_name='entry groupname')
-        self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.group_name)
+        radiusgroupcheck = RadiusGroupCheck(groupname='entry groupname')
+        self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.groupname)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusUserGroupModelTest(TestCase):
-
+class TestRadiusUserGroupModelTest(TestCase):
     def test_string_representation(self):
-        radiususergroup = RadiusUserGroup(user_name='entry username')
-        self.assertEqual(str(radiususergroup), radiususergroup.user_name)
+        radiususergroup = RadiusUserGroup(username='entry username')
+        self.assertEqual(str(radiususergroup), radiususergroup.username)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusPostAuthenticationModelTest(TestCase):
-
+class TestRadiusPostAuthModelTest(TestCase):
     def test_string_representation(self):
-        radiuspostauthentication = RadiusPostAuthentication(user_name='entry username')
-        self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.user_name)
+        radiuspostauthentication = RadiusPostAuth(username='entry username')
+        self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.username)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusGroupModelTest(TestCase):
-
+class TestRadiusGroupModelTest(TestCase):
     def test_string_representation(self):
-        radiusgroup = RadiusGroup(group_name='entry groupname')
-        self.assertEqual(str(radiusgroup), radiusgroup.group_name)
+        radiusgroup = RadiusGroup(groupname='entry groupname')
+        self.assertEqual(str(radiusgroup), radiusgroup.groupname)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class RadiusGroupUsersModelTest(TestCase):
-
+class TestRadiusGroupUsersModelTest(TestCase):
     def test_string_representation(self):
-        radiusgroupusers = RadiusGroupUsers(user_name='entry groupname')
-        self.assertEqual(str(radiusgroupusers), radiusgroupusers.user_name)
+        radiusgroupusers = RadiusGroupUsers(username='entry groupname')
+        self.assertEqual(str(radiusgroupusers), radiusgroupusers.username)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class UserTest(TestCase):
-
-    def setUp(self):
-        self.client = Client()
-        super(UserTest, self).setUp()
-
+class TestAdmin(TestCase):
     def test_users_not_login(self):
         resp = self.client.get('/admin/auth/')
         self.assertEqual(resp.status_code, 302)
@@ -114,95 +99,100 @@ class UserTest(TestCase):
         resp = self.client.get('/admin/login/?next=/admin/')
         self.assertEqual(resp.status_code, 200)
 
-    def test_users_nas(self):
+    def test_radius_nas_change(self):
         User.objects.create_superuser(username='gino', password='cc', email='giggi_vv@gmail.it')
-        obj = Nas.objects.create(
-            nas_name='fiore', short_name='ff', type='cisco', secret='d', ports='22', community='vmv',
-            description='ciao', server='jsjs', details='nb')
+        obj = Nas.objects.create(name='fiore', short_name='ff', type='cisco',
+                                 secret='d', ports='22', community='vmv',
+                                 description='ciao', server='jsjs', details='nb')
         self.client.login(username='gino', password='cc')
         resp = self.client.get(reverse('admin:sample_radius_nas_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_check(self):
+    def test_radiuscheck_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        obj = RadiusCheck.objects.create(
-            user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob', details='nb')
+        obj = RadiusCheck.objects.create(username='bob', attribute='Cleartext-Password',
+                                         op=':=', value='passbob', details='nb')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_reply(self):
+    def test_radiusreply_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        obj = RadiusReply.objects.create(
-            user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob', details='nb')
+        obj = RadiusReply.objects.create(username='bob', attribute='Cleartext-Password',
+                                         op=':=', value='passbob', details='nb')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusreply_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group_reply(self):
+    def test_radiusgroupreply_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        obj = RadiusGroupReply.objects.create(
-            group_name='students', attribute='Cleartext-Password', op=':=', value='PPP', details='nb')
+        obj = RadiusGroupReply.objects.create(groupname='students', attribute='Cleartext-Password',
+                                              op=':=', value='PPP', details='nb')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusgroupreply_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group_check(self):
+    def test_radiusgroupcheck_change(self):
         User.objects.create_superuser(username='fiorella', password='ciao', email='giggi_fiore@gmail.it')
-        obj = RadiusGroupCheck.objects.create(
-            group_name='students', attribute='Cleartext-Password', op=':=', value='PPP', details='nb')
+        obj = RadiusGroupCheck.objects.create(groupname='students', attribute='Cleartext-Password',
+                                              op=':=', value='PPP', details='nb')
         self.client.login(username='fiorella', password='ciao')
         resp = self.client.get(reverse('admin:sample_radius_radiusgroupcheck_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group(self):
+    def test_radiusgroup_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        obj = RadiusGroup.objects.create(
-            id='870df8e8-3107-4487-8316-81e089b8c2cf', group_name='students', priority='1',
-            notes='hh', details='nb')
+        obj = RadiusGroup.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
+                                         groupname='students', priority='1',
+                                         notes='hh', details='nb')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusgroup_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_usersgroup(self):
+    def test_radiususergroup_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        obj = RadiusUserGroup.objects.create(
-            user_name='bob', group_name='students', priority='1', details='nb')
+        obj = RadiusUserGroup.objects.create(username='bob', groupname='students',
+                                             priority='1', details='nb')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiususergroup_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_groupusers(self):
+    def test_radiusgroupusers_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        reply = RadiusReply.objects.create(
-            user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob')
-        check = RadiusCheck.objects.create(
-            user_name='bob', attribute='Cleartext-Password', op=':=', value='passbob')
-        obj = RadiusGroupUsers.objects.create(
-            id='870df8e8-3107-4487-8316-81e089b8c2cf', user_name='bob', group_name='students')
+        reply = RadiusReply.objects.create(username='bob', attribute='Cleartext-Password',
+                                           op=':=', value='passbob')
+        check = RadiusCheck.objects.create(username='bob', attribute='Cleartext-Password',
+                                           op=':=', value='passbob')
+        obj = RadiusGroupUsers.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
+                                              username='bob', groupname='students')
         obj.radius_reply.add(reply)
         obj.radius_check.add(check)
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusgroupusers_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_accounting(self):
+    def test_radiusaccounting_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         ola = RadiusAccounting.objects.create(
-            acct_unique_id='-2', user_name='bob', nas_ip_address='ff',
+            acct_unique_id='-2', username='bob', nas_ip_address='ff',
             acct_start_time='2012-09-04 06:00:00.000000-01:00',
             acct_stop_time='2012-09-04 06:00:00.000000-08:00', acct_session_time='5', acct_authentic='kj',
             connection_info_start='f', connection_info_stop='hgh',
-            acct_input_octets='1', acct_output_octets='4', rad_acct_id='123', details='nb')
+            acct_input_octets='1', acct_output_octets='4', rad_acct_id='123', details='nb'
+        )
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusaccounting_change', args=[ola.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_postauthentication(self):
+    def test_radiuspostauth_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
+<<<<<<< HEAD
         olu = RadiusPostAuthentication.objects.create(
             user_name='gino', password='ciao', reply='ghdhd', auth_date='2017-09-02', details='nb')
+=======
+        olu = RadiusPostAuth.objects.create(username='gino', password='ciao', reply='ghdhd',
+                                            date='2017-09-02', details='nb')
+>>>>>>> 94dcaee... fixup in big change
         self.client.login(username='gino', password='cic')
-        resp = self.client.get(reverse(
-            'admin:sample_radius_radiuspostauthentication_change', args=[olu.pk]))
+        resp = self.client.get(reverse('admin:sample_radius_radiuspostauth_change', args=[olu.pk]))
         self.assertContains(resp, 'ok')

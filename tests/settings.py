@@ -81,5 +81,5 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
     DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
     DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
-    DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+    DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "sample_radius.RadiusPostAuth"
     DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"

@@ -8,51 +8,48 @@ from django_freeradius.models import (
 )
 
 
-class RadiusGroup(AbstractRadiusGroup):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class DetailsModel(models.Model):
+    details = models.CharField(verbose_name=_('details'), max_length=64, blank=True, null=True)
+
+    class Meta:
+        abstract = True
 
 
-class RadiusCheck(AbstractRadiusCheck):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusGroup(DetailsModel, AbstractRadiusGroup):
+    pass
 
 
-class RadiusAccounting(AbstractRadiusAccounting):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusCheck(DetailsModel, AbstractRadiusCheck):
+    pass
 
 
-class RadiusReply(AbstractRadiusReply):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusAccounting(DetailsModel, AbstractRadiusAccounting):
+    pass
 
 
-class RadiusGroupCheck(AbstractRadiusGroupCheck):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusReply(DetailsModel, AbstractRadiusReply):
+    pass
 
 
-class RadiusGroupReply(AbstractRadiusGroupReply):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusGroupCheck(DetailsModel, AbstractRadiusGroupCheck):
+    pass
 
 
-class RadiusPostAuthentication(AbstractRadiusPostAuthentication):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusGroupReply(DetailsModel, AbstractRadiusGroupReply):
+    pass
 
 
-class RadiusUserGroup(AbstractRadiusUserGroup):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusPostAuth(DetailsModel, AbstractRadiusPostAuth):
+    pass
 
 
-class Nas(AbstractNas):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class RadiusUserGroup(DetailsModel, AbstractRadiusUserGroup):
+    pass
 
 
-class RadiusGroupUsers(AbstractRadiusGroupUsers):
-    details = models.CharField(
-            verbose_name=_('details'), max_length=64, blank=True, null=True)
+class Nas(DetailsModel, AbstractNas):
+    pass
+
+
+class RadiusGroupUsers(DetailsModel, AbstractRadiusGroupUsers):
+    pass

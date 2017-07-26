@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 
-class UserTestCase(TestCase):
+class TestApi(TestCase):
     def test_users_authorize(self):
         User.objects.create_user(username='molly', password='barbar')
         response = self.client.post(reverse('freeradius:authorize'),
