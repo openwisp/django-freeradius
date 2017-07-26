@@ -2,8 +2,8 @@ from swapper import swappable_setting
 
 from .base.models import (
     AbstractNas, AbstractRadiusAccounting, AbstractRadiusCheck, AbstractRadiusGroup,
-    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers,
-    AbstractRadiusPostAuth, AbstractRadiusReply, AbstractRadiusUserGroup,
+    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers, AbstractRadiusPostAuth,
+    AbstractRadiusReply, AbstractRadiusUserGroup,
 )
 
 
