@@ -51,6 +51,8 @@ class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
 
 class AbstractRadiusPostAuthAdmin(ModelAdmin):
     list_display = ['username', 'reply', 'date']
+    list_filter = ['date']
+    search_fields = ['username', 'reply']
 
     if not settings.EDITABLE_POSTAUTH:
         readonly_fields = ['username', 'password', 'reply', 'date']
