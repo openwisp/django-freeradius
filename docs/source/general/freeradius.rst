@@ -1,125 +1,157 @@
-=============================================
-Installation and configuration of Freeradius
-=============================================
+==============================================
+Installation and configuration of Freeradius 3
+==============================================
 
-We will install freeradius 3.x.
+This guide explains how to install and configure `freeradius 3 <http://freeradius.org/version3.html>`_
+in order to make it work with `django-freeradius <https://github.com/openwisp/django-freeradius/>`_.
 
-For this it will be much easier if you become the root user.
+.. note::
+    The guide is written for debian based systems, other linux distributions can work as well but the
+    name of packages and files may be different.
 
-.. code-block:: shell
+How to install freeradius 3
+---------------------------
 
-   sudo su
-
-First, let's add the PPA repository for the Freeradius 3.x stable branch:
-
-.. code-block:: shell
-
-   apt-add-repository ppa:freeradius/stable-3.0
+First of all, become root:
 
 .. code-block:: shell
 
-   apt-get update
+    sudo su
 
-Now you can install freeradius with freeradius-postgres and freeradius-mysql modules:
+Let's add the PPA repository for the Freeradius 3.x stable branch:
 
 .. code-block:: shell
 
-   apt-get install freeradius freeradius-mysql freeradius-postgresql
+    apt-add-repository ppa:freeradius/stable-3.0
 
-Let's go to the file /etc/freeradius/mods-available/sql.
+.. code-block:: shell
 
-You have to change  driver, dialect, server, port, login, password, radius_db.
+    apt-get update
+
+Now you can install the packages we need:
+
+.. code-block:: shell
+
+    apt-get install freeradius freeradius-postgresql freeradius-rest
+
+Open the file ``/etc/freeradius/mods-available/sql``.
+
+You have to change  ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
 
 Example for configuration with postgresql::
 
-   driver = "rlm_sql_postgresql"
+    driver = "rlm_sql_postgresql"
+    dialect = "postgresql"
 
-   dialect = "postgresql"
+    # Connection info:
+    server = "localhost"
+    port = 5432
+    login = "<user>"
+    password = "<password>"
+    radius_db = "radius"
 
-   # Connection info:
-
-	  server = "localhost"
-	  #port = 3306
-	  login = "<user>"
-	  password = "<password>"
-
-   # Database table configuration for everything except Oracle
-
-   radius_db = "freeradius"
-
-Create softlink for modules that you want to add:
+Enable the ``sql`` and ``rest`` modules:
 
 .. code-block:: shell
 
-   cd mods-enabled/
+    cd mods-enabled/
+    ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
+    ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
 
-   ln -s ../mods-available/sql ./
-
-   ln -s ../mods-available/redis ./
-
-   ln -s ../mods-available/rediswho ./
-
-Launch freeradius in debug mode:
+Restart freeradius to load the new configuration:
 
 .. code-block:: shell
 
-   freeradius -X
+    service freeradius restart
 
-You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`
+You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_.
 
-==========================================
-Configure Freeradius to use a RESTful API.
-==========================================
+How to configure the REST module
+--------------------------------
 
-First we need to install the rest module (rml_rest):
+Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/rest``, substituting
+``<url>`` with your project's URL, (eg: ``http://127.0.0.1:8000``) ::
 
-.. code-block:: shell
+    # /etc/freeradius/mods-enabled/rest
 
-   apt-get install freeradius-rest
+    connect_uri = "<url>"
 
-To enable the module rlm_rest by symlinking, eg:
+    authorize {
+        uri = "${..connect_uri}/api/authorize/"
+        method = 'post'
+        body = 'json'
+        data = '{"username": "%{User-Name}", "password": "%{User-Password}"}'
+        tls = ${..tls}
+    }
 
-.. code-block:: shell
+    # this section can be left empty
+    authenticate {}
 
-   ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
+Configure the ``authorize`` and ``authenticate`` section in the default site
+(``/etc/freeradius/sites-enabled/default``) as follows::
 
-rml_rest module configuration
------------------------------
+    # /etc/freeradius/sites-enabled/default
 
-Example::
-
-   #/etc/freeradius/mods-enabled/rest
-
-   connect_uri = "http://127.0.0.1:8000"
-
-   authorize {
-    uri = "${..connect_uri}/api/authorize/"
-    method = 'post'
-    body = 'json'
-    data = '{"username": "%{User-Name}", "password": "%{User-Password}"}'
-    tls = ${..tls}
-
-   }
-
-   authenticate {
-    uri = "${..connect_uri}/api/authorize/"
-    method = 'post'
-    body = 'json'
-    data = '{"username": "%{User-Name}", "password": "%{User-Password}"}'
-    tls = ${..tls}
-
-   }
-
-Configure the default site::
-
-   #/etc/freeradius/sites-enabled/default:
-
-   authorize {
+    authorize {
        rest
-       # ... other configuration
-   }
+    }
 
-   authenticate {
-       rest
-       # ... other configuration
-   }
+    # this section can be left empty
+    authenticate {}
+
+Debugging
+---------
+
+In this section we will explain how to debug your freeradius instance.
+
+Start freeradius in debug mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When debugging we suggest you to open up a dedicated terminal window to run freeradius in debug mode:
+
+.. code-block:: shell
+
+    # we need to stop the main freeradius process first
+    service freeradius stop
+    # launch freeradius in debug mode
+    freeradius -X
+
+Testing authentication and authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can do this with ``radtest``:
+
+.. code-block:: shell
+
+    # radtest <username> <password> <host> 10 <secret>
+    radtest admin admin localhost 10 testing123
+
+A successful authentication will return similar output::
+
+    Sent Access-Request Id 215 from 0.0.0.0:34869 to 127.0.0.1:1812 length 75
+    	User-Name = "admin"
+    	User-Password = "admin"
+    	NAS-IP-Address = 127.0.0.1
+    	NAS-Port = 10
+    	Message-Authenticator = 0x00
+    	Cleartext-Password = "admin"
+    Received Access-Accept Id 215 from 127.0.0.1:1812 to 0.0.0.0:0 length 20
+
+While an unsuccessful one will look like the following::
+
+    Sent Access-Request Id 85 from 0.0.0.0:51665 to 127.0.0.1:1812 length 73
+    	User-Name = "foo"
+    	User-Password = "bar"
+    	NAS-IP-Address = 127.0.0.1
+    	NAS-Port = 10
+    	Message-Authenticator = 0x00
+    	Cleartext-Password = "bar"
+    Received Access-Reject Id 85 from 127.0.0.1:1812 to 0.0.0.0:0 length 20
+    (0) -: Expected Access-Accept got Access-Reject
+
+
+Customizing your configuration
+------------------------------
+
+You can customize your freeradius configuration and exploit the many features of freeradius but
+you will need to test how your changes play with *django-freeradius*.
