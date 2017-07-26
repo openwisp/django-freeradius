@@ -176,16 +176,16 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='RadiusPostAuthentication',
+            name='RadiusPostAuth',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('username', models.CharField(max_length=64, verbose_name='username')),
                 ('password', models.CharField(db_column='pass', max_length=64, verbose_name='password')),
                 ('reply', models.CharField(max_length=32, verbose_name='reply')),
-                ('authdate', models.DateTimeField(auto_now_add=True, verbose_name='date')),
+                ('date', models.DateTimeField(auto_now_add=True, db_column='authdate', verbose_name='date')),
             ],
             options={
-                'swappable': swapper.swappable_setting('django_freeradius', 'RadiusPostAuthentication'),
+                'swappable': swapper.swappable_setting('django_freeradius', 'RadiusPostAuth'),
                 'db_table': 'radpostauth',
                 'verbose_name_plural': 'radius post authentication logs',
                 'abstract': False,

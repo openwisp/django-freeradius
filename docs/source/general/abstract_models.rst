@@ -109,7 +109,7 @@ In your reusable models use import swapper  and  add to Meta class  swappable = 
                              AbstractRadiusCheck, AbstractRadiusGroup,
                              AbstractRadiusGroupCheck, AbstractRadiusGroupReply,
                              AbstractRadiusGroupUsers,
-                             AbstractRadiusPostAuthentication,
+                             AbstractRadiusPostAuth,
                              AbstractRadiusReply, AbstractRadiusUserGroup)
 
 
@@ -184,7 +184,7 @@ Example:
                                          AbstractRadiusCheck, AbstractRadiusGroup,
                                          AbstractRadiusGroupCheck, AbstractRadiusGroupReply,
                                          AbstractRadiusGroupUsers,
-                                         AbstractRadiusPostAuthentication,
+                                         AbstractRadiusPostAuth,
                                          AbstractRadiusReply, AbstractRadiusUserGroup)
 
 
@@ -212,7 +212,7 @@ Add swapper.load_model() to sample_radius/admin.py. Example:
                                         AbstractRadiusGroupCheckAdmin,
                                         AbstractRadiusGroupReplyAdmin,
                                         AbstractRadiusGroupUsersAdmin,
-                                        AbstractRadiusPostAuthenticationAdmin,
+                                        AbstractRadiusPostAuthAdmin,
                                         AbstractRadiusReplyAdmin,
                                         AbstractRadiusUserGroupAdmin)
 
@@ -222,7 +222,7 @@ Add swapper.load_model() to sample_radius/admin.py. Example:
    RadiusUserGroup = swapper.load_model("django_freeradius", "RadiusUserGroup")
    RadiusReply = swapper.load_model("django_freeradius", "RadiusReply")
    RadiusCheck = swapper.load_model("django_freeradius", "RadiusCheck")
-   RadiusPostAuthentication = swapper.load_model("django_freeradius", "RadiusPostAuthentication")
+   RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
    Nas = swapper.load_model("django_freeradius", "Nas")
    RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
    RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
@@ -253,5 +253,5 @@ Update the settings to trigger the swapper:
            DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
            DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
            DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
-           DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuthentication"
+           DJANGO_FREERADIUS_RADIUSPOSTAUTHENTICATION_MODEL = "sample_radius.RadiusPostAuth"
            DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"

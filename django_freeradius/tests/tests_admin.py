@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from ..models import (
     Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-    RadiusPostAuthentication, RadiusReply, RadiusUserGroup,
+    RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 
@@ -22,7 +22,7 @@ class TestAdmin(TestCase):
         resp = self.client.get('/admin/login/?next=/admin/')
         self.assertEqual(resp.status_code, 200)
 
-    def test_users_nas(self):
+    def test_nas_change(self):
         User.objects.create_superuser(username='gino', password='cc', email='giggi_vv@gmail.it')
         obj = Nas.objects.create(name='fiore', short_name='ff', type='cisco',
                                  secret='d', ports='22', community='vmv',
@@ -31,7 +31,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_nas_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_check(self):
+    def test_radiuscheck_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusCheck.objects.create(username='bob', attribute='Cleartext-Password',
                                          op=':=', value='passbob')
@@ -39,7 +39,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiuscheck_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_reply(self):
+    def test_radiusreply_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusReply.objects.create(username='bob', attribute='Cleartext-Password',
                                          op=':=', value='passbob')
@@ -47,7 +47,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusreply_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group_reply(self):
+    def test_radiusgroupreply_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusGroupReply.objects.create(groupname='students', attribute='Cleartext-Password',
                                               op=':=', value='PPP')
@@ -55,7 +55,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusgroupreply_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group_check(self):
+    def test_radiusgroupcheck_change(self):
         User.objects.create_superuser(username='fiorella', password='ciao', email='giggi_fiore@gmail.it')
         obj = RadiusGroupCheck.objects.create(groupname='students', attribute='Cleartext-Password',
                                               op=':=', value='PPP')
@@ -63,7 +63,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusgroupcheck_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_group(self):
+    def test_radiusgroup_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusGroup.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
                                          groupname='students', priority='1', notes='hh')
@@ -71,14 +71,14 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusgroup_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_usersgroup(self):
+    def test_radiususergroup_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusUserGroup.objects.create(username='bob', groupname='students', priority='1')
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:django_freeradius_radiususergroup_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_groupusers(self):
+    def test_radiusgroupusers_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         reply = RadiusReply.objects.create(username='bob', attribute='Cleartext-Password',
                                            op=':=', value='passbob')
@@ -92,7 +92,7 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusgroupusers_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_accounting(self):
+    def test_radiusaccounting_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         ola = RadiusAccounting.objects.create(
             acct_unique_id='-2', username='bob', nas_ip_address='ff', acct_start_time='2017-06-10 10:50:00',
@@ -104,10 +104,10 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:django_freeradius_radiusaccounting_change', args=[ola.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_users_postauthentication(self):
+    def test_postauth_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-        olu = RadiusPostAuthentication.objects.create(username='gino', password='ciao',
-                                                      reply='ghdhd', auth_date='2017-09-02')
+        olu = RadiusPostAuth.objects.create(username='gino', password='ciao',
+                                            reply='ghdhd', date='2017-09-02')
         self.client.login(username='gino', password='cic')
-        resp = self.client.get(reverse('admin:django_freeradius_radiuspostauthentication_change', args=[olu.pk]))
+        resp = self.client.get(reverse('admin:django_freeradius_radiuspostauth_change', args=[olu.pk]))
         self.assertContains(resp, 'ok')

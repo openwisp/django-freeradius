@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from ..models import (
     Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-    RadiusPostAuthentication, RadiusReply, RadiusUserGroup,
+    RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 
@@ -59,9 +59,9 @@ class TestRadiusUserGroup(TestCase):
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusPostAuthentication(TestCase):
+class TestRadiusPostAuth(TestCase):
     def test_string_representation(self):
-        radiuspostauthentication = RadiusPostAuthentication(username='entry username')
+        radiuspostauthentication = RadiusPostAuth(username='entry username')
         self.assertEqual(str(radiuspostauthentication), radiuspostauthentication.username)
 
 

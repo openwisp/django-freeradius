@@ -48,11 +48,11 @@ class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusPostAuthenticationAdmin(ModelAdmin):
-    list_display = ['username', 'reply', 'authdate']
+class AbstractRadiusPostAuthAdmin(ModelAdmin):
+    list_display = ['username', 'reply', 'date']
 
     if not settings.EDITABLE_POSTAUTH:
-        readonly_fields = ['username', 'password', 'reply', 'authdate']
+        readonly_fields = ['username', 'password', 'reply', 'date']
 
         def has_add_permission(self, request):
             return False

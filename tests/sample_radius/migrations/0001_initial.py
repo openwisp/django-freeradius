@@ -152,13 +152,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='RadiusPostAuthentication',
+            name='RadiusPostAuth',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('username', models.CharField(max_length=64, verbose_name='username')),
                 ('password', models.CharField(db_column='pass', max_length=64, verbose_name='password')),
                 ('reply', models.CharField(max_length=32, verbose_name='reply')),
-                ('date', models.DateTimeField(auto_now_add=True, db_column='authdate', verbose_name='date')),
+                ('date', models.DateTimeField(auto_now=True, db_column='authdate', verbose_name='authdate')),
                 ('details', models.CharField(blank=True, max_length=64, null=True, verbose_name='details')),
             ],
             options={

@@ -12,7 +12,7 @@ RadiusGroupUsers = swapper.load_model("django_freeradius", "RadiusGroupUsers")
 RadiusUserGroup = swapper.load_model("django_freeradius", "RadiusUserGroup")
 RadiusReply = swapper.load_model("django_freeradius", "RadiusReply")
 RadiusCheck = swapper.load_model("django_freeradius", "RadiusCheck")
-RadiusPostAuthentication = swapper.load_model("django_freeradius", "RadiusPostAuthentication")
+RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
@@ -186,13 +186,8 @@ class TestAdmin(TestCase):
 
     def test_radiuspostauth_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
-<<<<<<< HEAD
-        olu = RadiusPostAuthentication.objects.create(
-            user_name='gino', password='ciao', reply='ghdhd', auth_date='2017-09-02', details='nb')
-=======
         olu = RadiusPostAuth.objects.create(username='gino', password='ciao', reply='ghdhd',
                                             date='2017-09-02', details='nb')
->>>>>>> 94dcaee... fixup in big change
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiuspostauth_change', args=[olu.pk]))
         self.assertContains(resp, 'ok')

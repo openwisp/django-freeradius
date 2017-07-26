@@ -4,7 +4,7 @@ from django.contrib import admin
 from django_freeradius.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
     AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin, AbstractRadiusGroupUsersAdmin,
-    AbstractRadiusPostAuthenticationAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin,
+    AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin,
 )
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
@@ -13,7 +13,7 @@ RadiusGroupUsers = swapper.load_model("django_freeradius", "RadiusGroupUsers")
 RadiusUserGroup = swapper.load_model("django_freeradius", "RadiusUserGroup")
 RadiusReply = swapper.load_model("django_freeradius", "RadiusReply")
 RadiusCheck = swapper.load_model("django_freeradius", "RadiusCheck")
-RadiusPostAuthentication = swapper.load_model("django_freeradius", "RadiusPostAuthentication")
+RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
@@ -64,6 +64,6 @@ class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
     model = RadiusGroupCheck
 
 
-@admin.register(RadiusPostAuthentication)
-class RadiusPostAuthenticationAdmin(AbstractRadiusPostAuthenticationAdmin):
-    model = RadiusPostAuthentication
+@admin.register(RadiusPostAuth)
+class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
+    model = RadiusPostAuth

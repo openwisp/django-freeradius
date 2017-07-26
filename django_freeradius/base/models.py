@@ -341,7 +341,7 @@ class AbstractRadiusGroupCheck(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusPostAuthentication(models.Model):
+class AbstractRadiusPostAuth(models.Model):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64)
     password = models.CharField(verbose_name=_('password'),
@@ -349,8 +349,9 @@ class AbstractRadiusPostAuthentication(models.Model):
                                 db_column='pass')
     reply = models.CharField(verbose_name=_('reply'),
                              max_length=32)
-    authdate = models.DateTimeField(verbose_name=_('date'),
-                                    auto_now_add=True)
+    date = models.DateTimeField(verbose_name=_('date'),
+                                db_column='authdate',
+                                auto_now_add=True)
 
     class Meta:
         db_table = 'radpostauth'
