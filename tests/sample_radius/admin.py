@@ -21,49 +21,49 @@ RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 
 @admin.register(RadiusGroup)
 class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
-    model = RadiusGroup
+    pass
 
 
 @admin.register(RadiusGroupUsers)
 class RadiusGroupUsersAdmin(AbstractRadiusGroupUsersAdmin):
-    model = RadiusGroupUsers
+    pass
 
 
 @admin.register(RadiusCheck)
 class RadiusCheckAdmin(AbstractRadiusCheckAdmin):
-    model = RadiusCheck
+    pass
 
 
 @admin.register(RadiusReply)
 class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
-    model = RadiusReply
+    pass
 
 
 @admin.register(RadiusAccounting)
 class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
-    model = RadiusAccounting
+    pass
 
 
 @admin.register(Nas)
 class NasAdmin(AbstractNasAdmin):
-    model = Nas
+    pass
 
 
 @admin.register(RadiusUserGroup)
 class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
-    model = RadiusUserGroup
+    pass
 
 
 @admin.register(RadiusGroupReply)
 class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
-    model = RadiusGroupReply
+    pass
 
 
 @admin.register(RadiusGroupCheck)
 class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
-    model = RadiusGroupCheck
+    pass
 
 
 @admin.register(RadiusPostAuth)
 class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
-    model = RadiusPostAuth
+    pass
