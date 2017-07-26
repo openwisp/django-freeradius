@@ -34,7 +34,8 @@ class AbstractRadiusAccountingAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):
-    pass
+    search_fields = ['name', 'short_name', 'server']
+    list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
 
 
 class AbstractRadiusUserGroupAdmin(TimeStampedEditableAdmin):
