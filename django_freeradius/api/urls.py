@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     url(r'^authorize/$', views.authorize, name='authorize'),
+    url(r'^postauth/$', views.postauth, name='postauth'),
 ]

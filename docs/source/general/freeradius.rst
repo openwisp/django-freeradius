@@ -87,7 +87,15 @@ Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/res
     # this section can be left empty
     authenticate {}
 
-Configure the ``authorize`` and ``authenticate`` section in the default site
+    post-auth {
+        uri = "${..connect_uri}/api/postauth/"
+        method = 'post'
+        body = 'json'
+        data = '{"username": "%{User-Name}", "password": "%{User-Password}" , "reply": "%{reply:Packet-Type}"}'
+        tls = ${..tls}
+    }
+
+Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the default site
 (``/etc/freeradius/sites-enabled/default``) as follows::
 
     # /etc/freeradius/sites-enabled/default
@@ -98,6 +106,10 @@ Configure the ``authorize`` and ``authenticate`` section in the default site
 
     # this section can be left empty
     authenticate {}
+
+    post-auth {
+       rest
+    }
 
 Debugging
 ---------
