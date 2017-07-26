@@ -203,12 +203,12 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
     acct_output_octets = models.BigIntegerField(verbose_name=_('accounting output octets'),
                                                 null=True,
                                                 db_column='acctoutputoctets')
-    callingStationId = models.CharField(verbose_name=_('calling station ID'),
-                                        max_length=50,
-                                        db_column='calledstationid')
-    calledStationId = models.CharField(verbose_name=_('called station ID'),
-                                       max_length=50,
-                                       db_column='callingstationid')
+    calling_station_id = models.CharField(verbose_name=_('calling station ID'),
+                                          max_length=50,
+                                          db_column='calledstationid')
+    called_station_id = models.CharField(verbose_name=_('called station ID'),
+                                         max_length=50,
+                                         db_column='callingstationid')
     acct_terminate_cause = models.CharField(verbose_name=_('accounting termination cause'),
                                             max_length=32,
                                             db_column='acctterminatecause')
