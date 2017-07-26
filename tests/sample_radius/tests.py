@@ -178,7 +178,8 @@ class TestAdmin(TestCase):
             acct_start_time='2012-09-04 06:00:00.000000-01:00',
             acct_stop_time='2012-09-04 06:00:00.000000-08:00', acct_session_time='5', acct_authentic='kj',
             connection_info_start='f', connection_info_stop='hgh',
-            acct_input_octets='1', acct_output_octets='4', rad_acct_id='123', details='nb'
+            acct_input_octets='1', acct_output_octets='4', rad_acct_id='123', details='nb',
+            acct_update_time='2012-09-06 11:50'
         )
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiusaccounting_change', args=[ola.pk]))

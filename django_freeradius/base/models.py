@@ -227,6 +227,10 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
                                               max_length=10,
                                               null=True,
                                               db_column='xascendsessionsvrkey')
+    acct_update_time = models.DateTimeField(verbose_name=_('acct update time'),
+                                            null=True,
+                                            db_column='acctupdatetime',
+                                            db_index=True)
 
     class Meta:
         db_table = 'radacct'
