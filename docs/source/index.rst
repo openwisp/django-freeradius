@@ -25,6 +25,7 @@ Django-freeradius is part of the `OpenWISP project <http://openwrt.org>`_.
    :caption: Contents:
 
    /general/setup
+   /general/settings
    /general/freeradius
    /general/abstract_models
    /general/contributing

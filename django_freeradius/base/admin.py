@@ -1,4 +1,5 @@
 from django.contrib.admin import ModelAdmin
+from .. import settings
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
@@ -48,4 +49,18 @@ class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusPostAuthenticationAdmin(ModelAdmin):
-    pass
+    list_display = ['username', 'reply', 'authdate']
+
+    if not settings.EDITABLE_POSTAUTH:
+        readonly_fields = ['username', 'password', 'reply', 'authdate']
+
+        def has_add_permission(self, request):
+            return False
+
+        def change_view(self, request, object_id, extra_context=None):
+            extra_context = extra_context or {}
+            extra_context['show_save_and_continue'] = False
+            extra_context['show_save'] = False
+            return super(AbstractRadiusPostAuthAdmin, self).change_view(request,
+                                                                        object_id,
+                                                                        extra_context=extra_context)
