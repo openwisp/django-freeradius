@@ -149,6 +149,57 @@ While an unsuccessful one will look like the following::
     Received Access-Reject Id 85 from 127.0.0.1:1812 to 0.0.0.0:0 length 20
     (0) -: Expected Access-Accept got Access-Reject
 
+Testing accounting
+~~~~~~~~~~~~~~~~~~
+
+You can do this with ``radclient``, but first of all you will have to create a text file
+like the following one::
+
+    # /tmp/accounting.txt
+
+    Acct-Session-Id = "35000006"
+    User-Name = "jim"
+    NAS-IP-Address = 172.16.64.91
+    NAS-Port = 1
+    NAS-Port-Type = Async
+    Acct-Status-Type = Interim-Update
+    Acct-Authentic = RADIUS
+    Service-Type = Login-User
+    Login-Service = Telnet
+    Login-IP-Host = 172.16.64.25
+    Acct-Delay-Time = 0
+    Acct-Session-Time = 261
+    Acct-Input-Octets = 9900909
+    Acct-Output-Octets = 10101010101
+    Called-Station-Id = 00-27-22-F3-FA-F1:hostname
+    Calling-Station-Id = 5c:7d:c1:72:a7:3b
+
+Then you can call ``radclient``:
+
+.. code-block:: shell
+
+    radclient -f /tmp/accounting.txt -x 127.0.0.1 acct testing123
+
+You should get the following output::
+
+    Sent Accounting-Request Id 83 from 0.0.0.0:51698 to 127.0.0.1:1813 length 154
+    	Acct-Session-Id = "35000006"
+    	User-Name = "jim"
+    	NAS-IP-Address = 172.16.64.91
+    	NAS-Port = 1
+    	NAS-Port-Type = Async
+    	Acct-Status-Type = Interim-Update
+    	Acct-Authentic = RADIUS
+    	Service-Type = Login-User
+    	Login-Service = Telnet
+    	Login-IP-Host = 172.16.64.25
+    	Acct-Delay-Time = 0
+    	Acct-Session-Time = 261
+    	Acct-Input-Octets = 9900909
+    	Acct-Output-Octets = 1511075509
+    	Called-Station-Id = "00-27-22-F3-FA-F1:hostname"
+    	Calling-Station-Id = "5c:7d:c1:72:a7:3b"
+    Received Accounting-Response Id 83 from 127.0.0.1:1813 to 0.0.0.0:0 length 20
 
 Customizing your configuration
 ------------------------------
