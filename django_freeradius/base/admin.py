@@ -29,8 +29,12 @@ class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusAccountingAdmin(TimeStampedEditableAdmin):
-    pass
+class AbstractRadiusAccountingAdmin(ModelAdmin):
+    list_display = ('nas_ip_address', 'username', 'session_time',
+                    'input_octets', 'output_octets',
+                    'start_time', 'stop_time')
+    search_fields = ('unique_id', 'username', 'nas_ip_address')
+    list_filter = ('start_time', 'stop_time')
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):

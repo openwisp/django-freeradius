@@ -95,11 +95,10 @@ class TestAdmin(TestCase):
     def test_radiusaccounting_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         ola = RadiusAccounting.objects.create(
-            acct_unique_id='-2', username='bob', nas_ip_address='ff', acct_start_time='2017-06-10 10:50:00',
-            acct_stop_time='2017-06-10 11:50:00', acct_session_time='5', acct_authentic='kj',
+            unique_id='2', username='bob', nas_ip_address='127.0.0.1', start_time='2017-06-10 10:50:00',
+            stop_time='2017-06-10 11:50:00', session_time='5', authentication='RADIUS',
             connection_info_start='f', connection_info_stop='hgh',
-            acct_input_octets='1', acct_output_octets='4', rad_acct_id='123',
-            acct_update_time='2017-03-10 11:50:00'
+            input_octets='1', output_octets='4', update_time='2017-03-10 11:50:00'
         )
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:django_freeradius_radiusaccounting_change', args=[ola.pk]))

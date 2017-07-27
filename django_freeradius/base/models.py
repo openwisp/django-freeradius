@@ -136,101 +136,120 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusAccounting(TimeStampedEditableModel):
-    rad_acct_id = models.BigIntegerField(verbose_name=_('RADIUS accounting ID'),
-                                         primary_key=True,
-                                         db_column='radacctid')
-    acct_session_id = models.CharField(verbose_name=_('accounting session ID'),
-                                       max_length=64,
-                                       db_column='acctsessionid',
-                                       db_index=True)
-    acct_unique_id = models.CharField(verbose_name=_('accounting unique ID'),
-                                      max_length=32,
-                                      db_column='acctuniqueid',
-                                      unique=True)
+class AbstractRadiusAccounting(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='radacctid')
+    session_id = models.CharField(verbose_name=_('session ID'),
+                                  max_length=64,
+                                  db_column='acctsessionid',
+                                  db_index=True)
+    unique_id = models.CharField(verbose_name=_('accounting unique ID'),
+                                 max_length=32,
+                                 db_column='acctuniqueid',
+                                 unique=True)
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
-                                db_index=True)
+                                db_index=True,
+                                null=True,
+                                blank=True)
     groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=64)
+                                 max_length=64,
+                                 null=True,
+                                 blank=True)
     realm = models.CharField(verbose_name=_('realm'),
                              max_length=64,
-                             null=True)
-    nas_ip_address = models.CharField(verbose_name=_('NAS IP address'),
-                                      max_length=15,
-                                      db_column='nasipaddress',
-                                      db_index=True)
+                             null=True,
+                             blank=True)
+    nas_ip_address = models.GenericIPAddressField(verbose_name=_('NAS IP address'),
+                                                  db_column='nasipaddress',
+                                                  db_index=True)
     nas_port_id = models.CharField(verbose_name=_('NAS port ID'),
                                    max_length=15,
+                                   db_column='nasportid',
                                    null=True,
-                                   db_column='nasportid')
+                                   blank=True)
     nas_port_type = models.CharField(verbose_name=_('NAS port type'),
                                      max_length=32,
-                                     db_column='nasporttype')
-    acct_start_time = models.DateTimeField(verbose_name=_('Accounting start time'),
-                                           db_column='acctstarttime',
-                                           db_index=True)
-    acct_stop_time = models.DateTimeField(verbose_name=_('Accounting stop time'),
-                                          null=True,
-                                          db_column='acctstoptime',
-                                          db_index=True)
-    acct_session_time = models.IntegerField(verbose_name=_('Accounting session time'),
-                                            null=True,
-                                            db_column='acctsessiontime',
-                                            db_index=True)
-    acct_authentic = models.CharField(verbose_name=_('Accounting authentication'),
-                                      max_length=32,
+                                     db_column='nasporttype',
+                                     null=True,
+                                     blank=True)
+    start_time = models.DateTimeField(verbose_name=_('start time'),
+                                      db_column='acctstarttime',
+                                      db_index=True,
                                       null=True,
-                                      db_column='acctauthentic')
+                                      blank=True)
+    update_time = models.DateTimeField(verbose_name=_('update time'),
+                                       db_column='acctupdatetime',
+                                       null=True,
+                                       blank=True)
+    stop_time = models.DateTimeField(verbose_name=_('stop time'),
+                                     db_column='acctstoptime',
+                                     db_index=True,
+                                     null=True,
+                                     blank=True)
+    interval = models.IntegerField(verbose_name=_('interval'),
+                                   db_column='acctinterval',
+                                   null=True,
+                                   blank=True)
+    session_time = models.PositiveIntegerField(verbose_name=_('session time'),
+                                               db_column='acctsessiontime',
+                                               null=True,
+                                               blank=True)
+    authentication = models.CharField(verbose_name=_('authentication'),
+                                      max_length=32,
+                                      db_column='acctauthentic',
+                                      null=True,
+                                      blank=True)
     connection_info_start = models.CharField(verbose_name=_('connection info start'),
                                              max_length=50,
+                                             db_column='connectinfo_start',
                                              null=True,
-                                             db_column='connectinfo_start')
+                                             blank=True)
     connection_info_stop = models.CharField(verbose_name=_('connection info stop'),
                                             max_length=50,
+                                            db_column='connectinfo_stop',
                                             null=True,
-                                            db_column='connectinfo_stop')
-    acct_input_octets = models.BigIntegerField(verbose_name=_('accounting input octets'),
-                                               null=True,
-                                               db_column='acctinputoctets')
-    acct_output_octets = models.BigIntegerField(verbose_name=_('accounting output octets'),
-                                                null=True,
-                                                db_column='acctoutputoctets')
+                                            blank=True)
+    input_octets = models.BigIntegerField(verbose_name=_('input octets'),
+                                          db_column='acctinputoctets',
+                                          null=True,
+                                          blank=True)
+    output_octets = models.BigIntegerField(verbose_name=_('output octets'),
+                                           db_column='acctoutputoctets',
+                                           null=True,
+                                           blank=True)
     calling_station_id = models.CharField(verbose_name=_('calling station ID'),
                                           max_length=50,
-                                          db_column='calledstationid')
+                                          db_column='calledstationid',
+                                          blank=True,
+                                          null=True)
     called_station_id = models.CharField(verbose_name=_('called station ID'),
                                          max_length=50,
-                                         db_column='callingstationid')
-    acct_terminate_cause = models.CharField(verbose_name=_('accounting termination cause'),
-                                            max_length=32,
-                                            db_column='acctterminatecause')
+                                         db_column='callingstationid',
+                                         blank=True,
+                                         null=True)
+    terminate_cause = models.CharField(verbose_name=_('termination cause'),
+                                       max_length=32,
+                                       db_column='acctterminatecause',
+                                       blank=True,
+                                       null=True)
     service_type = models.CharField(verbose_name=_('service type'),
                                     max_length=32,
+                                    db_column='servicetype',
                                     null=True,
-                                    db_column='servicetype')
+                                    blank=True)
     framed_protocol = models.CharField(verbose_name=_('framed protocol'),
                                        max_length=32,
+                                       db_column='framedprotocol',
                                        null=True,
-                                       db_column='framedprotocol')
-    framed_ip_address = models.CharField(verbose_name=_('framed IP address'),
-                                         max_length=15,
-                                         db_column='framedipaddress',
-                                         db_index=True)
-    acct_start_delay = models.IntegerField(verbose_name=_('accounting start delay'),
-                                           null=True,
-                                           db_column='acctstartdelay')
-    acct_stop_delay = models.IntegerField(verbose_name=_('accounting stop delay'),
-                                          null=True,
-                                          db_column='acctstopdelay')
-    xascend_session_svrkey = models.CharField(verbose_name=_('xascend session svrkey'),
-                                              max_length=10,
-                                              null=True,
-                                              db_column='xascendsessionsvrkey')
-    acct_update_time = models.DateTimeField(verbose_name=_('acct update time'),
-                                            null=True,
-                                            db_column='acctupdatetime',
-                                            db_index=True)
+                                       blank=True)
+    framed_ip_address = models.GenericIPAddressField(verbose_name=_('framed IP address'),
+                                                     db_column='framedipaddress',
+                                                     db_index=True,
+                                                     # the default MySQL freeradius schema defines
+                                                     # this as NOT NULL but defaulting to empty string
+                                                     # but that wouldn't work on PostgreSQL
+                                                     null=True,
+                                                     blank=True)
 
     class Meta:
         db_table = 'radacct'
@@ -239,7 +258,7 @@ class AbstractRadiusAccounting(TimeStampedEditableModel):
         abstract = True
 
     def __str__(self):
-        return self.acct_unique_id
+        return self.unique_id
 
 
 @python_2_unicode_compatible
@@ -267,6 +286,7 @@ class AbstractNas(TimeStampedEditableModel):
     description = models.CharField(verbose_name=_('description'),
                                    max_length=200,
                                    null=True)
+    # verificare
     server = models.CharField(verbose_name=_('server'),
                               max_length=64,
                               null=True)
@@ -353,6 +373,7 @@ class AbstractRadiusPostAuth(models.Model):
                                 db_column='pass')
     reply = models.CharField(verbose_name=_('reply'),
                              max_length=32)
+    # calling...
     date = models.DateTimeField(verbose_name=_('date'),
                                 db_column='authdate',
                                 auto_now_add=True)

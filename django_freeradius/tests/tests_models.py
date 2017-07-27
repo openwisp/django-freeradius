@@ -19,8 +19,8 @@ class TestNas(TestCase):
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestRadiusAccounting(TestCase):
     def test_string_representation(self):
-        radiusaccounting = RadiusAccounting(acct_unique_id='entry acctuniqueid')
-        self.assertEqual(str(radiusaccounting), radiusaccounting.acct_unique_id)
+        radiusaccounting = RadiusAccounting(unique_id='entry acctuniqueid')
+        self.assertEqual(str(radiusaccounting), radiusaccounting.unique_id)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
