@@ -16,7 +16,7 @@ First of all, become root:
 
 .. code-block:: shell
 
-    sudo su
+    sudo -i
 
 Let's add the PPA repository for the Freeradius 3.x stable branch:
 
