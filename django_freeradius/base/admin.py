@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin
 
-from .. import settings
+from .. import settings as app_settings
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
@@ -11,6 +11,43 @@ class TimeStampedEditableAdmin(ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super(TimeStampedEditableAdmin, self).get_readonly_fields(request, obj)
         return readonly_fields + ('created', 'modified')
+
+
+class ReadOnlyAdmin(ModelAdmin):
+    """
+    Disables all editing capabilities
+    """
+    def __init__(self, *args, **kwargs):
+        super(ReadOnlyAdmin, self).__init__(*args, **kwargs)
+        self.readonly_fields = [f.name for f in self.model._meta.fields]
+
+    def get_actions(self, request):
+        actions = super(ReadOnlyAdmin, self).get_actions(request)
+        del actions["delete_selected"]
+        return actions
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        pass
+
+    def delete_model(self, request, obj):
+        pass
+
+    def save_related(self, request, form, formsets, change):
+        pass
+
+    def change_view(self, request, object_id, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save'] = False
+        return super(ReadOnlyAdmin, self).change_view(request,
+                                                      object_id,
+                                                      extra_context=extra_context)
 
 
 class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
@@ -29,7 +66,10 @@ class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusAccountingAdmin(ModelAdmin):
+BaseAccounting = ReadOnlyAdmin if not app_settings.EDITABLE_ACCOUNTING else ModelAdmin
+
+
+class AbstractRadiusAccountingAdmin(BaseAccounting):
     list_display = ('nas_ip_address', 'username', 'session_time',
                     'input_octets', 'output_octets',
                     'start_time', 'stop_time')
@@ -54,21 +94,10 @@ class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusPostAuthAdmin(ModelAdmin):
+BasePostAuth = ReadOnlyAdmin if not app_settings.EDITABLE_POSTAUTH else ModelAdmin
+
+
+class AbstractRadiusPostAuthAdmin(BasePostAuth):
     list_display = ['username', 'reply', 'date']
     list_filter = ['date']
     search_fields = ['username', 'reply']
-
-    if not settings.EDITABLE_POSTAUTH:
-        readonly_fields = ['username', 'password', 'reply', 'date']
-
-        def has_add_permission(self, request):
-            return False
-
-        def change_view(self, request, object_id, extra_context=None):
-            extra_context = extra_context or {}
-            extra_context['show_save_and_continue'] = False
-            extra_context['show_save'] = False
-            return super(AbstractRadiusPostAuthAdmin, self).change_view(request,
-                                                                        object_id,
-                                                                        extra_context=extra_context)
