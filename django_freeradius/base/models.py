@@ -250,6 +250,12 @@ class AbstractRadiusAccounting(models.Model):
                                                      # but that wouldn't work on PostgreSQL
                                                      null=True,
                                                      blank=True)
+    acct_start_delay = models.IntegerField(verbose_name=_('accounting start delay'),
+                                           null=True,
+                                           db_column='acctstartdelay')
+    acct_stop_delay = models.IntegerField(verbose_name=_('accounting stop delay'),
+                                          null=True,
+                                          db_column='acctstopdelay')
 
     class Meta:
         db_table = 'radacct'
