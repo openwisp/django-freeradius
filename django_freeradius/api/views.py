@@ -1,12 +1,13 @@
 import swapper
 from django.contrib.auth import get_user_model
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .serializers import RadiusPostAuthSerializer
+from .serializers import RadiusAccountingSerializer, RadiusPostAuthSerializer
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
+RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 User = get_user_model()
 
 
@@ -37,3 +38,34 @@ class PostAuthView(generics.CreateAPIView):
 
 
 postauth = PostAuthView.as_view()
+
+
+class AccountingView(generics.ListCreateAPIView, mixins.UpdateModelMixin):
+    queryset = RadiusAccounting.objects.all()
+    """
+    This implements list, create and update semantic, as freeradius will use post method
+    in both the latter cases
+    whether to create the object or update an existing one, will depend whether an object
+    with the same unique_id already exists or not
+    """
+    serializer_class = RadiusAccountingSerializer
+
+    def get_object(self):
+        try:
+            queryset = RadiusAccounting.objects.all()
+            return queryset.get(unique_id=self.request.data.get('unique_id'))
+        except RadiusAccounting.MultipleObjectsReturned:
+            return queryset.filter(unique_id=self.request.data.get('unique_id')).first()
+        except RadiusAccounting.DoesNotExist:
+            return None
+
+    def post(self, request, *args, **kwargs):
+        if self.get_object() is None:
+            response = self.create(request, *args, **kwargs)
+            return response
+        else:
+            response = self.update(request, *args, **kwargs)
+            return response
+
+
+accounting = AccountingView.as_view()
