@@ -370,10 +370,20 @@ class AbstractRadiusPostAuth(models.Model):
                                 max_length=64)
     password = models.CharField(verbose_name=_('password'),
                                 max_length=64,
-                                db_column='pass')
+                                db_column='pass',
+                                blank=True)
     reply = models.CharField(verbose_name=_('reply'),
                              max_length=32)
-    # calling...
+    called_station_id = models.CharField(verbose_name=_('called station ID'),
+                                         max_length=50,
+                                         db_column='calledstationid',
+                                         blank=True,
+                                         null=True)
+    calling_station_id = models.CharField(verbose_name=_('calling station ID'),
+                                          max_length=50,
+                                          db_column='callingstationid',
+                                          blank=True,
+                                          null=True)
     date = models.DateTimeField(verbose_name=_('date'),
                                 db_column='authdate',
                                 auto_now_add=True)

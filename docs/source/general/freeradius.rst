@@ -91,7 +91,7 @@ Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/res
         uri = "${..connect_uri}/api/postauth/"
         method = 'post'
         body = 'json'
-        data = '{"username": "%{User-Name}", "password": "%{User-Password}" , "reply": "%{reply:Packet-Type}"}'
+        data = '{"username": "%{User-Name}", "password": "%{User-Password}", "reply": "%{reply:Packet-Type}", "called_station_id": "%{Called-Station-ID}", "calling_station_id": "%{Calling-Station-ID}"}'
         tls = ${..tls}
     }
 
@@ -109,6 +109,10 @@ Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the de
 
     post-auth {
        rest
+
+       Post-Auth-Type REJECT {
+            rest
+        }
     }
 
 Debugging
@@ -160,6 +164,19 @@ While an unsuccessful one will look like the following::
     	Cleartext-Password = "bar"
     Received Access-Reject Id 85 from 127.0.0.1:1812 to 0.0.0.0:0 length 20
     (0) -: Expected Access-Accept got Access-Reject
+
+Alternatively, you can use ``radclient`` which allows more complex tests; in the following
+example we show how to test an authentication request which includes ``Called-Station-ID``
+and ``Calling-Station-ID``:
+
+.. code-block:: shell
+
+    user="foo"
+    pass="bar"
+    called="00-11-22-33-44-55:localhost"
+    calling="00:11:22:33:44:55"
+    request="User-Name=$user,User-Password=$pass,Called-Station-ID=$called,Calling-Station-ID=$calling"
+    echo $request | radclient localhost auth testing123
 
 Testing accounting
 ~~~~~~~~~~~~~~~~~~

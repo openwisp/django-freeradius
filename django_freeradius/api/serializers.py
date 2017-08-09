@@ -5,7 +5,9 @@ RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 
 
 class RadiusPostAuthSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=False)
+    password = serializers.CharField(required=False, allow_blank=True)
+    called_station_id = serializers.CharField(required=False, allow_blank=True)
+    calling_station_id = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, data):
         # do not save correct passwords in clear text
@@ -15,4 +17,6 @@ class RadiusPostAuthSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RadiusPostAuth
-        fields = ('username', 'password', 'reply')
+        fields = ['username', 'password', 'reply',
+                  'called_station_id',
+                  'calling_station_id']

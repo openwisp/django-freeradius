@@ -20,15 +20,18 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
 
-    def test_postauth_accept(self):
+    def test_postauth_accept_201(self):
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
-        params = {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept'}
+        params = {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept',
+                  'called_station_id': '00-11-22-33-44-55:hostname',
+                  'calling_station_id': '00:26:b9:20:5f:10'}
         response = self.client.post(reverse('freeradius:postauth'), params)
-        self.assertEqual(RadiusPostAuth.objects.filter(username='molly', password='').count(), 1)
+        params['password'] = ''
+        self.assertEqual(RadiusPostAuth.objects.filter(**params).count(), 1)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
 
-    def test_postauth_reject(self):
+    def test_postauth_reject_201(self):
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
         params = {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject'}
         response = self.client.post(reverse('freeradius:postauth'), params)
@@ -36,7 +39,16 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
 
-    def test_postauth_reject_400(self):
+    def test_postauth_reject_201_empty_fields(self):
+        params = {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject',
+                  'called_station_id': '',
+                  'calling_station_id': ''}
+        response = self.client.post(reverse('freeradius:postauth'), params)
+        self.assertEqual(RadiusPostAuth.objects.filter(**params).count(), 1)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+
+    def test_postauth_400(self):
         response = self.client.post(reverse('freeradius:postauth'), {})
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
         self.assertEqual(response.status_code, 400)
