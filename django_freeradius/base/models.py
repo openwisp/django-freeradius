@@ -217,16 +217,16 @@ class AbstractRadiusAccounting(models.Model):
                                            db_column='acctoutputoctets',
                                            null=True,
                                            blank=True)
-    calling_station_id = models.CharField(verbose_name=_('calling station ID'),
-                                          max_length=50,
-                                          db_column='calledstationid',
-                                          blank=True,
-                                          null=True)
     called_station_id = models.CharField(verbose_name=_('called station ID'),
                                          max_length=50,
-                                         db_column='callingstationid',
+                                         db_column='calledstationid',
                                          blank=True,
                                          null=True)
+    calling_station_id = models.CharField(verbose_name=_('calling station ID'),
+                                          max_length=50,
+                                          db_column='callingstationid',
+                                          blank=True,
+                                          null=True)
     terminate_cause = models.CharField(verbose_name=_('termination cause'),
                                        max_length=32,
                                        db_column='acctterminatecause',
