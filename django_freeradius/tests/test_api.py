@@ -21,19 +21,22 @@ class TestApi(TestCase):
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
 
     def test_postauth_accept(self):
-        RadiusPostAuth.objects.all().count()
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
-        response = self.client.post(reverse('freeradius:postauth'),
-                                    {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept'})
+        params = {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept'}
+        response = self.client.post(reverse('freeradius:postauth'), params)
         self.assertEqual(RadiusPostAuth.objects.filter(username='molly', password='').count(), 1)
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.data, {''})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
 
     def test_postauth_reject(self):
-        RadiusPostAuth.objects.all().count()
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
-        response = self.client.post(reverse('freeradius:postauth'),
-                                    {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject'})
+        params = {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject'}
+        response = self.client.post(reverse('freeradius:postauth'), params)
         self.assertEqual(RadiusPostAuth.objects.filter(username='molly', password='barba').count(), 1)
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.data, {''})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+
+    def test_postauth_reject_400(self):
+        response = self.client.post(reverse('freeradius:postauth'), {})
+        self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
+        self.assertEqual(response.status_code, 400)

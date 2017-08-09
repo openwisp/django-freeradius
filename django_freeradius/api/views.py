@@ -1,10 +1,12 @@
 import swapper
 from django.contrib.auth import get_user_model
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
+from .serializers import RadiusPostAuthSerializer
 
+RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 User = get_user_model()
 
 
@@ -21,15 +23,17 @@ def authorize(request):
     return Response({'control:Auth-Type': 'Reject'}, status=401)
 
 
-@api_view(['POST'])
-def postauth(request):
-    try:
-        username = request.data.get('username')
-        password = request.data.get('password')
-        reply = request.data.get('reply')
-        if reply == 'Access-Accept':
-            password = ''
-        RadiusPostAuth.objects.create(username=username, password=password, reply=reply)
-        return Response({''}, status=204)
-    except:  # pragma: no cover
-        return Response({''}, status=500)
+class PostAuthView(generics.CreateAPIView):
+    serializer_class = RadiusPostAuthSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Sets the response data to None in order to instruct
+        FreeRADIUS to avoid processing the response body
+        """
+        response = self.create(request, *args, **kwargs)
+        response.data = None
+        return response
+
+
+postauth = PostAuthView.as_view()
