@@ -19,9 +19,7 @@ class RadiusPostAuthSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RadiusPostAuth
-        fields = ['username', 'password', 'reply',
-                  'called_station_id',
-                  'calling_station_id']
+        fields = '__all__'
 
 
 class RadiusAccountingSerializer(serializers.ModelSerializer):
