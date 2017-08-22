@@ -27,9 +27,9 @@ class RadiusAccountingSerializer(serializers.ModelSerializer):
     session_time = serializers.IntegerField(required=False, default=0)
     stop_time = serializers.DateTimeField(required=False)
     update_time = serializers.DateTimeField(required=False)
-    # this is needed otherwise serialize will ignore acct_status_type from accounting packet
+    # this is needed otherwise serialize will ignore status_type from accounting packet
     # as it's not a model field
-    acct_status_type = serializers.CharField(write_only=True)
+    status_type = serializers.CharField(write_only=True)
 
     def validate(self, data):
         """
@@ -41,14 +41,14 @@ class RadiusAccountingSerializer(serializers.ModelSerializer):
         :return: Dict accounting packet
         """
         time = timezone.now()
-        if data['acct_status_type'] == 'Interim-Update':
+        status_type = data.pop('status_type')
+        if status_type == 'Interim-Update':
             data['update_time'] = time
-        if data['acct_status_type'] == 'Stop':
+        if status_type == 'Stop':
             data['update_time'] = time
             data['stop_time'] = time
-        if data['session_time'] is None:
+        if status_type is None:
             data['session_time'] = (time - data['start_time']).seconds
-        del data['acct_status_type']
         return data
 
     class Meta:
