@@ -265,31 +265,33 @@ class AbstractRadiusAccounting(models.Model):
 class AbstractNas(TimeStampedEditableModel):
     name = models.CharField(verbose_name=_('name'),
                             max_length=128,
-                            unique=True,
                             help_text=_('NAS Name (or IP address)'),
                             db_index=True,
                             db_column='nasname')
     short_name = models.CharField(verbose_name=_('short name'),
                                   max_length=32,
                                   db_column='shortname')
-    type = models.CharField(verbose_name=_('type'), max_length=30)
+    type = models.CharField(verbose_name=_('type'),
+                            max_length=30,
+                            default='other')
+    ports = models.PositiveIntegerField(verbose_name=_('ports'),
+                                        blank=True,
+                                        null=True)
     secret = models.CharField(verbose_name=_('secret'),
                               max_length=60,
                               help_text=_('Shared Secret'))
-    ports = models.IntegerField(verbose_name=_('ports'),
-                                blank=True,
-                                null=True)
+    server = models.CharField(verbose_name=_('server'),
+                              max_length=64,
+                              blank=True,
+                              null=True)
     community = models.CharField(verbose_name=_('community'),
                                  max_length=50,
                                  blank=True,
                                  null=True)
     description = models.CharField(verbose_name=_('description'),
                                    max_length=200,
-                                   null=True)
-    # verificare
-    server = models.CharField(verbose_name=_('server'),
-                              max_length=64,
-                              null=True)
+                                   null=True,
+                                   blank=True)
 
     class Meta:
         db_table = 'nas'
