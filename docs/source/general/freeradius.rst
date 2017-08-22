@@ -99,7 +99,7 @@ Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/res
         uri = "${..connect_uri}/api/accounting/"
         method = 'post'
         body = 'json'
-        data = '{"username": "%{User-Name}", "nas_ip_address": "%{NAS-IP-Address}", "nas_port_id": "%{NAS-Port}",  "called_station_id": "%{Called-Station-Id}", "calling_station_id": "%{Calling-Station-Id}",  "nas_identifier": "%{NAS-Identifier}", "acct_status_type": "%{Acct-Status-Type}", "authentication": "%{Acct-Authentic}", "acct_delay_time": "%{Acct-Delay-Time}", "unique_id": "%{Acct-Unique-Session-Id}", "terminate_cause": "%{Acct-Terminate-Cause}",  "input_octets": "%{Acct-Input-Octets}", "output_octets": "%{Acct-Output-Octets}",  "nas_port_type": "%{NAS-Port-Type}", "session_time": "%{Acct-Session-Time}", "login_service": "%{Login-Service}", "login_ip_host": "%{Login-IP-Host}", "session_id": "%{Acct-Session-Id}", "framed_protocol": "%{Framed-Protocol}", "framed_ip_address": "%{Framed-IP-Address}", "service_type": "%{Service-Type}", "realm": "%{Realm}",  "authentication": "%{Acct-Authentic}"}'
+        data = '{"status_type": "%{Acct-Status-Type}", "session_id": "%{Acct-Session-Id}", "unique_id": "%{Acct-Unique-Session-Id}", "username": "%{User-Name}", "realm": "%{Realm}", "nas_ip_address": "%{NAS-IP-Address}", "nas_port_id": "%{NAS-Port}", "nas_port_type": "%{NAS-Port-Type}", "session_time": "%{Acct-Session-Time}", "authentication": "%{Acct-Authentic}", "input_octets": "%{Acct-Input-Octets}", "output_octets": "%{Acct-Output-Octets}", "called_station_id": "%{Called-Station-Id}", "calling_station_id": "%{Calling-Station-Id}", "terminate_cause": "%{Acct-Terminate-Cause}", "service_type": "%{Service-Type}", "framed_protocol": "%{Framed-Protocol}", "framed_ip_address": "%{Framed-IP-Address}"}'
         tls = ${..tls}
     }
 
@@ -130,9 +130,9 @@ Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the de
     For accounting configuration you need to verify that in pre-accounting we have:
 
     preacct {
-    #...
-     acct_unique
-    #...
+        # ...
+        acct_unique
+        # ...
     }
 
 Debugging
