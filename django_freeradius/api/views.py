@@ -60,12 +60,10 @@ class AccountingView(generics.ListCreateAPIView, mixins.UpdateModelMixin):
             return None
 
     def post(self, request, *args, **kwargs):
-        if self.get_object() is None:
-            response = self.create(request, *args, **kwargs)
-            return response
-        else:
-            response = self.update(request, *args, **kwargs)
-            return response
+        method = 'create' if self.get_object() is None else 'update'
+        response = getattr(self, method)(request, *args, **kwargs)
+        response.data = None
+        return response
 
 
 accounting = AccountingView.as_view()

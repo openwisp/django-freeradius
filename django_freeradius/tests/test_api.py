@@ -86,6 +86,7 @@ class TestApi(TestCase):
                 'service_type': 'Login-User', 'Realm': ''}
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
 
     def test_accounting_start_201(self):
@@ -104,6 +105,7 @@ class TestApi(TestCase):
                 'service_type': 'Login-User', 'Realm': ''}
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
 
     @freeze_time("2017-08-08 15:16:10+0200")
@@ -135,10 +137,9 @@ class TestApi(TestCase):
                 'login_ip_host': '172.16.64.25', 'session_id': '35000006',
                 'framed_protocol': '', 'framed_ip_address': '',
                 'service_type': 'Login-User', 'Realm': ''}
-
-        # sending an accounting packet
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
         ra.refresh_from_db()
         self.assertEqual(RadiusAccounting.objects.count(), 1)
         self.assertEqual(ra.output_octets, 1511074444)
@@ -179,6 +180,7 @@ class TestApi(TestCase):
                 'service_type': 'Login-User', 'Realm': ''}
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
         ra.refresh_from_db()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
