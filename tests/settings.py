@@ -65,11 +65,27 @@ TEMPLATES = [
     },
 ]
 
-# local settings must be imported before test runner otherwise they'll be ignored
-try:
-    from local_settings import *
-except ImportError:
-    pass
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        }
+    }
+}
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.append('sample_radius')
@@ -83,3 +99,9 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "sample_radius.RadiusPostAuth"
     DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
+
+# local settings must be imported before test runner otherwise they'll be ignored
+try:
+    from local_settings import *
+except ImportError:
+    pass
