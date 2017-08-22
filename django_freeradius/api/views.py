@@ -54,8 +54,6 @@ class AccountingView(generics.ListCreateAPIView, mixins.UpdateModelMixin):
         try:
             queryset = RadiusAccounting.objects.all()
             return queryset.get(unique_id=self.request.data.get('unique_id'))
-        except RadiusAccounting.MultipleObjectsReturned:
-            return queryset.filter(unique_id=self.request.data.get('unique_id')).first()
         except RadiusAccounting.DoesNotExist:
             return None
 
