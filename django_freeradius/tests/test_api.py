@@ -88,6 +88,9 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
+        ra.refresh_from_db()
+        self.assertEqual(ra.output_octets, 1511074444)
+        self.assertEqual(ra.input_octets, 1111909)
 
     def test_accounting_start_201(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
