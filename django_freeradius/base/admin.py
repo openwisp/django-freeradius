@@ -32,13 +32,13 @@ class ReadOnlyAdmin(ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # pragma: nocover
         pass
 
-    def delete_model(self, request, obj):
+    def delete_model(self, request, obj):  # pragma: nocover
         pass
 
-    def save_related(self, request, form, formsets, change):
+    def save_related(self, request, form, formsets, change):  # pragma: nocover
         pass
 
     def change_view(self, request, object_id, extra_context=None):

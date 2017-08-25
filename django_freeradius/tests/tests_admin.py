@@ -9,6 +9,7 @@ from ..models import (
     Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
     RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
+from .. import settings
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
@@ -103,6 +104,15 @@ class TestAdmin(TestCase):
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:django_freeradius_radiusaccounting_change', args=[ola.pk]))
         self.assertContains(resp, 'ok')
+
+    def test_radiusaccounting_changelist(self):
+        User.objects.create_superuser(username='gino', password='cc', email='giggi_vv@gmail.it')
+        self.client.login(username='gino', password='cc')
+        original_value = settings.EDITABLE_ACCOUNTING
+        settings.EDITABLE_ACCOUNTING = False
+        response = self.client.get(reverse('admin:django_freeradius_radiusaccounting_changelist'))
+        self.assertNotContains(response, 'Add accounting')
+        settings.EDITABLE_ACCOUNTING = original_value
 
     def test_postauth_change(self):
         User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
