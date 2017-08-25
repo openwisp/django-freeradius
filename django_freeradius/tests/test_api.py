@@ -7,6 +7,7 @@ from freezegun import freeze_time
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
+START_DATE = '2017-08-08 15:16:10+0200'
 
 
 class TestApi(TestCase):
@@ -56,131 +57,95 @@ class TestApi(TestCase):
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
         self.assertEqual(response.status_code, 400)
 
+    @property
+    def acct_post_data(self):
+        """ returns a copy of self._acct_data """
+        data = self._acct_initial_data.copy()
+        del data['start_time']
+        data.update(self._acct_post_data.copy())
+        return data
+
+    _acct_initial_data = {
+        'unique_id': '75058e50',
+        'session_id': '35000006',
+        'nas_ip_address': '172.16.64.91',
+        'session_time': 0,
+        'input_octets': 0,
+        'output_octets': 0,
+        'start_time': START_DATE,
+    }
+
+    _acct_post_data = {
+        'username': 'admin',
+        'realm': '',
+        'nas_port_id': '1',
+        'nas_port_type': 'Async',
+        'session_time': 261,
+        'authentication': 'RADIUS',
+        'input_octets': 1111909,
+        'output_octets': 1511074444,
+        'called_station_id': '00-27-22-F3-FA-F1:hostname',
+        'calling_station_id': '5c:7d:c1:72:a7:3b',
+        'terminate_cause': 'User_Request',
+        'service_type': 'Login-User',
+        # dummy values just for testing
+        'framed_protocol': 'test',
+        'framed_ip_address': '127.0.0.1'
+    }
+
+    def assertAcctData(self, ra, data):
+        for key, value in data.items():
+            if key == 'status_type':
+                continue
+            ra_value = getattr(ra, key)
+            data_value = data[key]
+            self.assertEqual(ra_value, data_value, msg=key)
+
     def test_accounting_start_200(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
-        ra = RadiusAccounting.objects.create(
-            session_id='35000006', unique_id='75058e50',
-            username='admin', start_time='2017-08-08 15:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='262',
-            authentication='authentication', realm='',
-            input_octets='9900909',
-            output_octets='1513075509', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='terminate_cause',
-            service_type='service_type', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
-        data = {'username': 'admin', 'nas_ip_address': '172.16.64.91',
-                'nas_port': '1', 'called_station_id': '00_27_22_F3_Fa_F1',
-                'calling_station_id': '5c:7d:c1:72:a7:3b', 'nas_identifier': '',
-                'status_type': 'Start', 'authentication': 'RADIUS',
-                'acct_delay_time': '0',
-                'unique_id': '75058e50',
-                'terminate_cause': 'User_Request', 'input_octets': '1111909',
-                'output_octets': '1511074444', 'nas_port_type': 'async',
-                'session_time': '261', 'login_service': 'Telnet',
-                'login_ip_host': '172.16.64.25', 'session_id': '35000006',
-                'framed_protocol': '', 'framed_ip_address': '',
-                'service_type': 'Login-User', 'Realm': ''}
+        ra = RadiusAccounting.objects.create(**self._acct_initial_data)
+        data = self.acct_post_data
+        data['status_type'] = 'Start'
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
         ra.refresh_from_db()
-        self.assertEqual(ra.output_octets, 1511074444)
-        self.assertEqual(ra.input_octets, 1111909)
+        self.assertAcctData(ra, data)
 
     def test_accounting_start_201(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
-        data = {'username': 'admin', 'nas_ip_address': '172.16.64.91',
-                'nas_port': '1', 'called_station_id': '00_27_22_F3_Fa_F1',
-                'calling_station_id': '5c:7d:c1:72:a7:3b', 'nas_identifier': '',
-                'status_type': 'Start', 'authentication': 'RADIUS',
-                'acct_delay_time': '0',
-                'unique_id': '75058e50',
-                'terminate_cause': 'User_Request', 'input_octets': '1111909',
-                'output_octets': '1511074444', 'nas_port_type': 'async',
-                'session_time': '261', 'login_service': 'Telnet',
-                'login_ip_host': '172.16.64.25', 'session_id': '35000006',
-                'framed_protocol': '', 'framed_ip_address': '',
-                'service_type': 'Login-User', 'Realm': ''}
+        data = self.acct_post_data
+        data['status_type'] = 'Start'
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
+        self.assertAcctData(RadiusAccounting.objects.first(), data)
 
-    @freeze_time("2017-08-08 15:16:10+0200")
+    @freeze_time(START_DATE)
     def test_accounting_update_200(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
-        ra = RadiusAccounting.objects.create(
-            session_id='35000006', unique_id='75058e50',
-            username='admin', start_time='2017-08-08 15:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='262',
-            authentication='authentication', realm='',
-            input_octets='9900909',
-            output_octets='1513075509', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='terminate_cause',
-            service_type='service_type', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
-        data = {'username': 'admin', 'nas_ip_address': '172.16.64.91',
-                'nas_port': '1', 'called_station_id': '00_27_22_F3_Fa_F1',
-                'calling_station_id': '5c:7d:c1:72:a7:3b', 'nas_identifier': '',
-                'status_type': 'Interim-Update', 'authentication': 'RADIUS',
-                'acct_delay_time': '0',
-                'unique_id': '75058e50',
-                'terminate_cause': 'User_Request', 'input_octets': '1111909',
-                'output_octets': '1511074444', 'nas_port_type': 'async',
-                'acct_session_time': '261', 'login_service': 'Telnet',
-                'login_ip_host': '172.16.64.25', 'session_id': '35000006',
-                'framed_protocol': '', 'framed_ip_address': '',
-                'service_type': 'Login-User', 'Realm': ''}
+        ra = RadiusAccounting.objects.create(**self._acct_initial_data)
+        data = self.acct_post_data
+        data['status_type'] = 'Interim-Update'
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
-        ra.refresh_from_db()
         self.assertEqual(RadiusAccounting.objects.count(), 1)
-        self.assertEqual(ra.output_octets, 1511074444)
-        self.assertEqual(ra.input_octets, 1111909)
+        ra.refresh_from_db()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
+        self.assertAcctData(ra, data)
 
-    @freeze_time("2017-08-08 15:16:10+0200")
+    @freeze_time(START_DATE)
     def test_accounting_stop_200(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
-        ra = RadiusAccounting.objects.create(
-            session_id='35000006', unique_id='75058e50',
-            username='admin', start_time='2017-08-08 15:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='261',
-            authentication='authentication', realm='',
-            input_octets='9900909',
-            output_octets='1511075509', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='terminate_cause',
-            service_type='service_type', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
+        ra = RadiusAccounting.objects.create(**self._acct_initial_data)
         # reload date object in order to store ra.start_time
         ra.refresh_from_db()
         start_time = ra.start_time
-        data = {'username': 'admin', 'nas_ip_address': '172.16.64.91',
-                'nas_port': '1', 'called_station_id': '00_27_22_F3_Fa_F1',
-                'calling_station_id': '5c:7d:c1:72:a7:3b', 'nas_identifier': '',
-                'status_type': 'Stop', 'authentication': 'RADIUS',
-                'acct_delay_time': '0',
-                'unique_id': '75058e50',
-                'terminate_cause': 'User_Request', 'input_octets': '9900909',
-                'output_octets': '1511075509', 'nas_port_type': 'async',
-                'session_time': '261', 'login_service': 'Telnet',
-                'login_ip_host': '172.16.64.25', 'session_id': '35000006',
-                'framed_protocol': '', 'framed_ip_address': '',
-                'service_type': 'Login-User', 'Realm': ''}
+        data = self.acct_post_data
+        data['status_type'] = 'Stop'
         response = self.client.post(reverse('freeradius:accounting'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
@@ -189,65 +154,42 @@ class TestApi(TestCase):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time, start_time)
+        self.assertAcctData(ra, data)
 
     def test_accounting_list_200(self):
-        RadiusAccounting.objects.create(
-            session_id='35000006', unique_id='75058e50',
-            username='admin', start_time='2017-08-08 15:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='262',
-            authentication='authentication', realm='',
-            input_octets='9900909',
-            output_octets='1513075509', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='terminate_cause',
-            service_type='service_type', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
-        RadiusAccounting.objects.create(
-            session_id='40111116', unique_id='12234f69',
-            username='molly', start_time='2017-08-08 15:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='262',
-            authentication='authentication', realm='',
-            input_octets='3000909',
-            output_octets='1613176609', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='terminate_cause',
-            service_type='service_type', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
-        RadiusAccounting.objects.create(
-            session_id='89897654', unique_id='99144d60',
-            username='lillo', start_time='2017-08-17 18:16:10+0200',
-            nas_ip_address='172.16.64.91', nas_port_id='1',
-            nas_port_type='Async',
-            session_time='262',
-            authentication='authentication', realm='',
-            input_octets='4440909',
-            output_octets='1119074409', calling_station_id='5c:7d:c1:72:a7:3b',
-            called_station_id='00-27-22-F3-FA-F1:hostname',
-            terminate_cause='User_Request',
-            service_type='Login-User', framed_protocol='',
-            framed_ip_address='', groupname=''
-        )
+        data1 = self.acct_post_data
+        data1.update(dict(session_id='35000006',
+                          unique_id='75058e50',
+                          input_octets=9900909,
+                          output_octets=1513075509))
+        RadiusAccounting.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(session_id='40111116',
+                          unique_id='12234f69',
+                          input_octets=3000909,
+                          output_octets=1613176609))
+        RadiusAccounting.objects.create(**data2)
+        data3 = self.acct_post_data
+        data3.update(dict(session_id='89897654',
+                          unique_id='99144d60',
+                          input_octets=4440909,
+                          output_octets=1119074409))
+        RadiusAccounting.objects.create(**data3)
         response = self.client.get(reverse('freeradius:accounting'))
         self.assertEqual(len(response.json()), 3)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
         self.assertEqual(item['username'], 'admin')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
-        self.assertEqual(item['output_octets'], 1513075509)
-        self.assertEqual(item['input_octets'], 9900909)
+        self.assertEqual(item['output_octets'], data1['output_octets'])
+        self.assertEqual(item['input_octets'], data1['input_octets'])
         item = response.data[1]
-        self.assertEqual(item['output_octets'], 1613176609)
+        self.assertEqual(item['output_octets'], data2['output_octets'])
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
-        self.assertEqual(item['input_octets'], 3000909)
+        self.assertEqual(item['input_octets'], data2['input_octets'])
         self.assertEqual(item['called_station_id'], '00-27-22-F3-FA-F1:hostname')
         item = response.data[2]
-        self.assertEqual(item['output_octets'], 1119074409)
-        self.assertEqual(item['input_octets'], 4440909)
+        self.assertEqual(item['output_octets'], data3['output_octets'])
+        self.assertEqual(item['input_octets'], data3['input_octets'])
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
