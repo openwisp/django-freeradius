@@ -22,6 +22,13 @@ class RadiusPostAuthSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+STATUS_TYPE_CHOICES = (
+    ('Start', 'Start'),
+    ('Interim-Update', 'Interim-Update'),
+    ('Stop', 'Stop'),
+)
+
+
 class RadiusAccountingSerializer(serializers.ModelSerializer):
     framed_ip_address = serializers.IPAddressField(required=False, allow_blank=True)
     session_time = serializers.IntegerField(required=False, default=0)
@@ -29,7 +36,7 @@ class RadiusAccountingSerializer(serializers.ModelSerializer):
     update_time = serializers.DateTimeField(required=False)
     # this is needed otherwise serialize will ignore status_type from accounting packet
     # as it's not a model field
-    status_type = serializers.CharField(write_only=True)
+    status_type = serializers.ChoiceField(write_only=True, choices=STATUS_TYPE_CHOICES)
 
     def validate(self, data):
         """
@@ -47,8 +54,6 @@ class RadiusAccountingSerializer(serializers.ModelSerializer):
         if status_type == 'Stop':
             data['update_time'] = time
             data['stop_time'] = time
-        if status_type is None:
-            data['session_time'] = (time - data['start_time']).seconds
         return data
 
     class Meta:

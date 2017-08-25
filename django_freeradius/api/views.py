@@ -1,5 +1,6 @@
 import swapper
 from django.contrib.auth import get_user_model
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
@@ -53,7 +54,8 @@ class AccountingView(generics.ListCreateAPIView):
     serializer_class = RadiusAccountingSerializer
 
     def post(self, request, *args, **kwargs):
-        method = 'create' if request.data['status_type'] == 'Start' else 'update'
+        status_type = self._get_status_type(request)
+        method = 'create' if status_type == 'Start' else 'update'
         return getattr(self, method)(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -83,6 +85,12 @@ class AccountingView(generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(None)
+
+    def _get_status_type(self, request):
+        try:
+            return request.data['status_type']
+        except KeyError:
+            raise ValidationError({'status_type': [_('This field is required.')]})
 
 
 accounting = AccountingView.as_view()

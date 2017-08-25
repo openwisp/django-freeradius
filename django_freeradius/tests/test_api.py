@@ -202,6 +202,32 @@ class TestApi(TestCase):
         self.assertEqual(ra.start_time.timetuple(), now().timetuple())
         self.assertAcctData(ra, data)
 
+    @freeze_time(START_DATE)
+    def test_accounting_400_missing_status_type(self):
+        response = self.post_json(self.acct_post_data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('status_type', response.data)
+        self.assertEqual(RadiusAccounting.objects.count(), 0)
+
+    @freeze_time(START_DATE)
+    def test_accounting_400_invalid_status_type(self):
+        data = self.acct_post_data
+        data['status_type'] = 'INVALID'
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('status_type', response.data)
+        self.assertEqual(RadiusAccounting.objects.count(), 0)
+
+    @freeze_time(START_DATE)
+    def test_accounting_400_validation_error(self):
+        data = self.acct_post_data
+        data['status_type'] = 'Start'
+        del data['nas_ip_address']
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('nas_ip_address', response.data)
+        self.assertEqual(RadiusAccounting.objects.count(), 0)
+
     def test_accounting_list_200(self):
         data1 = self.acct_post_data
         data1.update(dict(session_id='35000006',
