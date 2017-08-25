@@ -1,3 +1,5 @@
+import json
+
 import swapper
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -57,14 +59,7 @@ class TestApi(TestCase):
         self.assertEqual(RadiusPostAuth.objects.all().count(), 0)
         self.assertEqual(response.status_code, 400)
 
-    @property
-    def acct_post_data(self):
-        """ returns a copy of self._acct_data """
-        data = self._acct_initial_data.copy()
-        del data['start_time']
-        data.update(self._acct_post_data.copy())
-        return data
-
+    _acct_url = reverse('freeradius:accounting')
     _acct_initial_data = {
         'unique_id': '75058e50',
         'session_id': '35000006',
@@ -72,52 +67,75 @@ class TestApi(TestCase):
         'session_time': 0,
         'input_octets': 0,
         'output_octets': 0,
-        'start_time': START_DATE,
     }
-
     _acct_post_data = {
         'username': 'admin',
         'realm': '',
         'nas_port_id': '1',
         'nas_port_type': 'Async',
-        'session_time': 261,
+        'session_time': '261',
         'authentication': 'RADIUS',
-        'input_octets': 1111909,
-        'output_octets': 1511074444,
+        'input_octets': '1111909',
+        'output_octets': '1511074444',
         'called_station_id': '00-27-22-F3-FA-F1:hostname',
         'calling_station_id': '5c:7d:c1:72:a7:3b',
         'terminate_cause': 'User_Request',
         'service_type': 'Login-User',
-        # dummy values just for testing
         'framed_protocol': 'test',
         'framed_ip_address': '127.0.0.1'
     }
 
+    @property
+    def acct_post_data(self):
+        """ returns a copy of self._acct_data """
+        data = self._acct_initial_data.copy()
+        data.update(self._acct_post_data.copy())
+        return data
+
+    def post_json(self, data):
+        """
+        performs a post using application/json as content type
+        emulating the exact behaviour of freeradius 3
+        """
+        return self.client.post(self._acct_url,
+                                data=json.dumps(data),
+                                content_type='application/json')
+
     def assertAcctData(self, ra, data):
+        """
+        compares the values in data (dict)
+        with the values of a RadiusAccounting instance
+        to ensure they match
+        """
         for key, value in data.items():
             if key == 'status_type':
                 continue
             ra_value = getattr(ra, key)
             data_value = data[key]
+            _type = type(ra_value)
+            if _type != type(data_value):
+                data_value = _type(data_value)
             self.assertEqual(ra_value, data_value, msg=key)
 
+    @freeze_time(START_DATE)
     def test_accounting_start_200(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
         ra = RadiusAccounting.objects.create(**self._acct_initial_data)
         data = self.acct_post_data
         data['status_type'] = 'Start'
-        response = self.client.post(reverse('freeradius:accounting'), data=data)
+        response = self.post_json(data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
         ra.refresh_from_db()
         self.assertAcctData(ra, data)
 
+    @freeze_time(START_DATE)
     def test_accounting_start_201(self):
         self.assertEqual(RadiusAccounting.objects.count(), 0)
         data = self.acct_post_data
         data['status_type'] = 'Start'
-        response = self.client.post(reverse('freeradius:accounting'), data=data)
+        response = self.post_json(data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
@@ -129,11 +147,24 @@ class TestApi(TestCase):
         ra = RadiusAccounting.objects.create(**self._acct_initial_data)
         data = self.acct_post_data
         data['status_type'] = 'Interim-Update'
-        response = self.client.post(reverse('freeradius:accounting'), data=data)
+        response = self.post_json(data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
         ra.refresh_from_db()
+        self.assertEqual(ra.update_time.timetuple(), now().timetuple())
+        self.assertAcctData(ra, data)
+
+    @freeze_time(START_DATE)
+    def test_accounting_update_201(self):
+        self.assertEqual(RadiusAccounting.objects.count(), 0)
+        data = self.acct_post_data
+        data['status_type'] = 'Interim-Update'
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+        self.assertEqual(RadiusAccounting.objects.count(), 1)
+        ra = RadiusAccounting.objects.first()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertAcctData(ra, data)
 
@@ -146,7 +177,7 @@ class TestApi(TestCase):
         start_time = ra.start_time
         data = self.acct_post_data
         data['status_type'] = 'Stop'
-        response = self.client.post(reverse('freeradius:accounting'), data=data)
+        response = self.post_json(data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(RadiusAccounting.objects.count(), 1)
@@ -154,6 +185,21 @@ class TestApi(TestCase):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time, start_time)
+        self.assertAcctData(ra, data)
+
+    @freeze_time(START_DATE)
+    def test_accounting_stop_201(self):
+        self.assertEqual(RadiusAccounting.objects.count(), 0)
+        data = self.acct_post_data
+        data['status_type'] = 'Stop'
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+        self.assertEqual(RadiusAccounting.objects.count(), 1)
+        ra = RadiusAccounting.objects.first()
+        self.assertEqual(ra.update_time.timetuple(), now().timetuple())
+        self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
+        self.assertEqual(ra.start_time.timetuple(), now().timetuple())
         self.assertAcctData(ra, data)
 
     def test_accounting_list_200(self):
@@ -175,7 +221,7 @@ class TestApi(TestCase):
                           input_octets=4440909,
                           output_octets=1119074409))
         RadiusAccounting.objects.create(**data3)
-        response = self.client.get(reverse('freeradius:accounting'))
+        response = self.client.get(self._acct_url)
         self.assertEqual(len(response.json()), 3)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]

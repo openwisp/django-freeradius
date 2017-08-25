@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
@@ -250,6 +251,11 @@ class AbstractRadiusAccounting(models.Model):
                                                      # but that wouldn't work on PostgreSQL
                                                      null=True,
                                                      blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.start_time:
+            self.start_time = now()
+        super(AbstractRadiusAccounting, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'radacct'

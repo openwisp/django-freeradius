@@ -1,7 +1,8 @@
 import swapper
 from django.contrib.auth import get_user_model
-from rest_framework import generics, mixins
+from rest_framework import generics
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from .serializers import RadiusAccountingSerializer, RadiusPostAuthSerializer
@@ -40,28 +41,48 @@ class PostAuthView(generics.CreateAPIView):
 postauth = PostAuthView.as_view()
 
 
-class AccountingView(generics.ListCreateAPIView, mixins.UpdateModelMixin):
+class AccountingView(generics.ListCreateAPIView):
+    """
+    GET: get list of accounting objects
+
+    POST: add or update accounting information (start, interim-update, stop);
+          does not return any JSON response so that freeradius will avoid
+          processing the response without generating warnings
+    """
     queryset = RadiusAccounting.objects.all()
-    """
-    This implements list, create and update semantic, as freeradius will use post method
-    in both the latter cases
-    whether to create the object or update an existing one, will depend whether an object
-    with the same unique_id already exists or not
-    """
     serializer_class = RadiusAccountingSerializer
 
-    def get_object(self):
-        try:
-            queryset = RadiusAccounting.objects.all()
-            return queryset.get(unique_id=self.request.data.get('unique_id'))
-        except RadiusAccounting.DoesNotExist:
-            return None
-
     def post(self, request, *args, **kwargs):
-        method = 'create' if self.get_object() is None else 'update'
-        response = getattr(self, method)(request, *args, **kwargs)
-        response.data = None
-        return response
+        method = 'create' if request.data['status_type'] == 'Start' else 'update'
+        return getattr(self, method)(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid()
+        error_keys = serializer.errors.keys()
+        errors = len(error_keys)
+        if not errors:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(None, status=201, headers=headers)
+        # trying to create a record which
+        # already exist, fallback to update
+        if errors == 1 and 'unique_id' in error_keys:
+            return self.update(request, *args, **kwargs)
+        else:
+            raise ValidationError(serializer.errors)
+
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_queryset().get(unique_id=request.data['unique_id'])
+        # trying to update a record which
+        # does not exist, fallback to create
+        except RadiusAccounting.DoesNotExist:
+            return self.create(request, *args, **kwargs)
+        serializer = self.get_serializer(instance, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None)
 
 
 accounting = AccountingView.as_view()
