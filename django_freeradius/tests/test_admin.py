@@ -5,11 +5,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from .. import settings
 from ..models import (
     Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
     RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
-from .. import settings
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
