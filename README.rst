@@ -23,7 +23,7 @@ Django-freeradius is part of the `OpenWISP project <http://openwrt.org>`_.
 
 **django-freeradius** is Django reusable app that provides an admin interface to a `freeradius <http://freeradius.org/>`_ database.
 
-`Documentation <https://github.com/openwisp/django-freeradius/tree/master/docs>`_ |
+`Documentation <http://django-freeradius.readthedocs.io/en/latest/>`_ |
 `Change log <https://github.com/openwisp/django-freeradius/blob/master/CHANGES.rst>`_ |
 `Support channels <http://openwisp.org/support.html>`_ |
 `Issue Tracker <https://github.com/openwisp/django-freeradius/issues>`_ |
