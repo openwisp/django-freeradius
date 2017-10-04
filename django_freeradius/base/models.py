@@ -26,6 +26,15 @@ RADOP_REPLY_TYPES = (
     ('+=', '+='),
 )
 
+RADCHECK_PASSWD_TYPE = (
+    ('Cleartext-Password', 'Cleartext-Password'),
+    ('NT-Password', 'NT-Password'),        
+    ('LM-Password', 'LM-Password'),    
+    ('MD5-Password', 'MD5-Password'),
+    ('SMD5-Password', 'SMD5-Password'),
+    ('SSHA-Password', 'SSHA-Password'),
+    ('Crypt-Password', 'Crypt-Password'),  
+)
 
 class TimeStampedEditableModel(models.Model):
     """
@@ -124,8 +133,9 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                           choices=RADOP_CHECK_TYPES,
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
-                                 max_length=64)
-
+                                 max_length=64, choices=RADCHECK_PASSWD_TYPE)
+    is_active = models.BooleanField()
+    
     class Meta:
         db_table = 'radcheck'
         verbose_name = _('radius check')
