@@ -8,9 +8,12 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
 .. note::
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
+    
+.. note::
+    You will need a recent version of Debian as Freeradius 3 is available from **Jessie**. The related Ubuntu version is **Zesty**
 
-How to install freeradius 3
----------------------------
+How to install freeradius 3 on older version
+---------------------------------------------
 
 First of all, become root:
 
@@ -34,12 +37,20 @@ Now you can install the packages we need:
 
     apt-get install freeradius freeradius-postgresql freeradius-rest
 
-Open the file ``/etc/freeradius/mods-available/sql``.
+Configuring Freeradius 3
+------------------------
 
-You have to change  ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
+Edit the file ``/etc/freeradius/mods-available/sql``.
 
-Example for configuration with postgresql::
+Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
 
+Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_ for the available configuration values.
+
+Example configuration  using  postgresql as storage
+
+.. code-block:: ini
+    
+    # /etc/freeradius/mods-available/sql
     driver = "rlm_sql_postgresql"
     dialect = "postgresql"
 
@@ -50,7 +61,7 @@ Example for configuration with postgresql::
     password = "<password>"
     radius_db = "radius"
 
-Enable the ``sql`` and ``rest`` modules:
+Now enable the ``sql`` and ``rest`` modules:
 
 .. code-block:: shell
 
@@ -63,6 +74,8 @@ Restart freeradius to load the new configuration:
 .. code-block:: shell
 
     service freeradius restart
+    # alternatively if you are using systemd
+    systemctl restart freeradius
 
 You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_.
 
@@ -70,7 +83,9 @@ How to configure the REST module
 --------------------------------
 
 Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/rest``, substituting
-``<url>`` with your project's URL, (eg: ``http://127.0.0.1:8000``) ::
+``<url>`` with your django-freeradius's URL, (eg: ``http://127.0.0.1:8000``)
+
+.. code-block:: ini
 
     # /etc/freeradius/mods-enabled/rest
 
@@ -253,5 +268,5 @@ You should get the following output::
 Customizing your configuration
 ------------------------------
 
-You can customize your freeradius configuration and exploit the many features of freeradius but
-you will need to test how your changes play with *django-freeradius*.
+You can further customize your freeradius configuration and exploit the many features of freeradius but
+you will need to test how your configuratoin play with *django-freeradius*.
