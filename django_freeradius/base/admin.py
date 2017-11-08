@@ -1,7 +1,10 @@
 from django.contrib.admin import ModelAdmin
+from django.contrib import messages
 
 from .. import settings as app_settings
+from . forms import AbstractRadiusCheckAdminForm
 
+from passlib.hash import nthash
 
 class TimeStampedEditableAdmin(ModelAdmin):
     """
@@ -60,11 +63,39 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     list_display = ('username', 'attribute', 'value', 'is_active',
-                    'created', 'modified',
+                    'created', 'valid_until',
                    )
-    search_fields = ('username',)
-    list_filter = ('created', 'modified')
-
+    search_fields = ('username', 'value')
+    list_filter = ('created', 'modified', 'valid_until')
+    readonly_fields = ('value',)
+    form = AbstractRadiusCheckAdminForm
+    fields = ('username', 'value', 'op', 'attribute', 'new_value',
+              'is_active', 'valid_until', 'note', 'created', 'modified')
+    
+    # if new_value is present this will be hashed and stored into value
+    def save_model(self, request, obj, form, change):
+        
+        # processes form.data['new_value'] with appropriate hash func
+        password_renewed = form.data['new_value']
+        password_format = form.data['attribute']
+        disabled_pass_type = ['LM-Password',
+                              'MD5-Password',
+                              'SMD5-Password',
+                              'SSHA-Password',
+                              'Crypt-Password']
+        
+        if password_format in disabled_pass_type:
+            messages.add_message(request, messages.ERROR, 
+                '{} is not currently enabled. The password'
+                ' was not changed'.format(password_format))
+            return
+        
+        if password_renewed:
+            if password_format == 'Cleartext-Password':
+                obj.value = password_renewed
+            elif password_format == 'NT-Password':
+                obj.value = nthash.hash(password_renewed)
+        obj.save()
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
     pass
