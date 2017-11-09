@@ -5,7 +5,7 @@ from . models import AbstractRadiusCheck
 
 class AbstractRadiusCheckAdminForm(forms.ModelForm):
     # custom field not backed by database
-    new_value = forms.CharField(label=_('new value'), required=False, 
+    new_value = forms.CharField(label=_('new Value'), required=False, 
                                 widget=forms.PasswordInput(),
                                 help_text=_('Renew the password value'))
 

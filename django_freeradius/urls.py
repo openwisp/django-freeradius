@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.conf.urls import url, include
 
 from .api import urls as api
 
