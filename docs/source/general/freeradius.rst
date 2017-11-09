@@ -19,16 +19,14 @@ First of all, become root:
     sudo -i
 
 .. note::
-    If you use a recent version of Debian like **Jessie** or Ubuntu **Zesty**, you can skip the following command and use the official repositories if you prefer.
+    If you use a recent version of Debian like **Jessie** or Ubuntu **Zesty**,
+    you can skip the following command and use the official repositories if you prefer.
 
 Let's add the PPA repository for the Freeradius 3.x stable branch:
 
 .. code-block:: shell
 
     apt-add-repository ppa:freeradius/stable-3.0
-
-.. code-block:: shell
-
     apt-get update
 
 Now you can install the packages we need:
@@ -49,7 +47,7 @@ Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/
 Example configuration using the PostgreSQL database:
 
 .. code-block:: ini
-    
+
     # /etc/freeradius/mods-available/sql
     driver = "rlm_sql_postgresql"
     dialect = "postgresql"
