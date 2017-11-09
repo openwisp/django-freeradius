@@ -8,7 +8,7 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
 .. note::
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
-    
+
 How to install freeradius 3
 ---------------------------
 
