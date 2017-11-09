@@ -9,8 +9,8 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
     
-How to install freeradius 3 on older debian/ubuntu systems
-----------------------------------------------------------
+How to install freeradius 3
+---------------------------
 
 First of all, become root:
 
@@ -83,7 +83,7 @@ How to configure the REST module
 --------------------------------
 
 Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/rest``, substituting
-``<url>`` with your django-freeradius's URL, (eg: ``http://127.0.0.1:8000``)
+``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org/``)-
 
 .. code-block:: ini
 
