@@ -9,17 +9,17 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
     
-.. note::
-    You will need a recent version of Debian as Freeradius 3 is available from **Jessie**. The related Ubuntu version is **Zesty**
-
-How to install freeradius 3 on older version
----------------------------------------------
+How to install freeradius 3 on older debian/ubuntu systems
+----------------------------------------------------------
 
 First of all, become root:
 
 .. code-block:: shell
 
     sudo -i
+
+.. note::
+    If you use a recent version of Debian like **Jessie** or Ubuntu **Zesty**, you can skip the following command and use the official repositories if you prefer.
 
 Let's add the PPA repository for the Freeradius 3.x stable branch:
 
@@ -46,7 +46,7 @@ Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``lo
 
 Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_ for the available configuration values.
 
-Example configuration  using  postgresql as storage
+Example configuration using the PostgreSQL database:
 
 .. code-block:: ini
     
@@ -269,4 +269,4 @@ Customizing your configuration
 ------------------------------
 
 You can further customize your freeradius configuration and exploit the many features of freeradius but
-you will need to test how your configuratoin play with *django-freeradius*.
+you will need to test how your configuration plays with *django-freeradius*.
