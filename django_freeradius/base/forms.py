@@ -37,7 +37,7 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
             if not re.findall(regexp, self.data['new_value']):
                 raise ValidationError('The secret must contains lowercase'
                                       ' and uppercase characters, '
-                                      ' number and at least one of these symbol'
+                                      ' number and at least one of these symbols:'
                                       ' ! % - _ + = [ ] { } : , . ? < > ( ) ;'
                                       )
         return self.cleaned_data["new_value"]
