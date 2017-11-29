@@ -4,8 +4,13 @@ EDITABLE_ACCOUNTING = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_ACCOUNTING',
 EDITABLE_POSTAUTH = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_POSTAUTH', False)
 
 DISABLED_SECRET_FORMAT = ['Cleartext-Password',
-                          'LM-Password', 
+                          'LM-Password',
                           'MD5-Password',
                           'SMD5-Password',
                           'SSHA-Password',
                           'Crypt-Password']
+
+RADCHECK_SECRET_VALIDATORS = {'regexp_lowercase': '[a-z]+',
+                              'regexp_uppercase': '[A-Z]+',
+                              'regexp_number': '[0-9]+',
+                              'regexp_special': '[\!\%\-_+=\[\]\{\}\:\,\.\?\<\>\(\)\;]+'}

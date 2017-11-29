@@ -1,17 +1,15 @@
 from django.contrib.admin import ModelAdmin
-from django.contrib import messages
+from passlib.hash import lmhash, nthash
 
 from .. import settings as app_settings
-from . forms import AbstractRadiusCheckAdminForm
-from . admin_filters import DuplicateListFilter
+from .admin_filters import DuplicateListFilter
+from .forms import AbstractRadiusCheckAdminForm
 
-from passlib.hash import nthash, lmhash
 
 class TimeStampedEditableAdmin(ModelAdmin):
     """
     ModelAdmin for TimeStampedEditableModel
     """
-
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super(TimeStampedEditableAdmin, self).get_readonly_fields(request, obj)
         return readonly_fields + ('created', 'modified')
@@ -63,7 +61,8 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
-    list_display = ('username', 'attribute', 'is_active',
+    list_display = (
+                    'username', 'attribute', 'is_active',
                     'created', 'valid_until',
                    )
     search_fields = ('username', 'value')
@@ -72,16 +71,11 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     form = AbstractRadiusCheckAdminForm
     fields = ('username', 'value', 'op', 'attribute', 'new_value',
               'is_active', 'valid_until', 'note', 'created', 'modified')
-    
+
     # if new_value is present this will be hashed and stored into value
     def save_model(self, request, obj, form, change):
         password_renewed = form.data['new_value']
         password_format = form.data['attribute']
-        if password_format in app_settings.DISABLED_SECRET_FORMAT:
-            messages.add_message(request, messages.ERROR, 
-                '{} is not currently enabled. The password'
-                ' was not changed'.format(password_format))
-            return
         if password_renewed:
             if password_format == 'Cleartext-Password':
                 obj.value = password_renewed
@@ -90,6 +84,7 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
             elif password_format == 'LM-Password':
                 obj.value = lmhash.hash(password_renewed)
         obj.save()
+
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
     pass

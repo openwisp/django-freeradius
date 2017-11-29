@@ -36,6 +36,7 @@ RADCHECK_PASSWD_TYPE = (
     ('Crypt-Password', 'Crypt-Password'),
 )
 
+
 class TimeStampedEditableModel(models.Model):
     """
     An abstract base class model that provides self-updating
@@ -133,13 +134,12 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                           choices=RADOP_CHECK_TYPES,
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
-                                 max_length=64, 
+                                 max_length=64,
                                  choices=RADCHECK_PASSWD_TYPE)
     is_active = models.BooleanField(default=True)
-    valid_until   = models.DateTimeField(null=True,blank=True)
-    
-    note          = models.TextField(null=True,blank=True)
-    
+    valid_until = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+
     class Meta:
         db_table = 'radcheck'
         verbose_name = _('radius check')
