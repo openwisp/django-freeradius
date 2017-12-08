@@ -1,3 +1,4 @@
+django>=1.11,<1.12
 coverage
 coveralls
 isort

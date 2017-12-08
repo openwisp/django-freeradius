@@ -3,12 +3,14 @@ from django.conf import settings
 EDITABLE_ACCOUNTING = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_ACCOUNTING', False)
 EDITABLE_POSTAUTH = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_POSTAUTH', False)
 
-DISABLED_SECRET_FORMAT = ['Cleartext-Password',
-                          'LM-Password',
-                          'MD5-Password',
-                          'SMD5-Password',
-                          'SSHA-Password',
-                          'Crypt-Password']
+DEFAULT_SECRET_FORMAT = 'NT-Password'
+
+DISABLED_SECRET_FORMATS = ['Cleartext-Password',
+                           'LM-Password',
+                           'MD5-Password',
+                           'SMD5-Password',
+                           'SSHA-Password',
+                           'Crypt-Password']
 
 RADCHECK_SECRET_VALIDATORS = {'regexp_lowercase': '[a-z]+',
                               'regexp_uppercase': '[A-Z]+',

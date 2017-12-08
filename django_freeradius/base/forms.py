@@ -9,20 +9,18 @@ from .models import AbstractRadiusCheck
 
 
 class AbstractRadiusCheckAdminForm(forms.ModelForm):
+    _secret_help_text = _('The secret must contains lowercase'
+                          ' and uppercase characters, '
+                          ' number and at least one of these symbols:'
+                          '! % - _ + = [ ] { } : , . ? < > ( ) ; ')
     # custom field not backed by database
-    new_value = forms.CharField(label=_('new Value'), required=False,
+    new_value = forms.CharField(label=_('Value'), required=False,
                                 min_length=8, max_length=16,
                                 widget=forms.PasswordInput(),
-                                help_text=_(
-                                'must be 8-16 characters '
-                                'long and may contain only the following '
-                                'characters: '
-                                'A-Z, a-z, 0-9, '
-                                '! % - _ + = [ ] { } : , . ? < > ( ) ; ')
-                                )
+                                help_text=_secret_help_text)
 
     def clean_attribute(self):
-        if self.data['attribute'] not in app_settings.DISABLED_SECRET_FORMAT:
+        if self.data['attribute'] not in app_settings.DISABLED_SECRET_FORMATS:
             return self.cleaned_data["attribute"]
         raise ValidationError('This SECRET FORMAT is disabled'
                               ', please use another one')
@@ -31,11 +29,7 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
         for regexp in app_settings.RADCHECK_SECRET_VALIDATORS.values():
             found = re.findall(regexp, self.data['new_value'])
             if not found:
-                raise ValidationError('The secret must contains lowercase'
-                                      ' and uppercase characters, '
-                                      ' number and at least one of these symbols:'
-                                      ' ! % - _ + = [ ] { } : , . ? < > ( ) ;'
-                                      )
+                raise ValidationError(self._secret_help_text)
         return self.cleaned_data["new_value"]
 
     class Meta:

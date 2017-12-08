@@ -1,9 +1,11 @@
 from django.contrib.admin import ModelAdmin
-from passlib.hash import lmhash, nthash
+from django.contrib.admin.actions import delete_selected
 
 from .. import settings as app_settings
-from .admin_filters import DuplicateListFilter
+from .admin_actions import disable_accounts, enable_accounts
+from .admin_filters import DuplicateListFilter, ExpiredListFilter
 from .forms import AbstractRadiusCheckAdminForm
+from .models import _encode_secret
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
@@ -61,28 +63,20 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
-    list_display = (
-                    'username', 'attribute', 'is_active',
-                    'created', 'valid_until',
-                   )
+    list_display = ('username', 'attribute', 'is_active',
+                    'created', 'valid_until')
     search_fields = ('username', 'value')
-    list_filter = (DuplicateListFilter, 'created', 'modified', 'valid_until')
+    list_filter = (DuplicateListFilter, ExpiredListFilter, 'created',
+                   'modified', 'valid_until')
     readonly_fields = ('value',)
     form = AbstractRadiusCheckAdminForm
     fields = ('username', 'value', 'op', 'attribute', 'new_value',
               'is_active', 'valid_until', 'note', 'created', 'modified')
+    actions = [disable_accounts, enable_accounts, delete_selected]
 
-    # if new_value is present this will be hashed and stored into value
     def save_model(self, request, obj, form, change):
-        password_renewed = form.data['new_value']
-        password_format = form.data['attribute']
-        if password_renewed:
-            if password_format == 'Cleartext-Password':
-                obj.value = password_renewed
-            elif password_format == 'NT-Password':
-                obj.value = nthash.hash(password_renewed)
-            elif password_format == 'LM-Password':
-                obj.value = lmhash.hash(password_renewed)
+        obj.value = _encode_secret(form.data['attribute'],
+                                   form.data.get('new_value'))
         obj.save()
 
 
