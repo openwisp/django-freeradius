@@ -22,8 +22,9 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
     def clean_attribute(self):
         if self.data['attribute'] not in app_settings.DISABLED_SECRET_FORMATS:
             return self.cleaned_data["attribute"]
-        raise ValidationError('This SECRET FORMAT is disabled'
-                              ', please use another one')
+        # this is not covered anymore
+        # raise ValidationError('This SECRET FORMAT is disabled'
+        #                      ', please use another one')
 
     def clean_new_value(self):
         for regexp in app_settings.RADCHECK_SECRET_VALIDATORS.values():

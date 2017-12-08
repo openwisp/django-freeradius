@@ -3,6 +3,7 @@ from copy import copy
 from unittest import skipUnless
 
 import swapper
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -97,6 +98,10 @@ class TestRadiusGroupUsersModelTest(TestCase):
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class TestAdmin(TestCase):
+
+    def setUp(self):
+        self.site = AdminSite()
+
     def test_users_not_login(self):
         resp = self.client.get('/admin/auth/')
         self.assertEqual(resp.status_code, 302)
@@ -147,6 +152,16 @@ class TestAdmin(TestCase):
         _RADCHECK['attribute'] = 'Cleartext-Password'
         response = self.client.post(reverse('admin:sample_radius_radiuscheck_add'),
                                     _RADCHECK, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radiuscheck_admin_save_model(self):
+        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        change_url = reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk])
+        data = _RADCHECK_ENTRY_PW_UPDATE
+        data['op'] = ':='
+        response = self.client.post(change_url, data, follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_radiuscheck_enable_disable_accounts(self):
