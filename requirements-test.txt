@@ -3,6 +3,7 @@ coveralls
 isort
 flake8
 django-environ
+django>=1.11,<2.0
 mysqlclient
 psycopg2
 sphinx
