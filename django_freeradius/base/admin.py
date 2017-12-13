@@ -1,6 +1,11 @@
 from django.contrib.admin import ModelAdmin
+from django.contrib.admin.actions import delete_selected
 
 from .. import settings as app_settings
+from .admin_actions import disable_accounts, enable_accounts
+from .admin_filters import DuplicateListFilter, ExpiredListFilter
+from .forms import AbstractRadiusCheckAdminForm
+from .models import _encode_secret
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
@@ -59,10 +64,22 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
-    list_display = ('username', 'attribute', 'value', 'is_active',
-                    'created', 'modified')
-    search_fields = ('username',)
-    list_filter = ('created', 'modified')
+    list_display = ('username', 'attribute', 'is_active',
+                    'created', 'valid_until')
+    search_fields = ('username', 'value')
+    list_filter = (DuplicateListFilter, ExpiredListFilter, 'created',
+                   'modified', 'valid_until')
+    readonly_fields = ('value',)
+    form = AbstractRadiusCheckAdminForm
+    fields = ('username', 'value', 'op', 'attribute', 'new_value',
+              'is_active', 'valid_until', 'note', 'created', 'modified')
+    actions = [disable_accounts, enable_accounts, delete_selected]
+
+    def save_model(self, request, obj, form, change):
+        if form.data.get('new_value'):
+            obj.value = _encode_secret(form.data['attribute'],
+                                       form.data.get('new_value'))
+        obj.save()
 
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):

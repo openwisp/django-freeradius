@@ -9,6 +9,9 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
 
+.. note::
+    On Debian, Freeradius config directory is at /etc/freeradius/3.0.
+
 How to install freeradius 3
 ---------------------------
 
@@ -34,6 +37,8 @@ Now you can install the packages we need:
 .. code-block:: shell
 
     apt-get install freeradius freeradius-postgresql freeradius-rest
+    # if mysql instead of postgresql
+    apt-get install freeradius freeradius-mysql freeradius-rest
 
 Configuring Freeradius 3
 ------------------------
@@ -66,6 +71,23 @@ Now enable the ``sql`` and ``rest`` modules:
     cd mods-enabled/
     ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
     ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
+
+Extends Freeradius query to introduce is_active and valid_until checks.
+An example using Mysql server is:
+
+.. code-block:: shell
+    
+    nano /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
+
+.. code-block:: ini
+
+    authorize_check_query = "\
+    SELECT id, username, attribute, value, op \
+    FROM ${authcheck_table} \
+    WHERE username = '%{SQL-User-Name}' \
+    AND is_active = TRUE \
+    AND valid_until >= CURDATE() \
+    ORDER BY id"
 
 Restart freeradius to load the new configuration:
 

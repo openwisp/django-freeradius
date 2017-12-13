@@ -1,40 +1,38 @@
 from django.db import models
+from django.db.models import Count
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from passlib.hash import lmhash, nthash
 
-RADOP_CHECK_TYPES = (
-    ('=', '='),
-    (':=', ':='),
-    ('==', '=='),
-    ('+=', '+='),
-    ('!=', '!='),
-    ('>', '>'),
-    ('>=', '>='),
-    ('<', '<'),
-    ('<=', '<='),
-    ('=~', '=~'),
-    ('!~', '!~'),
-    ('=*', '=*'),
-    ('!*', '!*'),
-)
+from .. import settings as app_settings
 
-RADOP_REPLY_TYPES = (
-    ('=', '='),
-    (':=', ':='),
-    ('+=', '+='),
-)
+RADOP_CHECK_TYPES = (('=', '='),
+                     (':=', ':='),
+                     ('==', '=='),
+                     ('+=', '+='),
+                     ('!=', '!='),
+                     ('>', '>'),
+                     ('>=', '>='),
+                     ('<', '<'),
+                     ('<=', '<='),
+                     ('=~', '=~'),
+                     ('!~', '!~'),
+                     ('=*', '=*'),
+                     ('!*', '!*'))
 
-RADCHECK_PASSWD_TYPE = (
-    ('Cleartext-Password', 'Cleartext-Password'),
-    ('NT-Password', 'NT-Password'),
-    ('LM-Password', 'LM-Password'),
-    ('MD5-Password', 'MD5-Password'),
-    ('SMD5-Password', 'SMD5-Password'),
-    ('SSHA-Password', 'SSHA-Password'),
-    ('Crypt-Password', 'Crypt-Password'),
-)
+RADOP_REPLY_TYPES = (('=', '='),
+                     (':=', ':='),
+                     ('+=', '+='))
+
+RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
+                        'NT-Password',
+                        'LM-Password',
+                        'MD5-Password',
+                        'SMD5-Password',
+                        'SSHA-Password',
+                        'Crypt-Password']
 
 
 class TimeStampedEditableModel(models.Model):
@@ -123,6 +121,48 @@ class AbstractRadiusReply(TimeStampedEditableModel):
         return self.username
 
 
+class AbstractRadiusCheckQueryset(models.query.QuerySet):
+    def filter_duplicate_username(self):
+        pks = []
+        for i in self.values('username').annotate(Count('id')).order_by().filter(id__count__gt=1):
+            pks.extend([account.pk for account in self.filter(username=i['username'])])
+        return self.filter(pk__in=pks)
+
+    def filter_duplicate_value(self):
+        pks = []
+        for i in self.values('value').annotate(Count('id')).order_by().filter(id__count__gt=1):
+            pks.extend([accounts.pk for accounts in self.filter(value=i['value'])])
+        return self.filter(pk__in=pks)
+
+    def filter_expired(self):
+        return self.filter(valid_until__lt=now())
+
+    def filter_not_expired(self):
+        return self.filter(valid_until__gte=now())
+
+
+def _encode_secret(attribute, new_value=None):
+    if attribute == 'Cleartext-Password':
+        password_renewed = new_value
+    elif attribute == 'NT-Password':
+        password_renewed = nthash.hash(new_value)
+    elif attribute == 'LM-Password':
+        password_renewed = lmhash.hash(new_value)
+    return password_renewed
+
+
+class AbstractRadiusCheckManager(models.Manager):
+    def get_queryset(self):
+        return AbstractRadiusCheckQueryset(self.model, using=self._db)
+
+    def create(self, *args, **kwargs):
+        if 'new_value' in kwargs:
+            kwargs['value'] = _encode_secret(kwargs['attribute'],
+                                             kwargs['new_value'])
+            del(kwargs['new_value'])
+        return super(AbstractRadiusCheckManager, self).create(*args, **kwargs)
+
+
 @python_2_unicode_compatible
 class AbstractRadiusCheck(TimeStampedEditableModel):
     username = models.CharField(verbose_name=_('username'),
@@ -134,8 +174,16 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                           choices=RADOP_CHECK_TYPES,
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
-                                 max_length=64, choices=RADCHECK_PASSWD_TYPE)
+                                 max_length=64,
+                                 choices=[(i, i) for i in RADCHECK_PASSWD_TYPE
+                                          if i not in
+                                          app_settings.DISABLED_SECRET_FORMATS],
+                                 blank=True,
+                                 default=app_settings.DEFAULT_SECRET_FORMAT)
     is_active = models.BooleanField(default=True)
+    valid_until = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    objects = AbstractRadiusCheckManager()
 
     class Meta:
         db_table = 'radcheck'
