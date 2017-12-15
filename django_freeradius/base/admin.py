@@ -62,7 +62,7 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     list_display = ('username', 'attribute', 'value', 'is_active',
-                   'created', 'modified')
+                    'created', 'modified')
     search_fields = ('username',)
     list_filter = ('created', 'modified')
     
