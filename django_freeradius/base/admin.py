@@ -1,5 +1,5 @@
 from django.contrib.admin import ModelAdmin
-from form import NasModelForm
+from .forms import NasModelForm
 
 from .. import settings as app_settings
 
