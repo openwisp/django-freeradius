@@ -1,11 +1,11 @@
 from django.contrib.admin import ModelAdmin
-
-from .. import settings as app_settings
 from form import NasModelForm
 
-from django.core.exceptions import ValidationError
+from .. import settings as app_settings
+
 
 class TimeStampedEditableAdmin(ModelAdmin):
+
     """
     ModelAdmin for TimeStampedEditableModel
     """
@@ -84,17 +84,19 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
     form = NasModelForm
     fieldsets = (
         (None, {
-            'fields': ('name','short_name',('standard_type','other_NAS_type'), 'ports', 'secret','server','community','description'),
+            'fields': ('name', 'short_name',
+                       ('standard_type', 'other_NAS_type'),
+                       'ports', 'secret', 'server', 'community', 'description'),
         }),
     )
     search_fields = ['name', 'short_name', 'server']
     list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
 
     def save_model(self, request, obj, form, change):
-        if form.cleaned_data.get('other_NAS_type') != "" :
-            obj.type = form.cleaned_data.get('other_NAS_type');
+        if form.cleaned_data.get('other_NAS_type') != "":
+            obj.type = form.cleaned_data.get('other_NAS_type')
         else:
-            obj.type = form.cleaned_data.get('standard_type');
+            obj.type = form.cleaned_data.get('standard_type')
 
         super(AbstractNasAdmin, self).save_model(request, obj, form, change)
 
