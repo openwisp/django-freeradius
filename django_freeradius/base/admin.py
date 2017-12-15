@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin
-from .forms import NasModelForm
 
 from .. import settings as app_settings
+from .forms import NasModelForm
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
@@ -65,7 +65,6 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
                     'created', 'modified')
     search_fields = ('username',)
     list_filter = ('created', 'modified')
-    
 
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
