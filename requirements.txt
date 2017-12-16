@@ -1,4 +1,4 @@
-django>=1.11,<1.12
+django>=1.11,<2.1
 django-model-utils
 swapper
 djangorestframework>=3.7,<3.8

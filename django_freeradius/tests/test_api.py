@@ -2,8 +2,8 @@ import json
 
 import swapper
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
 
