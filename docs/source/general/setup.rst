@@ -77,7 +77,7 @@ Install your forked repo:
 
 .. code-block:: shell
 
-    git clone git://github.com/<your_fork>/django-freeradius
+    git clone git://github.com/<your_username>/django-freeradius
     cd django-freeradius/
     python setup.py develop
 
