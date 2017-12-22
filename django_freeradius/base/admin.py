@@ -1,9 +1,11 @@
 from django.contrib.admin import ModelAdmin
 
 from .. import settings as app_settings
+from .forms import NasModelForm
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
+
     """
     ModelAdmin for TimeStampedEditableModel
     """
@@ -81,8 +83,25 @@ class AbstractRadiusAccountingAdmin(BaseAccounting):
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):
+    # make a link to the form OtherFieldsNAS
+    form = NasModelForm
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'short_name',
+                       ('standard_type', 'other_NAS_type'),
+                       'ports', 'secret', 'server', 'community', 'description'),
+        }),
+    )
     search_fields = ['name', 'short_name', 'server']
     list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
+
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data.get('other_NAS_type') != "":
+            obj.type = form.cleaned_data.get('other_NAS_type')
+        else:
+            obj.type = form.cleaned_data.get('standard_type')
+
+        super(AbstractNasAdmin, self).save_model(request, obj, form, change)
 
 
 class AbstractRadiusUserGroupAdmin(TimeStampedEditableAdmin):
