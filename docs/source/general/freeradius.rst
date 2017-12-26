@@ -9,9 +9,6 @@ in order to make it work with `django-freeradius <https://github.com/openwisp/dj
     The guide is written for debian based systems, other linux distributions can work as well but the
     name of packages and files may be different.
 
-.. note::
-    On Debian, Freeradius config directory is at /etc/freeradius/3.0.
-
 How to install freeradius 3
 ---------------------------
 
@@ -76,7 +73,7 @@ Extends Freeradius query to introduce is_active and valid_until checks.
 An example using Mysql server is:
 
 .. code-block:: shell
-    
+
     nano /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
 
 .. code-block:: ini
