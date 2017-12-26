@@ -71,8 +71,8 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
                    'modified', 'valid_until')
     readonly_fields = ('value',)
     form = AbstractRadiusCheckAdminForm
-    fields = ('username', 'value', 'op', 'attribute', 'new_value',
-              'is_active', 'valid_until', 'note', 'created', 'modified')
+    fields = ['username', 'op', 'attribute', 'value', 'new_value',
+              'is_active', 'valid_until', 'note', 'created', 'modified']
     actions = [disable_accounts, enable_accounts, delete_selected]
 
     def save_model(self, request, obj, form, change):
@@ -80,6 +80,17 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
             obj.value = _encode_secret(form.data['attribute'],
                                        form.data.get('new_value'))
         obj.save()
+
+    def get_fields(self, request, obj=None):
+        """ do not show raw value (readonly) when adding a new item """
+        fields = self.fields[:]
+        if not obj:
+            fields.remove('value')
+        return fields
+
+    class Media:
+        js = ('django-freeradius/js/radcheck.js',)
+        css = {'all': ('django-freeradius/css/radcheck.css',)}
 
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
