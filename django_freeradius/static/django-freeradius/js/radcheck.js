@@ -1,4 +1,3 @@
-$ = django.jQuery;
 django.jQuery(function ($) {
     'use strict';
     // stop here if in add mode
