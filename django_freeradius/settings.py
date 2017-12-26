@@ -7,14 +7,7 @@ DEFAULT_SECRET_FORMAT = getattr(settings,
                                 'DJANGO_FREERADIUS_DEFAULT_SECRET_FORMAT',
                                 'NT-Password')
 
-DISABLED_SECRET_FORMATS = getattr(settings,
-                                  'DISABLED_SECRET_FORMATS',
-                                  ['Cleartext-Password',
-                                   'LM-Password',
-                                   'MD5-Password',
-                                   'SMD5-Password',
-                                   'SSHA-Password',
-                                   'Crypt-Password'])
+DISABLED_SECRET_FORMATS = getattr(settings, 'DJANGO_FREERADIUS_DISABLED_SECRET_FORMATS', [])
 
 RADCHECK_SECRET_VALIDATORS = getattr(settings,
                                      'DJANGO_FREERADIUS_RADCHECK_SECRET_VALIDATORS',
