@@ -180,9 +180,12 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                                           app_settings.DISABLED_SECRET_FORMATS],
                                  blank=True,
                                  default=app_settings.DEFAULT_SECRET_FORMAT)
+    # additional fields to enable more granular checks
     is_active = models.BooleanField(default=True)
     valid_until = models.DateTimeField(null=True, blank=True)
-    note = models.TextField(null=True, blank=True)
+    # internal notes
+    notes = models.TextField(null=True, blank=True)
+    # custom manager
     objects = AbstractRadiusCheckManager()
 
     class Meta:
