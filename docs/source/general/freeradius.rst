@@ -19,7 +19,7 @@ First of all, become root:
     sudo -i
 
 .. note::
-    If you use a recent version of Debian like **Jessie** or Ubuntu **Zesty**,
+    If you use a recent version of Debian like **Jessie**(9) or Ubuntu **Zesty**(17.04),
     you can skip the following command and use the official repositories if you prefer.
 
 Let's add the PPA repository for the Freeradius 3.x stable branch:
