@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from .. import settings as app_settings
 from .models import AbstractRadiusCheck
 
+radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
+
 
 class AbstractRadiusCheckAdminForm(forms.ModelForm):
     _secret_help_text = _('The secret must contains lowercase'
@@ -15,7 +17,8 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
                           '! % - _ + = [ ] { } : , . ? < > ( ) ; ')
     # custom field not backed by database
     new_value = forms.CharField(label=_('Value'), required=False,
-                                min_length=8, max_length=16,
+                                min_length=8,
+                                max_length=radcheck_value_field.max_length,
                                 widget=forms.PasswordInput(),
                                 help_text=_secret_help_text)
 
