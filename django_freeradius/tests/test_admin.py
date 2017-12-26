@@ -1,4 +1,5 @@
 import os
+from copy import copy
 from unittest import skipIf
 
 from django.contrib.auth.models import User
@@ -10,6 +11,11 @@ from ..models import (
     Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
     RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
+
+_RADCHECK_ENTRY = {'username': 'Monica', 'value': 'Cam0_liX',
+                   'attribute': 'NT-Password'}
+_RADCHECK_ENTRY_PW_UPDATE = {'username': 'Monica', 'new_value': 'Cam0_liX',
+                             'attribute': 'NT-Password'}
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
@@ -28,12 +34,6 @@ class TestAdmin(TestCase):
                                  secret='d', ports='22', community='vmv',
                                  description='ciao', server='jsjs')
         response = self.client.get(reverse('admin:django_freeradius_nas_change', args=[obj.pk]))
-        self.assertContains(response, 'ok')
-
-    def test_radiuscheck_change(self):
-        obj = RadiusCheck.objects.create(username='bob', attribute='Cleartext-Password',
-                                         op=':=', value='passbob')
-        response = self.client.get(reverse('admin:django_freeradius_radiuscheck_change', args=[obj.pk]))
         self.assertContains(response, 'ok')
 
     def test_radiusreply_change(self):
@@ -95,9 +95,83 @@ class TestAdmin(TestCase):
         settings.EDITABLE_ACCOUNTING = original_value
 
     def test_postauth_change(self):
-        User.objects.create_superuser(username='gino', password='cic', email='giggi_vv@gmail.it')
         obj = RadiusPostAuth.objects.create(username='gino', password='ciao',
                                             reply='ghdhd', date='2017-09-02')
-        self.client.login(username='gino', password='cic')
         response = self.client.get(reverse('admin:django_freeradius_radiuspostauth_change', args=[obj.pk]))
         self.assertContains(response, 'ok')
+
+    def test_radiuscheck_change(self):
+        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['attribute'] = 'Cleartext-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'LM-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'NT-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        response = self.client.post(reverse('admin:django_freeradius_radiuscheck_change', args=[obj.pk]),
+                                    _RADCHECK_ENTRY_PW_UPDATE, follow=True)
+        self.assertContains(response, 'ok')
+
+    def test_radiuscheck_create_weak_passwd(self):
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['new_value'] = ''
+        resp = self.client.post(reverse('admin:django_freeradius_radiuscheck_add'),
+                                _RADCHECK, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_create_disabled_hash(self):
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['attribute'] = 'Cleartext-Password'
+        response = self.client.post(reverse('admin:django_freeradius_radiuscheck_add'),
+                                    _RADCHECK, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radiuscheck_admin_save_model(self):
+        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        change_url = reverse('admin:django_freeradius_radiuscheck_change', args=[obj.pk])
+        # test admin save_model method
+        data = _RADCHECK_ENTRY_PW_UPDATE
+        data['op'] = ':='
+        response = self.client.post(change_url, data, follow=True)
+        # test also invalid password
+        data = _RADCHECK_ENTRY_PW_UPDATE
+        data['new_value'] = 'cionfrazZ'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radiuscheck_enable_disable_action(self):
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        checks = RadiusCheck.objects.all().values_list('pk', flat=True)
+        change_url = reverse('admin:django_freeradius_radiuscheck_changelist')
+        data = {'action': 'enable_action',
+                '_selected_action': checks}
+        self.client.post(change_url, data, follow=True)
+        data = {'action': 'disable_action',
+                '_selected_action': checks}
+        self.client.post(change_url, data, follow=True)
+        self.assertEqual(RadiusCheck.objects.filter(is_active=True).count(), 0)
+
+    def test_radiuscheck_filter_duplicates_username(self):
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        url = reverse('admin:django_freeradius_radiuscheck_changelist')+'?duplicates=username'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_duplicates_value(self):
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        url = reverse('admin:django_freeradius_radiuscheck_changelist')+'?duplicates=value'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_expired(self):
+        url = reverse('admin:django_freeradius_radiuscheck_changelist')+'?expired=expired'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_not_expired(self):
+        url = reverse('admin:django_freeradius_radiuscheck_changelist')+'?expired=not_expired'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)

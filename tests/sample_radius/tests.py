@@ -115,101 +115,6 @@ class TestAdmin(TestCase):
         resp = self.client.get(reverse('admin:sample_radius_nas_change', args=[obj.pk]))
         self.assertContains(resp, 'ok')
 
-    def test_radiuscheck_change(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
-        _RADCHECK['attribute'] = 'Cleartext-Password'
-        RadiusCheck.objects.create(**_RADCHECK)
-        _RADCHECK['attribute'] = 'LM-Password'
-        RadiusCheck.objects.create(**_RADCHECK)
-        _RADCHECK['attribute'] = 'NT-Password'
-        RadiusCheck.objects.create(**_RADCHECK)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        response = self.client.post(reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk]),
-                                    _RADCHECK_ENTRY_PW_UPDATE, follow=True)
-        self.assertContains(response, 'ok')
-
-    def test_radiuscheck_create_weak_passwd(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
-        _RADCHECK['new_value'] = ''
-        resp = self.client.post(reverse('admin:sample_radius_radiuscheck_add'),
-                                _RADCHECK, follow=True)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_radiuscheck_create_disabled_hash(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
-        _RADCHECK['attribute'] = 'Cleartext-Password'
-        response = self.client.post(reverse('admin:sample_radius_radiuscheck_add'),
-                                    _RADCHECK, follow=True)
-        self.assertEqual(response.status_code, 200)
-
-    def test_radiuscheck_admin_save_model(self):
-        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        change_url = reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk])
-        # test admin save_model method
-        data = _RADCHECK_ENTRY_PW_UPDATE
-        data['op'] = ':='
-        response = self.client.post(change_url, data, follow=True)
-        # test also invalid password
-        data = _RADCHECK_ENTRY_PW_UPDATE
-        data['new_value'] = 'cionfrazZ'
-        response = self.client.post(change_url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
-
-    def test_radiuscheck_enable_disable_accounts(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        accounts = RadiusCheck.objects.all().values_list('pk', flat=True)
-        change_url = reverse('admin:sample_radius_radiuscheck_changelist')
-        data = {'action': 'enable_accounts',
-                '_selected_action': accounts}
-        self.client.post(change_url, data, follow=True)
-        data = {'action': 'disable_accounts',
-                '_selected_action': accounts}
-        self.client.post(change_url, data, follow=True)
-        self.assertEqual(RadiusCheck.objects.filter(is_active=True).count(), 0)
-
-    def test_radiuscheck_filter_duplicates_username(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?duplicates=username'
-        resp = self.client.get(url, follow=True)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_radiuscheck_filter_duplicates_value(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
-        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?duplicates=value'
-        resp = self.client.get(url, follow=True)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_radiuscheck_filter_expired(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?expired=expired'
-        resp = self.client.get(url, follow=True)
-        self.assertEqual(resp.status_code, 200)
-
-    def test_radiuscheck_filter_not_expired(self):
-        User.objects.create_superuser(**_SUPERUSER)
-        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?expired=not_expired'
-        resp = self.client.get(url, follow=True)
-        self.assertEqual(resp.status_code, 200)
-
     def test_radiusreply_change(self):
         User.objects.create_superuser(**_SUPERUSER)
         obj = RadiusReply.objects.create(username='bob', attribute='Cleartext-Password',
@@ -286,3 +191,98 @@ class TestAdmin(TestCase):
         self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
         resp = self.client.get(reverse('admin:sample_radius_radiuspostauth_change', args=[olu.pk]))
         self.assertContains(resp, 'ok')
+
+    def test_radiuscheck_change(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['attribute'] = 'Cleartext-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'LM-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'NT-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        response = self.client.post(reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk]),
+                                    _RADCHECK_ENTRY_PW_UPDATE, follow=True)
+        self.assertContains(response, 'ok')
+
+    def test_radiuscheck_create_weak_passwd(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['new_value'] = ''
+        resp = self.client.post(reverse('admin:sample_radius_radiuscheck_add'),
+                                _RADCHECK, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_create_disabled_hash(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK['attribute'] = 'Cleartext-Password'
+        response = self.client.post(reverse('admin:sample_radius_radiuscheck_add'),
+                                    _RADCHECK, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radiuscheck_admin_save_model(self):
+        obj = RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        change_url = reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk])
+        # test admin save_model method
+        data = _RADCHECK_ENTRY_PW_UPDATE
+        data['op'] = ':='
+        response = self.client.post(change_url, data, follow=True)
+        # test also invalid password
+        data = _RADCHECK_ENTRY_PW_UPDATE
+        data['new_value'] = 'cionfrazZ'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radiuscheck_enable_disable_action(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        checks = RadiusCheck.objects.all().values_list('pk', flat=True)
+        change_url = reverse('admin:sample_radius_radiuscheck_changelist')
+        data = {'action': 'enable_action',
+                '_selected_action': checks}
+        self.client.post(change_url, data, follow=True)
+        data = {'action': 'disable_action',
+                '_selected_action': checks}
+        self.client.post(change_url, data, follow=True)
+        self.assertEqual(RadiusCheck.objects.filter(is_active=True).count(), 0)
+
+    def test_radiuscheck_filter_duplicates_username(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?duplicates=username'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_duplicates_value(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        RadiusCheck.objects.create(**_RADCHECK_ENTRY)
+        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?duplicates=value'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_expired(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?expired=expired'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_radiuscheck_filter_not_expired(self):
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        url = reverse('admin:sample_radius_radiuscheck_changelist')+'?expired=not_expired'
+        resp = self.client.get(url, follow=True)
+        self.assertEqual(resp.status_code, 200)
