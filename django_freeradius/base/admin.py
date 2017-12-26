@@ -2,7 +2,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.actions import delete_selected
 
 from .. import settings as app_settings
-from .admin_actions import disable_accounts, enable_accounts
+from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
 from .forms import AbstractRadiusCheckAdminForm
 from .models import _encode_secret
@@ -72,8 +72,8 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     readonly_fields = ('value',)
     form = AbstractRadiusCheckAdminForm
     fields = ['username', 'op', 'attribute', 'value', 'new_value',
-              'is_active', 'valid_until', 'note', 'created', 'modified']
-    actions = [disable_accounts, enable_accounts, delete_selected]
+              'is_active', 'valid_until', 'notes', 'created', 'modified']
+    actions = [disable_action, enable_action, delete_selected]
 
     def save_model(self, request, obj, form, change):
         if form.data.get('new_value'):
