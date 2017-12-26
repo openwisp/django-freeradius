@@ -69,23 +69,6 @@ Now enable the ``sql`` and ``rest`` modules:
     ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
     ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
 
-Extends Freeradius query to introduce is_active and valid_until checks.
-An example using Mysql server is:
-
-.. code-block:: shell
-
-    nano /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
-
-.. code-block:: ini
-
-    authorize_check_query = "\
-    SELECT id, username, attribute, value, op \
-    FROM ${authcheck_table} \
-    WHERE username = '%{SQL-User-Name}' \
-    AND is_active = TRUE \
-    AND valid_until >= CURDATE() \
-    ORDER BY id"
-
 Restart freeradius to load the new configuration:
 
 .. code-block:: shell
@@ -166,6 +149,27 @@ Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the de
         acct_unique
         # ...
     }
+
+Radius Checks: ``is_active`` & ``valid_until``
+----------------------------------------------
+
+Django-Freeradius provides the possibility to extend the freeradius
+query in order to introduce ``is_active`` and ``valid_until`` checks.
+
+An example using MySQL is:
+
+.. code-block:: shell
+
+    vim /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
+
+.. code-block:: ini
+
+    authorize_check_query = "SELECT id, username, attribute, value, op \
+                             FROM ${authcheck_table} \
+                             WHERE username = '%{SQL-User-Name}' \
+                             AND is_active = TRUE \
+                             AND valid_until >= CURDATE() \
+                             ORDER BY id"
 
 Debugging
 ---------
