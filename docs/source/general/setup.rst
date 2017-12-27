@@ -5,19 +5,19 @@ Setup
 Create a virtual environment
 ----------------------------
 
-Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_. It keeps everybody on the same page, helps reproducing bugs
-and resolving problems. Otherwise, you may encounter errors.
+Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_.
+It keeps everybody on the same page, helps reproducing bugs and resolving problems.
 
-We suggest you to use `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io>`_ for this task.
+We highly suggest to use **virtualenvwrapper**, please refer to the official `virtualenvwarpper installation page <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ and come back here when ready to proceed.
 
 .. code-block:: shell
 
-    mkvirtualenv radius  # create virtualenv
+    # create virtualenv
+    mkvirtualenv radius
 
 .. note::
-    You may encounter an error like `Python could not import the module virtualenvwrapper`
-    **Solution**: enter `VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3` and run `source virtualenvwrapper.sh` again :)
-
+    If you encounter an error like ``Python could not import the module virtualenvwrapper``
+    add ``VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3`` and run ``source virtualenvwrapper.sh`` again :)
 
 Install stable version from pypi
 --------------------------------
