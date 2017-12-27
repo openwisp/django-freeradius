@@ -19,7 +19,7 @@ First of all, become root:
     sudo -i
 
 .. note::
-    If you use a recent version of Debian like **Jessie** or Ubuntu **Zesty**,
+    If you use a recent version of Debian like **Stretch** (9) or Ubuntu **Zesty** (17),
     you can skip the following command and use the official repositories if you prefer.
 
 Let's add the PPA repository for the Freeradius 3.x stable branch:
@@ -66,8 +66,12 @@ Now enable the ``sql`` and ``rest`` modules:
 .. code-block:: shell
 
     cd mods-enabled/
-    ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
-    ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
+    ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
+    ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
+    
+.. note::
+    Where *3.0* is version of freeradius. In the future there may be another version, not 3.0.
+    And on some distributions the *3.0/* dir is missing and then typically the path is `/etc/freeradius/mods-available`
 
 Restart freeradius to load the new configuration:
 

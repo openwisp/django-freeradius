@@ -2,6 +2,23 @@
 Setup
 =====
 
+Create a virtual environment
+----------------------------
+
+Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_.
+It keeps everybody on the same page, helps reproducing bugs and resolving problems.
+
+We highly suggest to use **virtualenvwrapper**, please refer to the official `virtualenvwarpper installation page <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ and come back here when ready to proceed.
+
+.. code-block:: shell
+
+    # create virtualenv
+    mkvirtualenv radius
+
+.. note::
+    If you encounter an error like ``Python could not import the module virtualenvwrapper``
+    add ``VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3`` and run ``source virtualenvwrapper.sh`` again :)
+
 Install stable version from pypi
 --------------------------------
 
@@ -72,6 +89,12 @@ Install sqlite:
 .. code-block:: shell
 
     sudo apt-get install sqlite3 libsqlite3-dev
+
+Install mysqlclient:
+
+.. code-block:: shell
+
+    sudo apt-get install libmysqlclient-dev
 
 Install your forked repo:
 
