@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import AbstractRadiusCheck
+from .models import RAD_NAS_TYPES, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 
@@ -37,4 +37,21 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
 
     class Meta:
         model = AbstractRadiusCheck
+        fields = '__all__'
+
+
+# class for add customer fields in the NAS
+class NasModelForm(forms.ModelForm):
+
+    standard_type = forms.ChoiceField(choices=RAD_NAS_TYPES,
+                                      help_text="choose one of the standard types...",
+                                      initial='Other',
+                                      )
+
+    other_NAS_type = forms.CharField(help_text="...or write a new type.",
+                                     required=False,
+                                     max_length=30,
+                                     )
+
+    class Meta:
         fields = '__all__'
