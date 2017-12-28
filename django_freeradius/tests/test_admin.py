@@ -186,3 +186,9 @@ class TestAdmin(TestCase):
         )
         call_command('delete_old_radacct', 3)
         self.assertEqual(RadiusAccounting.objects.filter(unique_id='666').count(), 0)
+
+    def test_delete_old_postauth_command(self):
+        RadiusPostAuth.objects.create(username='steve', password='jones', reply='ghdhd')
+        RadiusPostAuth.objects.filter(username='steve').update(date='2017-06-10 10:50:00')
+        call_command('delete_old_postauth', 3)
+        self.assertEqual(RadiusPostAuth.objects.filter(username='steve').count(), 0)
