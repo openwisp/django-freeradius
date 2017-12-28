@@ -27,3 +27,18 @@ For example:
 .. code-block:: shell
 
     ./manage.py delete_old_radacct 365
+
+``delete_old_postauth``
+------------------------
+
+This command deletes RADIUS post-auth logs older than <days>.
+
+.. code-block:: shell
+
+    ./manage.py delete_old_postauth <days>
+
+For example:
+
+.. code-block:: shell
+
+    ./manage.py delete_old_postauth 365
