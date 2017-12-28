@@ -61,7 +61,7 @@ class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
-    list_display = ('username', 'attribute', 'value', 'is_active',
+    list_display = ('username', 'attribute', 'value',
                     'created', 'modified')
     search_fields = ('username',)
     list_filter = ('created', 'modified')
@@ -93,7 +93,7 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
         }),
     )
     search_fields = ['name', 'short_name', 'server']
-    list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
+    list_display = ['name', 'short_name', 'server','type', 'secret', 'created', 'modified']
 
     def save_model(self, request, obj, form, change):
         if form.cleaned_data.get('other_NAS_type') != "":

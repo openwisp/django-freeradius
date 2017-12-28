@@ -20,20 +20,65 @@ RADOP_CHECK_TYPES = (
     ('!*', '!*'),
 )
 
+RAD_CHECK_ATTRIBUTE = (
+    ('session_limit', 'session_limit'),
+    ('Simultaneous-Use', 'Simultaneous-Use'),
+    ('attributo2', 'attributo2'),
+)
+
+RAD_NAS_TYPES = (
+    ('Async', 'Async'),
+    ('Sync', 'Sync'),
+    ('ISDN Sync', 'ISDN Sync'),
+    ('ISDN Async V.120', 'ISDN Async V.120'),
+    ('ISDN Async V.110', 'ISDN Async V.110'),
+    ('Virtual', 'Virtual'),
+    ('PIAFS', 'PIAFS'),
+    ('HDLC Clear', 'HDLC Clear'),
+    ('Channel', 'Channel'),
+    ('X.25', 'X.25'),
+    ('X.75', 'X.75'),
+    ('G.3 Fax', 'G.3 Fax'),
+    ('SDSL', 'SDSL - Symmetric DSL'),
+    ('ADSL-CAP', 'ADSL-CAP'),
+    ('ADSL-DMT', 'ADSL-DMT'),
+    ('IDSL', 'IDSL'),
+    ('Ethernet', 'Ethernet'),
+    ('xDSL', 'xDSL'),
+    ('Cable', 'Cable'),
+    ('Wireless - Other', 'Wireless - Other'),
+    ('IEEE 802.11', 'Wireless - IEEE 802.11'),
+    ('Token-Ring', 'Token-Ring'),
+    ('FDDI', 'FDDI'),
+    ('Wireless - CDMA2000', 'Wireless - CDMA2000'),
+    ('Wireless - UMTS', 'Wireless - UMTS'),
+    ('Wireless - 1X-EV', 'Wireless - 1X-EV'),
+    ('IAPP', 'IAPP'),
+    ('FTTP', 'FTTP'),
+    ('IEEE 802.16', 'Wireless - IEEE 802.16'),
+    ('IEEE 802.20', 'Wireless - IEEE 802.20'),
+    ('IEEE 802.22', 'Wireless - IEEE 802.22'),
+    ('PPPoA', 'PPPoA - PPP over ATM'),
+    ('PPPoEoA', 'PPPoEoA - PPP over Ethernet over ATM'),
+    ('PPPoEoE', 'PPPoEoE - PPP over Ethernet over Ethernet'),
+    ('PPPoEoVLAN', 'PPPoEoVLAN - PPP over Ethernet over VLAN'),
+    ('PPPoEoQinQ', 'PPPoEoQinQ - PPP over Ethernet over IEEE 802.1QinQ'),
+    ('xPON', 'xPON - Passive Optical Network'),
+    ('Wireless - XGP', 'Wireless - XGP'),
+    ('WiMAX', ' WiMAX Pre-Release 8 IWK Function'),
+    ('WIMAX-WIFI-IWK', 'WIMAX-WIFI-IWK: WiMAX WIFI Interworking'),
+    ('WIMAX-SFF', 'WIMAX-SFF: Signaling Forwarding Function for LTE/3GPP2'),
+    ('WIMAX-HA-LMA', 'WIMAX-HA-LMA: WiMAX HA and or LMA function'),
+    ('WIMAX-DHCP', 'WIMAX-DHCP: WIMAX DCHP service'),
+    ('WIMAX-LBS', 'WIMAX-LBS: WiMAX location based service'),
+    ('WIMAX-WVS', 'WIMAX-WVS: WiMAX voice service'),
+    ('Other', 'Other'),
+)
+
 RADOP_REPLY_TYPES = (
     ('=', '='),
     (':=', ':='),
     ('+=', '+='),
-)
-
-RADCHECK_PASSWD_TYPE = (
-    ('Cleartext-Password', 'Cleartext-Password'),
-    ('NT-Password', 'NT-Password'),
-    ('LM-Password', 'LM-Password'),
-    ('MD5-Password', 'MD5-Password'),
-    ('SMD5-Password', 'SMD5-Password'),
-    ('SSHA-Password', 'SSHA-Password'),
-    ('Crypt-Password', 'Crypt-Password'),
 )
 
 
@@ -134,8 +179,7 @@ class AbstractRadiusCheck(TimeStampedEditableModel):
                           choices=RADOP_CHECK_TYPES,
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
-                                 max_length=64, choices=RADCHECK_PASSWD_TYPE)
-    is_active = models.BooleanField(default=True)
+                                 max_length=64)
 
     class Meta:
         db_table = 'radcheck'
@@ -280,27 +324,32 @@ class AbstractRadiusAccounting(models.Model):
 
 @python_2_unicode_compatible
 class AbstractNas(TimeStampedEditableModel):
-    name = models.CharField(verbose_name=_('name'),
+    name = models.CharField(verbose_name=_('hostname/ip-address'),
                             max_length=128,
                             help_text=_('NAS Name (or IP address)'),
-                            db_index=True,
-                            db_column='nasname')
+                            db_column='nasname',
+                            unique = True)
     short_name = models.CharField(verbose_name=_('short name'),
                                   max_length=32,
                                   db_column='shortname')
     type = models.CharField(verbose_name=_('type'),
                             max_length=30,
-                            default='other')
+                            help_text=_('Type of NAS'),
+                            )
+
     ports = models.PositiveIntegerField(verbose_name=_('ports'),
                                         blank=True,
-                                        null=True)
+                                        null=True,)
+
     secret = models.CharField(verbose_name=_('secret'),
                               max_length=60,
                               help_text=_('Shared Secret'))
     server = models.CharField(verbose_name=_('server'),
                               max_length=64,
                               blank=True,
-                              null=True)
+                              null=True,
+                              help_text=_('The virtual server of the NAS'),
+                              )
     community = models.CharField(verbose_name=_('community'),
                                  max_length=50,
                                  blank=True,
@@ -366,7 +415,9 @@ class AbstractRadiusGroupCheck(TimeStampedEditableModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
                                  db_index=True)
-    attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
+    attribute = models.CharField(verbose_name=_('attribute'),
+                                 max_length=64,
+                                 choices = RAD_CHECK_ATTRIBUTE,)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
                           choices=RADOP_CHECK_TYPES,
