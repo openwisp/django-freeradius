@@ -23,6 +23,8 @@ _RADCHECK_ENTRY = {'username': 'Monica', 'value': 'Cam0_liX',
                    'attribute': 'NT-Password'}
 _RADCHECK_ENTRY_PW_UPDATE = {'username': 'Monica', 'new_value': 'Cam0_liX',
                              'attribute': 'NT-Password'}
+_NAS_ENTRY = {'name': 'e', 'short_name': 'e', 'type': ' ', 'ports': '12',
+              'secret': 'c', 'server': 'e', 'community': 'e', 'description': 'e'}
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
@@ -286,3 +288,17 @@ class TestAdmin(TestCase):
         url = reverse('admin:sample_radius_radiuscheck_changelist')+'?expired=not_expired'
         resp = self.client.get(url, follow=True)
         self.assertEqual(resp.status_code, 200)
+
+    def test_nas_admin_save_model(self):
+        obj = Nas.objects.create(**_NAS_ENTRY)
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        change_url = reverse('admin:sample_radius_nas_change', args=[obj.pk])
+        data = copy(_NAS_ENTRY)
+        data['other_NAS_type'] = ''
+        data['standard_type'] = 'Other'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        data['other_NAS_type'] = 'cionfrazZ'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
