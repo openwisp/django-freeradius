@@ -1,5 +1,7 @@
 from django import forms
+
 from .models import RAD_NAS_TYPES
+
 
 # class for add customer fields in the NAS
 class NasModelForm(forms.ModelForm):

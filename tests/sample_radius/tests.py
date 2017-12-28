@@ -1,4 +1,5 @@
 import os
+from copy import copy
 from unittest import skipUnless
 
 import swapper
@@ -16,6 +17,11 @@ RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
+
+
+_SUPERUSER = {'username': 'gino', 'password': 'cic', 'email': 'gigi_vv@gmail.it'}
+_NAS_ENTRY = {'name': 'e', 'short_name': 'e', 'type': ' ', 'ports': '12',
+              'secret': 'c', 'server': 'e', 'community': 'e', 'description': 'e'}
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
@@ -101,7 +107,7 @@ class TestAdmin(TestCase):
 
     def test_radius_nas_change(self):
         User.objects.create_superuser(username='gino', password='cc', email='giggi_vv@gmail.it')
-        obj = Nas.objects.create(name='fiore', short_name='ff', type='cisco',
+        obj = Nas.objects.create(name='fiore', short_name='ff',
                                  secret='d', ports='22', community='vmv',
                                  description='ciao', server='jsjs', details='nb')
         self.client.login(username='gino', password='cc')
@@ -192,3 +198,17 @@ class TestAdmin(TestCase):
         self.client.login(username='gino', password='cic')
         resp = self.client.get(reverse('admin:sample_radius_radiuspostauth_change', args=[olu.pk]))
         self.assertContains(resp, 'ok')
+
+    def test_nas_admin_save_model(self):
+        obj = Nas.objects.create(**_NAS_ENTRY)
+        User.objects.create_superuser(**_SUPERUSER)
+        self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
+        change_url = reverse('admin:sample_radius_nas_change', args=[obj.pk])
+        data = copy(_NAS_ENTRY)
+        data['other_NAS_type'] = ''
+        data['standard_type'] = 'Other'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        data['other_NAS_type'] = 'cionfrazZ'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)

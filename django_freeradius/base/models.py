@@ -328,7 +328,7 @@ class AbstractNas(TimeStampedEditableModel):
                             max_length=128,
                             help_text=_('NAS Name (or IP address)'),
                             db_column='nasname',
-                            unique = True)
+                            unique=True)
     short_name = models.CharField(verbose_name=_('short name'),
                                   max_length=32,
                                   db_column='shortname')
@@ -417,7 +417,7 @@ class AbstractRadiusGroupCheck(TimeStampedEditableModel):
                                  db_index=True)
     attribute = models.CharField(verbose_name=_('attribute'),
                                  max_length=64,
-                                 choices = RAD_CHECK_ATTRIBUTE,)
+                                 choices=RAD_CHECK_ATTRIBUTE,)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
                           choices=RADOP_CHECK_TYPES,

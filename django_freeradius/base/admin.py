@@ -93,7 +93,7 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
         }),
     )
     search_fields = ['name', 'short_name', 'server']
-    list_display = ['name', 'short_name', 'server','type', 'secret', 'created', 'modified']
+    list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
 
     def save_model(self, request, obj, form, change):
         if form.cleaned_data.get('other_NAS_type') != "":
