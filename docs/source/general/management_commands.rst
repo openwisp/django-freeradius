@@ -42,3 +42,18 @@ For example:
 .. code-block:: shell
 
     ./manage.py delete_old_postauth 365
+
+``cleanup_stale_radacct``
+-------------------------
+
+This command closes stale RADIUS sessions that have remained open for the number of days specified.
+
+.. code-block:: shell
+
+    ./manage.py cleanup_stale_radacct <days>
+
+For example:
+
+.. code-block:: shell
+
+    ./manage.py cleanup_stale_radacct 15

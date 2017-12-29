@@ -17,6 +17,10 @@ _RADCHECK_ENTRY = {'username': 'Monica', 'value': 'Cam0_liX',
                    'attribute': 'NT-Password'}
 _RADCHECK_ENTRY_PW_UPDATE = {'username': 'Monica', 'new_value': 'Cam0_liX',
                              'attribute': 'NT-Password'}
+_RADACCT = {'username': 'bob', 'nas_ip_address': '127.0.0.1',
+            'start_time': '2017-06-10 10:50:00', 'authentication': 'RADIUS',
+            'connection_info_start': 'f', 'connection_info_stop': 'hgh',
+            'input_octets': '1', 'output_octets': '4'}
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
@@ -178,12 +182,11 @@ class TestAdmin(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_delete_old_radacct_command(self):
-        RadiusAccounting.objects.create(
-            unique_id='666', username='bob', nas_ip_address='127.0.0.1', start_time='2017-06-10 10:50:00',
-            stop_time='2017-06-10 11:50:00', session_time='5', authentication='RADIUS',
-            connection_info_start='f', connection_info_stop='hgh',
-            input_octets='1', output_octets='4', update_time='2017-03-10 11:50:00'
-        )
+        options = _RADACCT.copy()
+        options['stop_time'] = '2017-06-10 11:50:00'
+        options['update_time'] = '2017-03-10 11:50:00'
+        options['unique_id'] = '666'
+        RadiusAccounting.objects.create(**options)
         call_command('delete_old_radacct', 3)
         self.assertEqual(RadiusAccounting.objects.filter(unique_id='666').count(), 0)
 
@@ -213,3 +216,13 @@ class TestAdmin(TestCase):
         self.assertNotContains(response, 'error')
         nas.refresh_from_db()
         self.assertEqual(nas.type, 'my-custom-type')
+
+    def test_cleanup_stale_radacct_command(self):
+        options = _RADACCT.copy()
+        options['unique_id'] = '117'
+        RadiusAccounting.objects.create(**options)
+        call_command('cleanup_stale_radacct', 30)
+        session = RadiusAccounting.objects.get(unique_id='117')
+        self.assertNotEqual(session.stop_time, None)
+        self.assertNotEqual(session.session_time, None)
+        self.assertEqual(session.update_time, session.stop_time)
