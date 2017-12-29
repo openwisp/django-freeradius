@@ -192,3 +192,24 @@ class TestAdmin(TestCase):
         RadiusPostAuth.objects.filter(username='steve').update(date='2017-06-10 10:50:00')
         call_command('delete_old_postauth', 3)
         self.assertEqual(RadiusPostAuth.objects.filter(username='steve').count(), 0)
+
+    def test_nas_admin_save_model(self):
+        options = {
+            'name': 'test-NAS', 'short_name': 'test', 'type': 'Virtual',
+            'ports': '12', 'secret': 'testing123', 'server': '',
+            'community': '', 'description': 'test'
+        }
+        nas = Nas.objects.create(**options)
+        change_url = reverse('admin:django_freeradius_nas_change', args=[nas.pk])
+        data = options.copy()
+        data['custom_type'] = ''
+        data['type'] = 'Other'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertNotContains(response, 'error')
+        nas.refresh_from_db()
+        self.assertEqual(nas.type, 'Other')
+        data['custom_type'] = 'my-custom-type'
+        response = self.client.post(change_url, data, follow=True)
+        self.assertNotContains(response, 'error')
+        nas.refresh_from_db()
+        self.assertEqual(nas.type, 'my-custom-type')

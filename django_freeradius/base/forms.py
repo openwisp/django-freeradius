@@ -5,9 +5,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import RAD_NAS_TYPES, AbstractRadiusCheck
+from .models import RAD_NAS_TYPES, AbstractNas, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
+nas_type_field = AbstractNas._meta.get_field('type')
 
 
 class AbstractRadiusCheckAdminForm(forms.ModelForm):
@@ -24,7 +25,7 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
 
     def clean_attribute(self):
         if self.data['attribute'] not in app_settings.DISABLED_SECRET_FORMATS:
-            return self.cleaned_data["attribute"]
+            return self.cleaned_data['attribute']
 
     def clean_new_value(self):
         if not self.data['new_value']:
@@ -33,25 +34,22 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
             found = re.findall(regexp, self.data['new_value'])
             if not found:
                 raise ValidationError(self._secret_help_text)
-        return self.cleaned_data["new_value"]
+        return self.cleaned_data['new_value']
 
     class Meta:
         model = AbstractRadiusCheck
         fields = '__all__'
 
 
-# class for add customer fields in the NAS
 class NasModelForm(forms.ModelForm):
-
-    standard_type = forms.ChoiceField(choices=RAD_NAS_TYPES,
-                                      help_text="choose one of the standard types...",
-                                      initial='Other',
-                                      )
-
-    other_NAS_type = forms.CharField(help_text="...or write a new type.",
-                                     required=False,
-                                     max_length=30,
-                                     )
-
-    class Meta:
-        fields = '__all__'
+    """
+    Allows users to easily select a NAS type from
+    a predefined list or to define a custom type
+    """
+    type = forms.ChoiceField(choices=RAD_NAS_TYPES,
+                             initial='Other',
+                             help_text=_('You can use one of the standard '
+                                         'types from the list'))
+    custom_type = forms.CharField(max_length=nas_type_field.max_length,
+                                  required=False,
+                                  help_text=_('or define a custom type'))

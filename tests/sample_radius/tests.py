@@ -23,8 +23,6 @@ _RADCHECK_ENTRY = {'username': 'Monica', 'value': 'Cam0_liX',
                    'attribute': 'NT-Password'}
 _RADCHECK_ENTRY_PW_UPDATE = {'username': 'Monica', 'new_value': 'Cam0_liX',
                              'attribute': 'NT-Password'}
-_NAS_ENTRY = {'name': 'e', 'short_name': 'e', 'type': ' ', 'ports': '12',
-              'secret': 'c', 'server': 'e', 'community': 'e', 'description': 'e'}
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
@@ -290,15 +288,24 @@ class TestAdmin(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_nas_admin_save_model(self):
-        obj = Nas.objects.create(**_NAS_ENTRY)
         User.objects.create_superuser(**_SUPERUSER)
         self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
-        change_url = reverse('admin:sample_radius_nas_change', args=[obj.pk])
-        data = copy(_NAS_ENTRY)
-        data['other_NAS_type'] = ''
-        data['standard_type'] = 'Other'
+        options = {
+            'name': 'test-NAS', 'short_name': 'test', 'type': 'Virtual',
+            'ports': '12', 'secret': 'testing123', 'server': '',
+            'community': '', 'description': 'test'
+        }
+        nas = Nas.objects.create(**options)
+        change_url = reverse('admin:sample_radius_nas_change', args=[nas.pk])
+        data = options.copy()
+        data['custom_type'] = ''
+        data['type'] = 'Other'
         response = self.client.post(change_url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        data['other_NAS_type'] = 'cionfrazZ'
+        self.assertNotContains(response, 'error')
+        nas.refresh_from_db()
+        self.assertEqual(nas.type, 'Other')
+        data['custom_type'] = 'my-custom-type'
         response = self.client.post(change_url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'error')
+        nas.refresh_from_db()
+        self.assertEqual(nas.type, 'my-custom-type')
