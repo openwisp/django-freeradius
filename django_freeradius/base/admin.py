@@ -4,9 +4,8 @@ from django.contrib.admin.actions import delete_selected
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
-from .forms import AbstractRadiusCheckAdminForm
+from .forms import AbstractRadiusCheckAdminForm, NasModelForm
 from .models import _encode_secret
-from .forms import NasModelForm
 
 
 class TimeStampedEditableAdmin(ModelAdmin):
