@@ -71,7 +71,6 @@ Now enable the ``sql`` and ``rest`` modules:
 
 .. code-block:: shell
 
-    cd mods-enabled/
     ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
     ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
     
@@ -125,8 +124,10 @@ Configure the rest module by editing the file ``/etc/freeradius/3.0/mods-enabled
         tls = ${..tls}
     }
 
-Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the default site
-(``/etc/freeradius/3.0/sites-enabled/default``) as follows::
+Configure the ``authorize``, ``authenticate`` and ``postauth`` section
+as follows
+
+.. code-block:: ini
 
     # /etc/freeradius/3.0/sites-enabled/default
 
@@ -149,7 +150,9 @@ Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the de
        rest
     }
 
-    For accounting configuration you need to verify that in pre-accounting we have:
+For accounting configuration you need to verify that in pre-accounting we have:
+
+.. code-block:: ini
 
     preacct {
         # ...
@@ -165,12 +168,9 @@ query in order to introduce ``is_active`` and ``valid_until`` checks.
 
 An example using MySQL is:
 
-.. code-block:: shell
-
-    vim /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
-
 .. code-block:: ini
 
+    # /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
     authorize_check_query = "SELECT id, username, attribute, value, op \
                              FROM ${authcheck_table} \
                              WHERE username = '%{SQL-User-Name}' \
@@ -192,6 +192,8 @@ When debugging we suggest you to open up a dedicated terminal window to run free
 
     # we need to stop the main freeradius process first
     service freeradius stop
+    # alternatively if you are using systemd
+    systemctl stop freeradius
     # launch freeradius in debug mode
     freeradius -X
 
