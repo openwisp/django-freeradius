@@ -40,6 +40,8 @@ Now you can install the packages we need:
 Configuring Freeradius 3
 ------------------------
 
+For a complete reference on how to configure freeradius please read the `Freeradius wiki, configuration files <http://wiki.freeradius.org/config/Configuration-files>`_ and their `configuration tutorial <http://wiki.freeradius.org/guide/HOWTO>`_.
+
 .. note::
     The path to freeradius configuration could be different on your system. This article use the `/etc/freeradius/3.0/` directory that ships with Debian Stretch
 
