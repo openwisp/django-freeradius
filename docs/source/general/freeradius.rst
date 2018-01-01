@@ -40,7 +40,15 @@ Now you can install the packages we need:
 Configuring Freeradius 3
 ------------------------
 
-Edit the file ``/etc/freeradius/mods-available/sql``.
+For a complete reference on how to configure freeradius please read the `Freeradius wiki, configuration files <http://wiki.freeradius.org/config/Configuration-files>`_ and their `configuration tutorial <http://wiki.freeradius.org/guide/HOWTO>`_.
+
+.. note::
+    The path to freeradius configuration could be different on your system. This article use the `/etc/freeradius/3.0/` directory that ships with Debian Stretch
+
+Configure the SQL module
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Edit the file ``/etc/freeradius/3.0/mods-available/sql``.
 
 Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
 
@@ -50,7 +58,7 @@ Example configuration using the PostgreSQL database:
 
 .. code-block:: ini
 
-    # /etc/freeradius/mods-available/sql
+    # /etc/freeradius/3.0/mods-available/sql
     driver = "rlm_sql_postgresql"
     dialect = "postgresql"
 
@@ -65,13 +73,9 @@ Now enable the ``sql`` and ``rest`` modules:
 
 .. code-block:: shell
 
-    cd mods-enabled/
     ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
     ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
     
-.. note::
-    Where *3.0* is version of freeradius. In the future there may be another version, not 3.0.
-    And on some distributions the *3.0/* dir is missing and then typically the path is `/etc/freeradius/mods-available`
 
 Restart freeradius to load the new configuration:
 
@@ -83,15 +87,15 @@ Restart freeradius to load the new configuration:
 
 You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_.
 
-How to configure the REST module
---------------------------------
+Configure the REST module
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/rest``, substituting
+Configure the rest module by editing the file ``/etc/freeradius/3.0/mods-enabled/rest``, substituting
 ``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org/``)-
 
 .. code-block:: ini
 
-    # /etc/freeradius/mods-enabled/rest
+    # /etc/freeradius/3.0/mods-enabled/rest
 
     connect_uri = "<url>"
 
@@ -122,10 +126,12 @@ Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/res
         tls = ${..tls}
     }
 
-Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the default site
-(``/etc/freeradius/sites-enabled/default``) as follows::
+Configure the ``authorize``, ``authenticate`` and ``postauth`` section
+as follows
 
-    # /etc/freeradius/sites-enabled/default
+.. code-block:: ini
+
+    # /etc/freeradius/3.0/sites-enabled/default
 
     authorize {
        rest
@@ -146,7 +152,9 @@ Configure the ``authorize``, ``authenticate`` and ``postauth`` section in the de
        rest
     }
 
-    For accounting configuration you need to verify that in pre-accounting we have:
+For accounting configuration you need to verify that in pre-accounting we have:
+
+.. code-block:: ini
 
     preacct {
         # ...
@@ -162,12 +170,9 @@ query in order to introduce ``is_active`` and ``valid_until`` checks.
 
 An example using MySQL is:
 
-.. code-block:: shell
-
-    vim /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
-
 .. code-block:: ini
 
+    # /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
     authorize_check_query = "SELECT id, username, attribute, value, op \
                              FROM ${authcheck_table} \
                              WHERE username = '%{SQL-User-Name}' \
@@ -181,7 +186,7 @@ Debugging
 In this section we will explain how to debug your freeradius instance.
 
 Start freeradius in debug mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When debugging we suggest you to open up a dedicated terminal window to run freeradius in debug mode:
 
@@ -189,11 +194,13 @@ When debugging we suggest you to open up a dedicated terminal window to run free
 
     # we need to stop the main freeradius process first
     service freeradius stop
+    # alternatively if you are using systemd
+    systemctl stop freeradius
     # launch freeradius in debug mode
     freeradius -X
 
 Testing authentication and authorization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can do this with ``radtest``:
 
@@ -239,7 +246,7 @@ and ``Calling-Station-ID``:
     echo $request | radclient localhost auth testing123
 
 Testing accounting
-~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^
 
 You can do this with ``radclient``, but first of all you will have to create a text file
 like the following one::
