@@ -9,6 +9,13 @@ START_DATE = '2017-08-08 15:16:10+0200'
 
 
 class BaseTestApi(object):
+    def test_disabled_user_login(self):
+        User.objects.create_user(username='barbar', password='molly', is_active=False)
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'barbar', 'password': 'molly'})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+
     def test_authorize_200(self):
         User.objects.create_user(username='molly', password='barbar')
         response = self.client.post(reverse('freeradius:authorize'),

@@ -18,7 +18,7 @@ def authorize(request):
     username = request.data.get('username')
     password = request.data.get('password')
     try:
-        user = User.objects.get(username=username)
+        user = User.objects.get(username=username, is_active=True)
     except User.DoesNotExist:
         user = None
     if user and user.check_password(password):
