@@ -67,8 +67,8 @@ When you introduce changes, ensure test coverage is not decreased with:
 
     coverage run --source=django_freeradius runtests.py
 
-Follow style conventions (PEP8, isort)
---------------------------------------
+Follow style conventions (PEP8, isort, JSLint)
+----------------------------------------------
 
 First of all, install the test requirements:
 
@@ -76,6 +76,7 @@ First of all, install the test requirements:
 
     workon radius  # activate virtualenv
     pip install --no-cache-dir -U -r requirements-test.txt
+    npm install -g jslint
 
 Before committing your work check that your changes are not breaking the style conventions with:
 
@@ -83,6 +84,7 @@ Before committing your work check that your changes are not breaking the style c
 
     ./runflake8
     ./runisort
+    jslint ./django_freeradius/static/django-freeradius/js/*.js
 
 For more information, please see:
 
