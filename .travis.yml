@@ -33,6 +33,7 @@ before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runisort
+  - npm install -g jslint
 
 install:
   - pip install $DJANGO
@@ -45,6 +46,7 @@ before_script:
 
 # command to run tests, e.g. python setup.py test
 script:
+  - jslint ./django_freeradius/static/django-freeradius/js/*.js
   - coverage run --source=django_freeradius runtests.py
 
 after_success:

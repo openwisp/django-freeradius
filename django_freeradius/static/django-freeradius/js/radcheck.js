@@ -2,7 +2,7 @@ django.jQuery(function ($) {
     'use strict';
     // stop here if in add mode
     if (!('.deletelink').length) { return; }
-    if (!gettext) { var gettext = function (text) { return text; }}
+    if (!gettext) { gettext = function (text) { return text; }; }
     var newValueRow = $('.field-new_value'),
         rawValueRow = $('.field-value'),
         newValueInput = newValueRow.find('input'),
