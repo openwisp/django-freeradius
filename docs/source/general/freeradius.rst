@@ -45,6 +45,8 @@ For a complete reference on how to configure freeradius please read the `Freerad
 .. note::
     The path to freeradius configuration could be different on your system. This article use the `/etc/freeradius/3.0/` directory that ships with Debian Stretch
 
+Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_ for the available configuration values.
+
 Configure the SQL module
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -52,7 +54,7 @@ Edit the file ``/etc/freeradius/3.0/mods-available/sql``.
 
 Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
 
-Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_ for the available configuration values.
+Refer to the `sql module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/sql.html>`_ for the available configuration values.
 
 Example configuration using the PostgreSQL database:
 
@@ -69,29 +71,14 @@ Example configuration using the PostgreSQL database:
     password = "<password>"
     radius_db = "radius"
 
-Now enable the ``sql`` and ``rest`` modules:
-
-.. code-block:: shell
-
-    ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
-    ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
-    
-
-Restart freeradius to load the new configuration:
-
-.. code-block:: shell
-
-    service freeradius restart
-    # alternatively if you are using systemd
-    systemctl restart freeradius
-
-You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_.
 
 Configure the REST module
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Configure the rest module by editing the file ``/etc/freeradius/3.0/mods-enabled/rest``, substituting
 ``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org/``)-
+
+Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/rest.html>`_ for the available configuration values.
 
 .. code-block:: ini
 
@@ -161,6 +148,26 @@ For accounting configuration you need to verify that in pre-accounting we have:
         acct_unique
         # ...
     }
+
+Enable the configured modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now enable the ``sql`` and ``rest`` modules:
+
+.. code-block:: shell
+
+    ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
+    ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
+
+Restart freeradius to load the new configuration:
+
+.. code-block:: shell
+
+    service freeradius restart
+    # alternatively if you are using systemd
+    systemctl restart freeradius
+
+You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_ for further details on how to configure other modules.
 
 Radius Checks: ``is_active`` & ``valid_until``
 ----------------------------------------------
