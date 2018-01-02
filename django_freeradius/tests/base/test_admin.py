@@ -1,5 +1,3 @@
-from copy import copy
-
 from django.contrib.auth.models import User
 from django.urls import reverse
 
@@ -115,7 +113,7 @@ class BaseTestAdmin(object):
 
     def test_radiuscheck_change(self):
         obj = self.radius_check_model.objects.create(**_RADCHECK_ENTRY)
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
         _RADCHECK['attribute'] = 'Cleartext-Password'
         self.radius_check_model.objects.create(**_RADCHECK)
         _RADCHECK['attribute'] = 'LM-Password'
@@ -129,14 +127,14 @@ class BaseTestAdmin(object):
         self.assertContains(response, 'ok')
 
     def test_radiuscheck_create_weak_passwd(self):
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
         _RADCHECK['new_value'] = ''
         resp = self.client.post(reverse('admin:{0}_radiuscheck_add'.format(self.app_name)),
                                 _RADCHECK, follow=True)
         self.assertEqual(resp.status_code, 200)
 
     def test_radiuscheck_create_disabled_hash(self):
-        _RADCHECK = copy(_RADCHECK_ENTRY_PW_UPDATE)
+        _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
         _RADCHECK['attribute'] = 'Cleartext-Password'
         response = self.client.post(reverse('admin:{0}_radiuscheck_add'.format(self.app_name)),
                                     _RADCHECK, follow=True)
