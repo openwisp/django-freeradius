@@ -269,3 +269,59 @@ class BaseTestApi(object):
         self.assertEqual(item['input_octets'], data3['input_octets'])
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
+
+    @freeze_time(START_DATE)
+    def test_coova_accounting_on_200(self):
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+        data = {
+            'status_type': 'Accounting-On',
+            'session_id': '',
+            'unique_id': '569533dad629d47d8b122826d3ed7f3d',
+            'username': '',
+            'realm': '',
+            'nas_ip_address': '192.168.182.1',
+            'nas_port_id': '',
+            'nas_port_type': 'Wireless-802.11',
+            'session_time': '',
+            'authentication': '',
+            'input_octets': '',
+            'output_octets': '',
+            'called_station_id': 'C0-4A-00-EE-D1-0D',
+            'calling_station_id': '00-00-00-00-00-00',
+            'terminate_cause': '',
+            'service_type': '',
+            'framed_protocol': '',
+            'framed_ip_address': ''
+        }
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+
+    @freeze_time(START_DATE)
+    def test_coova_accounting_off_200(self):
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+        data = {
+            'status_type': 'Accounting-Off',
+            'session_id': '',
+            'unique_id': '569533dad629d47d8b122826d3ed7f3d',
+            'username': '',
+            'realm': '',
+            'nas_ip_address': '192.168.182.1',
+            'nas_port_id': '',
+            'nas_port_type': 'Wireless-802.11',
+            'session_time': '',
+            'authentication': '',
+            'input_octets': '',
+            'output_octets': '',
+            'called_station_id': 'C0-4A-00-EE-D1-0D',
+            'calling_station_id': '00-00-00-00-00-00',
+            'terminate_cause': '0',
+            'service_type': '',
+            'framed_protocol': '',
+            'framed_ip_address': ''
+        }
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)

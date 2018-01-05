@@ -55,6 +55,10 @@ class AccountingView(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         status_type = self._get_status_type(request)
+        # Accounting-On and Accounting-Off are not implemented and
+        # hence  ignored right now - may be implemented in the future
+        if status_type in ['Accounting-On', 'Accounting-Off']:
+            return Response(None)
         method = 'create' if status_type == 'Start' else 'update'
         return getattr(self, method)(request, *args, **kwargs)
 
