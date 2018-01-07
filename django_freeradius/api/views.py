@@ -63,6 +63,10 @@ class AccountingView(generics.ListCreateAPIView):
         return getattr(self, method)(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
+        is_start = request.data['status_type'] == 'Start'
+        for field in ['session_time', 'input_octets', 'output_octets']:
+            if is_start and request.data[field] == '':
+                request.data[field] = 0
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid()
         error_keys = serializer.errors.keys()
