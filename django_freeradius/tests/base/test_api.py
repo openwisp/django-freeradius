@@ -135,6 +135,43 @@ class BaseTestApi(object):
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
+    def test_accounting_start_coova_chilli(self):
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+        data = {
+            'status_type': 'Start',
+            'session_id': '5a4f59aa00000001',
+            'unique_id': 'd11a8069e261040d8b01b9135bdb8dc9',
+            'username': 'username',
+            'realm': '',
+            'nas_ip_address': '192.168.182.1',
+            'nas_port_id': '1',
+            'nas_port_type': 'Wireless-802.11',
+            'session_time': '',
+            'authentication': '',
+            'input_octets': '',
+            'output_octets': '',
+            'called_station_id': 'C0-4A-00-EE-D1-0D',
+            'calling_station_id': 'A4-02-B9-D3-FD-29',
+            'terminate_cause': '',
+            'service_type': '',
+            'framed_protocol': '',
+            'framed_ip_address': '192.168.182.3'
+        }
+        response = self.post_json(data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+        self.assertEqual(self.radius_accounting_model.objects.count(), 1)
+        ra = self.radius_accounting_model.objects.last()
+        ra.refresh_from_db()
+        data['session_time'] = 0
+        data['input_octets'] = 0
+        data['output_octets'] = 0
+        self.assertEqual(ra.session_time, 0)
+        self.assertEqual(ra.input_octets, 0)
+        self.assertEqual(ra.output_octets, 0)
+        self.assertAcctData(ra, data)
+
+    @freeze_time(START_DATE)
     def test_accounting_start_201(self):
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
         data = self.acct_post_data

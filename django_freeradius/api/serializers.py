@@ -36,6 +36,8 @@ class RadiusAccountingSerializer(serializers.ModelSerializer):
     session_time = serializers.IntegerField(required=False, default=0)
     stop_time = serializers.DateTimeField(required=False)
     update_time = serializers.DateTimeField(required=False)
+    input_octets = serializers.IntegerField(required=False, default=0)
+    output_octets = serializers.IntegerField(required=False, default=0)
     # this is needed otherwise serialize will ignore status_type from accounting packet
     # as it's not a model field
     status_type = serializers.ChoiceField(write_only=True, choices=STATUS_TYPE_CHOICES)
