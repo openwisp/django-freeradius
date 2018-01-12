@@ -64,3 +64,6 @@ local_settings.py
 *.db
 *.tar.gz
 tests/.env
+
+#Pycharm projects
+.idea/
