@@ -11,7 +11,12 @@ django.jQuery(function ($) {
         cancelId = 'cancel-change-radcheck-value',
         cancelHtml = '<button class="button" id="' + cancelId + '">' + gettext('cancel') + '</button>';
     newValueRow.hide();
-    rawValueRow.find('.readonly').append(changeHtml);
+    if (!rawValueRow.html()) {
+        newValueRow.show();
+    } else {
+        rawValueRow.find('.readonly').append(changeHtml);
+    }
+    $('#' + cancelId).hide();
     newValueInput.after(cancelHtml);
     // change value operation
     $('#' + changeId).click(function (e) {
