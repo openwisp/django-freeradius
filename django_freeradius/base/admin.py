@@ -89,7 +89,8 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
         return fields
 
     class Media:
-        js = ('django-freeradius/js/radcheck.js',)
+        js = ('django-freeradius/js/radcheck.js',
+              'django-freeradius/js/textarea-autosize.js')
         css = {'all': ('django-freeradius/css/radcheck.css',)}
 
 
