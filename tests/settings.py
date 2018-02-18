@@ -24,9 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'openwisp_utils.admin_theme',
     'django.contrib.admin',
     'django_freeradius',
-    'rest_framework'
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
