@@ -3,3 +3,4 @@ django-model-utils
 swapper
 djangorestframework>=3.7,<3.8
 passlib
+djangorestframework-link-header-pagination>=0.1.1,<2

@@ -1,3 +1,4 @@
+import drf_link_header_pagination
 import swapper
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -42,8 +43,17 @@ class PostAuthView(generics.CreateAPIView):
 postauth = PostAuthView.as_view()
 
 
+class AccountingViewPagination(drf_link_header_pagination.LinkHeaderPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class AccountingView(generics.ListCreateAPIView):
     """
+    HEADER: Pagination is provided using a Link header
+            https://developer.github.com/v3/guides/traversing-with-pagination/
+
     GET: get list of accounting objects
 
     POST: add or update accounting information (start, interim-update, stop);
@@ -52,6 +62,7 @@ class AccountingView(generics.ListCreateAPIView):
     """
     queryset = RadiusAccounting.objects.all()
     serializer_class = RadiusAccountingSerializer
+    pagination_class = AccountingViewPagination
 
     def post(self, request, *args, **kwargs):
         status_type = self._get_status_type(request)

@@ -288,20 +288,26 @@ class BaseTestApi(object):
                           input_octets=4440909,
                           output_octets=1119074409))
         self.radius_accounting_model.objects.create(**data3)
-        response = self.client.get(self._acct_url)
-        self.assertEqual(len(response.json()), 3)
+        response = self.client.get('{0}?page_size=1&page=1'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
         self.assertEqual(item['username'], 'admin')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
         self.assertEqual(item['output_octets'], data1['output_octets'])
         self.assertEqual(item['input_octets'], data1['input_octets'])
-        item = response.data[1]
+        response = self.client.get('{0}?page_size=1&page=2'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
         self.assertEqual(item['output_octets'], data2['output_octets'])
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['input_octets'], data2['input_octets'])
         self.assertEqual(item['called_station_id'], '00-27-22-F3-FA-F1:hostname')
-        item = response.data[2]
+        response = self.client.get('{0}?page_size=1&page=3'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
         self.assertEqual(item['output_octets'], data3['output_octets'])
         self.assertEqual(item['input_octets'], data3['input_octets'])
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
