@@ -2,6 +2,8 @@ import drf_link_header_pagination
 import swapper
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
@@ -43,6 +45,26 @@ class PostAuthView(generics.CreateAPIView):
 postauth = PostAuthView.as_view()
 
 
+class AccountingFilter(filters.FilterSet):
+    start_time = filters.DateTimeFilter(name='start_time', lookup_expr='gte')
+    stop_time = filters.DateTimeFilter(name='stop_time', lookup_expr='gte')
+    is_open = filters.BooleanFilter(method='filter_open')
+
+    def filter_open(self, queryset, name,  value):
+        if value:
+            return queryset.filter(stop_time__isnull=True)
+        return queryset.filter(stop_time__isnull=False)
+
+    class Meta:
+        model = RadiusAccounting
+        fields = ('username',
+                  'called_station_id',
+                  'calling_station_id',
+                  'start_time',
+                  'stop_time',
+                  'is_open')
+
+
 class AccountingViewPagination(drf_link_header_pagination.LinkHeaderPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -63,6 +85,8 @@ class AccountingView(generics.ListCreateAPIView):
     queryset = RadiusAccounting.objects.all()
     serializer_class = RadiusAccountingSerializer
     pagination_class = AccountingViewPagination
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = AccountingFilter
 
     def post(self, request, *args, **kwargs):
         status_type = self._get_status_type(request)
