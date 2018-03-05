@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django_freeradius',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

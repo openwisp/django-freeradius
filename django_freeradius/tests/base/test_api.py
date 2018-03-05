@@ -313,6 +313,102 @@ class BaseTestApi(object):
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
 
+    def test_accounting_filter_username(self):
+        data1 = self.acct_post_data
+        data1.update(dict(username='test_user',
+                          unique_id='75058e50'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(username='admin',
+                          unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?username=test_user'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['username'], 'test_user')
+
+    def test_accounting_filter_called_station_id(self):
+        data1 = self.acct_post_data
+        data1.update(dict(called_station_id='E0-CA-40-EE-D1-0D',
+                          unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(called_station_id='C0-CA-40-FE-E1-9D',
+                          unique_id='85144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?called_station_id=E0-CA-40-EE-D1-0D'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['called_station_id'], 'E0-CA-40-EE-D1-0D')
+
+    def test_accounting_filter_calling_station_id(self):
+        data1 = self.acct_post_data
+        data1.update(dict(calling_station_id='4c:8d:c2:80:a7:4c',
+                          unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(calling_station_id='5c:6d:c2:80:a7:4c',
+                          unique_id='85144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?calling_station_id=4c:8d:c2:80:a7:4c'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['calling_station_id'], '4c:8d:c2:80:a7:4c')
+
+    @freeze_time(START_DATE)
+    def test_accounting_filter_start_time(self):
+        data1 = self.acct_post_data
+        data1.update(dict(unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(start_time='2018-03-02T00:43:24.020460+01:00',
+                          unique_id='85144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-02'))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['start_time'], '2018-03-02T00:43:24.020460+01:00')
+
+    @freeze_time(START_DATE)
+    def test_accounting_filter_stop_time(self):
+        data1 = self.acct_post_data
+        data1.update(dict(stop_time=START_DATE,
+                          unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
+                          unique_id='85144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02'))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['stop_time'], '2018-03-02T00:43:24.020460+01:00')
+
+    def test_accounting_filter_is_open(self):
+        data1 = self.acct_post_data
+        data1.update(dict(stop_time=None,
+                          unique_id='99144d60'))
+        self.radius_accounting_model.objects.create(**data1)
+        data2 = self.acct_post_data
+        data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
+                          unique_id='85144d60'))
+        self.radius_accounting_model.objects.create(**data2)
+        response = self.client.get('{0}?is_open=true'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['stop_time'], None)
+        response = self.client.get('{0}?is_open=false'.format(self._acct_url))
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+        item = response.data[0]
+        self.assertEqual(item['stop_time'], '2018-03-02T00:43:24.020460+01:00')
+
     @freeze_time(START_DATE)
     def test_coova_accounting_on_200(self):
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
