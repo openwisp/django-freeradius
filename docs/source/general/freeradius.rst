@@ -169,6 +169,27 @@ Restart freeradius to load the new configuration:
 
 You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_ for further details on how to configure other modules.
 
+Reconfigure the development environment using PostgreSQL
+--------------------------------------------------------
+
+You'll have to reconfigure the development environment as well before being able to use django-radius for managing the freeradius databases. Create a file `tests/local_settings.py` and add the following code to configure the database.
+
+.. code-block:: python
+
+   # django-freeradius/tests/local_settings.py
+     DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': '<db_name>',
+            'USER': '<db_user>',
+            'PASSWORD': '<db_password>',
+            'HOST': '127.0.0.1',
+            'PORT': '5432'
+        },
+     }
+
+Make sure the database by the name <db_name> is created and also the role <db_user> with <db_password> as password.
+
 Radius Checks: ``is_active`` & ``valid_until``
 ----------------------------------------------
 
