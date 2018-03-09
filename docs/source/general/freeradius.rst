@@ -50,9 +50,9 @@ Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/
 Configure the SQL module
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Edit the file ``/etc/freeradius/3.0/mods-available/sql``.
+Once you have configured properly an SQL server, e.g. PostgreSQL:, and you can connect with a username and password edit the file ``/etc/freeradius/3.0/mods-available/sql`` to configure Freeradius to use the relational database.
 
-Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db``.
+Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db`` as you need to fit your SQL server configuration.
 
 Refer to the `sql module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/sql.html>`_ for the available configuration values.
 
