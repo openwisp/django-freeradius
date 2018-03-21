@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from openwisp_utils.base import TimeStampedEditableModel
 from passlib.hash import lmhash, nthash
 
 from .. import settings as app_settings
@@ -85,20 +85,15 @@ RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
                         'Crypt-Password']
 
 
-class TimeStampedEditableModel(models.Model):
-    """
-    An abstract base class model that provides self-updating
-    ``created`` and ``modified`` fields.
-    """
-    created = AutoCreatedField(_('created'), editable=True)
-    modified = AutoLastModifiedField(_('modified'), editable=True)
+class BaseModel(TimeStampedEditableModel):
+    id = None
 
     class Meta:
         abstract = True
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroup(TimeStampedEditableModel):
+class AbstractRadiusGroup(BaseModel):
     id = models.UUIDField(primary_key=True, db_column='id')
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=255,
@@ -121,7 +116,7 @@ class AbstractRadiusGroup(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupUsers(TimeStampedEditableModel):
+class AbstractRadiusGroupUsers(BaseModel):
     id = models.UUIDField(primary_key=True,
                           db_column='id')
     username = models.CharField(verbose_name=_('username'),
@@ -150,7 +145,7 @@ class AbstractRadiusGroupUsers(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusReply(TimeStampedEditableModel):
+class AbstractRadiusReply(BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
                                 db_index=True)
@@ -214,7 +209,7 @@ class AbstractRadiusCheckManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusCheck(TimeStampedEditableModel):
+class AbstractRadiusCheck(BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
                                 db_index=True)
@@ -380,7 +375,7 @@ class AbstractRadiusAccounting(models.Model):
 
 
 @python_2_unicode_compatible
-class AbstractNas(TimeStampedEditableModel):
+class AbstractNas(BaseModel):
     name = models.CharField(verbose_name=_('name'),
                             max_length=128,
                             help_text=_('NAS Name (or IP address)'),
@@ -422,7 +417,7 @@ class AbstractNas(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusUserGroup(TimeStampedEditableModel):
+class AbstractRadiusUserGroup(BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
                                 db_index=True)
@@ -441,7 +436,7 @@ class AbstractRadiusUserGroup(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupReply(TimeStampedEditableModel):
+class AbstractRadiusGroupReply(BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
                                  db_index=True)
@@ -463,7 +458,7 @@ class AbstractRadiusGroupReply(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupCheck(TimeStampedEditableModel):
+class AbstractRadiusGroupCheck(BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
                                  db_index=True)
