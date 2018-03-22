@@ -97,9 +97,15 @@ class TimeStampedEditableModel(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
-class AbstractRadiusGroup(TimeStampedEditableModel):
+class idMixin(models.Model):
     id = models.UUIDField(primary_key=True, db_column='id')
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class AbstractRadiusGroup(idMixin, TimeStampedEditableModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=255,
                                  unique=True,
@@ -121,9 +127,7 @@ class AbstractRadiusGroup(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupUsers(TimeStampedEditableModel):
-    id = models.UUIDField(primary_key=True,
-                          db_column='id')
+class AbstractRadiusGroupUsers(idMixin, TimeStampedEditableModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
                                 unique=True)
