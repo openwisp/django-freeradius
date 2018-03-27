@@ -18,7 +18,7 @@ env:
    - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
    - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
    - DJANGO="django>=2.0,<2.1" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
-   - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1   
+   - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
 
 matrix:
   exclude:
@@ -46,6 +46,7 @@ before_script:
 
 # command to run tests, e.g. python setup.py test
 script:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then ./tests/manage.py makemigrations --dry-run django_freeradius | grep "No changes detected"; fi
   - jslint ./django_freeradius/static/django-freeradius/js/*.js
   - coverage run --source=django_freeradius runtests.py
 
