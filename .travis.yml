@@ -7,6 +7,10 @@ python:
   - "3.4"
   - "2.7"
 
+services:
+  - mysql
+  - postgresql
+
 branches:
   only:
     - master
@@ -15,10 +19,10 @@ env:
   matrix:
    - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
    - DJANGO="django>=1.11,<1.12" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
-   - DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
+   - SAMPLE_APP=1 DJANGO="django>=1.11,<1.12" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
    - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
    - DJANGO="django>=2.0,<2.1" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
-   - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
+   - SAMPLE_APP=1 DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
 
 matrix:
   exclude:
@@ -27,27 +31,35 @@ matrix:
     - python: "2.7"
       env: DJANGO="django>=2.0,<2.1" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
     - python: "2.7"
-      env: DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test' SAMPLE_APP=1
+      env: SAMPLE_APP=1 DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
 
 before_install:
+  - pip install -U pip wheel
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runisort
   - npm install -g jslint
+  - jslint ./django_freeradius/static/django-freeradius/js/*.js
 
 install:
   - pip install $DJANGO
   - python setup.py -q develop
 
 before_script:
+  - if [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/freeradius_test' ]; then psql -c "CREATE DATABASE freeradius_test;" -U postgres; fi
+  - mysql -e "CREATE DATABASE IF NOT EXISTS freeradius_test;"
   - ./runsphinx-build
-  - if [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/freeradius_test' ]; then psql -c "create database freeradius_test;" -U postgres; fi
-  - if [ "$DATABASE_URL" == 'mysql://root@127.0.0.1/freeradius_test']; then mysql -e "create database IF NOT EXISTS freeradius_test;"; fi
+  - ./tests/manage.py migrate
+  # ensure no migrations pending but show output for easier debugging
+  - |
+    if [[ $TRAVIS_PYTHON_VERSION == 3.4 && $SAMPLE_APP != "1" ]]; then
+      OUTPUT=$(./tests/manage.py makemigrations --dry-run django_freeradius)
+      echo $OUTPUT
+      echo $OUTPUT | grep "No changes detected"
+    fi
 
 # command to run tests, e.g. python setup.py test
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then ./tests/manage.py makemigrations --dry-run django_freeradius | grep "No changes detected"; fi
-  - jslint ./django_freeradius/static/django-freeradius/js/*.js
   - coverage run --source=django_freeradius runtests.py
 
 after_success:
