@@ -1,4 +1,8 @@
-from django.core.management import call_command
+from datetime import timedelta
+
+from django.contrib.auth import get_user_model
+from django.core.management import CommandError, call_command
+from django.utils.timezone import now
 
 _RADACCT = {'username': 'bob', 'nas_ip_address': '127.0.0.1',
             'start_time': '2017-06-10 10:50:00', 'authentication': 'RADIUS',
@@ -31,3 +35,36 @@ class BaseTestCommands(object):
         self.radius_accounting_model.objects.create(**options)
         call_command('delete_old_radacct', 3)
         self.assertEqual(self.radius_accounting_model.objects.filter(unique_id='666').count(), 0)
+
+    def test_batch_add_users_command(self):
+        self.assertEqual(self.radius_batch_model.objects.all().count(), 0)
+        call_command('batch_add_users', file='django_freeradius/tests/static/test_batch.csv',
+                     expiration='28-01-2018')
+        self.assertEqual(self.radius_batch_model.objects.all().count(), 1)
+        radiusbatch = self.radius_batch_model.objects.first()
+        self.assertEqual(get_user_model().objects.all().count(), 3)
+        self.assertEqual(radiusbatch.expiration_date.strftime('%d-%m-%y'), '27-01-18')
+        call_command('batch_add_users', file='django_freeradius/tests/static/test_batch.csv')
+        self.assertEqual(self.radius_batch_model.objects.all().count(), 2)
+        self.assertEqual(get_user_model().objects.all().count(), 6)
+        with self.assertRaises(CommandError):
+            call_command('batch_add_users', file='doesnotexist.csv')
+
+    def test_deactivate_expired_users_command(self):
+        call_command('batch_add_users', file='django_freeradius/tests/static/test_batch.csv',
+                     expiration='28-01-1970')
+        self.assertEqual(get_user_model().objects.filter(is_active=True).count(), 3)
+        call_command('deactivate_expired_users')
+        self.assertEqual(get_user_model().objects.filter(is_active=True).count(), 0)
+
+    def test_delete_old_users_command(self):
+        call_command('batch_add_users', file='django_freeradius/tests/static/test_batch.csv',
+                     expiration='28-01-1970')
+        expiration_date = now() - timedelta(days=30*15)
+        call_command('batch_add_users', file='django_freeradius/tests/static/test_batch.csv',
+                     expiration=expiration_date.strftime('%d-%m-%Y'))
+        self.assertEqual(get_user_model().objects.all().count(), 6)
+        call_command('delete_old_users')
+        self.assertEqual(get_user_model().objects.all().count(), 3)
+        call_command('delete_old_users', older_than_months=12)
+        self.assertEqual(get_user_model().objects.all().count(), 0)

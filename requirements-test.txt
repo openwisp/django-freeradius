@@ -10,3 +10,4 @@ sphinx
 sphinx_rtd_theme
 freezegun
 openwisp-utils>=0.2,<0.3
+django-extensions
