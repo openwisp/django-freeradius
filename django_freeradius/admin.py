@@ -1,13 +1,14 @@
 from django.contrib import admin
 
 from .base.admin import (
-    AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusCheckAdmin, AbstractRadiusGroupAdmin,
-    AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin, AbstractRadiusGroupUsersAdmin,
-    AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin,
+    AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
+    AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
+    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin,
+    AbstractRadiusUserGroupAdmin,
 )
 from .models import (
-    Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-    RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
+    RadiusGroupUsers, RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 
@@ -58,4 +59,9 @@ class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
 
 @admin.register(RadiusPostAuth)
 class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
+    pass
+
+
+@admin.register(RadiusBatch)
+class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
     pass

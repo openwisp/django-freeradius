@@ -4,7 +4,7 @@ from django.contrib.admin.actions import delete_selected
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
-from .forms import AbstractRadiusCheckAdminForm, NasModelForm
+from .forms import AbstractRadiusBatchAdminForm, AbstractRadiusCheckAdminForm, NasModelForm
 from .models import _encode_secret
 
 
@@ -150,3 +150,7 @@ class AbstractRadiusPostAuthAdmin(BasePostAuth):
     list_display = ['username', 'reply', 'date']
     list_filter = ['date', 'reply']
     search_fields = ['username', 'reply']
+
+
+class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
+    form = AbstractRadiusBatchAdminForm
