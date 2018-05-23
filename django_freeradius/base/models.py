@@ -1,10 +1,16 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count
+from django.utils.crypto import get_random_string
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
 from passlib.hash import lmhash, nthash
+
+from django_freeradius.settings import BATCH_DEFAULT_PASSWORD_LENGTH
+from django_freeradius.utils import find_available_username
 
 from .. import settings as app_settings
 
@@ -511,3 +517,56 @@ class AbstractRadiusPostAuth(models.Model):
 
     def __str__(self):
         return str(self.username)
+
+
+class AbstractRadiusBatch(TimeStampedEditableModel):
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                   related_name='radius_batch')
+    expiration_date = models.DateTimeField(verbose_name=_('expiration time'),
+                                           null=True,
+                                           blank=True)
+
+    class Meta:
+        db_table = 'radbatch'
+        verbose_name = _('radius batch')
+        verbose_name_plural = _('radius batches')
+        abstract = True
+
+    def __str__(self):
+        return str("Radius Batch: {0}".format(self.pk))
+
+    def add(self, reader, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
+        User = get_user_model()
+        users_list = []
+        for row in reader:
+            username, password, email, first_name, last_name = row
+            if not email:
+                raise ValueError('Email id is None')
+            if not username and email:
+                username = email.split('@')[0]
+            username = find_available_username(username, users_list)
+            user = User(username=username, email=email, first_name=first_name, last_name=last_name)
+            cleartext_delimiter = 'cleartext$'
+            if not password:
+                password = get_random_string(length=password_length)
+                user.set_password(password)
+            elif password and password.startswith(cleartext_delimiter):
+                password = password[len(cleartext_delimiter):]
+                user.set_password(password)
+            else:
+                user.password = password
+            user.full_clean()
+            users_list.append(user)
+        for u in users_list:
+            u.save()
+            self.users.add(u)
+
+    def delete(self):
+        self.users.all().delete()
+        super(AbstractRadiusBatch, self).delete()
+
+    def expire(self):
+        users = self.users.all()
+        for u in users:
+            u.is_active = False
+            u.save()

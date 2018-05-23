@@ -1,7 +1,7 @@
 from swapper import swappable_setting
 
 from .base.models import (
-    AbstractNas, AbstractRadiusAccounting, AbstractRadiusCheck, AbstractRadiusGroup,
+    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck, AbstractRadiusGroup,
     AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers, AbstractRadiusPostAuth,
     AbstractRadiusReply, AbstractRadiusUserGroup,
 )
@@ -65,3 +65,9 @@ class RadiusUserGroup(AbstractRadiusUserGroup):
     class Meta(AbstractRadiusUserGroup.Meta):
         abstract = False
         swappable = swappable_setting('django_freeradius', 'RadiusUserGroup')
+
+
+class RadiusBatch(AbstractRadiusBatch):
+    class Meta(AbstractRadiusBatch.Meta):
+        abstract = False
+        swappable = swappable_setting('django_freeradius', 'RadiusBatch')

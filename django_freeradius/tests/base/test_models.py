@@ -1,3 +1,6 @@
+from django.contrib.auth import get_user_model
+
+
 class BaseTestNas(object):
     def test_string_representation(self):
         nas = self.nas_model(name='entry nasname')
@@ -56,3 +59,22 @@ class BaseTestRadiusGroupUsersModel(object):
     def test_string_representation(self):
         radiusgroupusers = self.radius_groupusers_model(username='entry groupname')
         self.assertEqual(str(radiusgroupusers), radiusgroupusers.username)
+
+
+class BaseTestRadiusBatchModel(object):
+    def test_string_representation(self):
+        radiusbatch = self.radius_batch_model()
+        self.assertEqual(str(radiusbatch), 'Radius Batch: {}'.format(radiusbatch.pk))
+
+    def test_custom_queryset(self):
+        radiusbatch = self.radius_batch_model.objects.create()
+        User = get_user_model()
+        for i in range(5):
+            user = User.objects.create(username='rohith{}'.format(str(i)))
+            user.set_password('password')
+            user.save()
+            radiusbatch.users.add(user)
+        self.assertEqual(User.objects.all().count(), 5)
+        radiusbatch.delete()
+        self.assertEqual(self.radius_batch_model.objects.all().count(), 0)
+        self.assertEqual(User.objects.all().count(), 0)

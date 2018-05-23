@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django_freeradius',
     'rest_framework',
     'django_filters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,7 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "sample_radius.RadiusPostAuth"
     DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
+    DJANGO_FREERADIUS_RADIUSBATCH_MODEL = "sample_radius.RadiusBatch"
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

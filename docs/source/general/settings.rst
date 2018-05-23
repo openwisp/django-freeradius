@@ -50,3 +50,18 @@ by default the following character families are required:
 - an uppercase character
 - a number
 - a special character
+
+``DJANGO_FREERADIUS_BATCH_DEFAULT_PASSWORD_LENGTH``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``8``
+
+The default password length of the auto generated passwords while
+batch addition of users from the csv.
+
+``DJANGO_FREERADIUS_DEFAULT_USER_DELETION_DURATION``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``18``
+
+It is the duration after which the expired users are deleted.

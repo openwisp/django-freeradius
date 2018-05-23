@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import RAD_NAS_TYPES, AbstractNas, AbstractRadiusCheck
+from .models import RAD_NAS_TYPES, AbstractNas, AbstractRadiusBatch, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 nas_type_field = AbstractNas._meta.get_field('type')
@@ -53,3 +53,8 @@ class NasModelForm(forms.ModelForm):
     custom_type = forms.CharField(max_length=nas_type_field.max_length,
                                   required=False,
                                   help_text=_('or define a custom type'))
+
+
+class AbstractRadiusBatchAdminForm(forms.ModelForm):
+    csv = forms.FileField(required=False,
+                          help_text=_('Upload users from the csv file'))
