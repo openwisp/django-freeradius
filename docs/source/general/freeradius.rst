@@ -76,7 +76,7 @@ Configure the REST module
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Configure the rest module by editing the file ``/etc/freeradius/3.0/mods-enabled/rest``, substituting
-``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org/``)-
+``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org``)-
 
 Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/rest.html>`_ for the available configuration values.
 
