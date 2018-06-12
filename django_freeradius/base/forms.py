@@ -53,3 +53,8 @@ class NasModelForm(forms.ModelForm):
     custom_type = forms.CharField(max_length=nas_type_field.max_length,
                                   required=False,
                                   help_text=_('or define a custom type'))
+
+
+class AbstractRadiusBatchAdminForm(forms.ModelForm):
+    number_of_users = forms.IntegerField(required=False,
+                                         help_text=_('Number of users to be generated'))

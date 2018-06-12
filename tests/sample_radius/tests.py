@@ -17,6 +17,7 @@ RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
+RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 _SUPERUSER = {'username': 'gino', 'password': 'cic', 'email': 'giggi_vv@gmail.it'}
 _RADCHECK_ENTRY = {'username': 'Monica', 'value': 'Cam0_liX',
