@@ -2,6 +2,7 @@ import re
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
@@ -57,4 +58,5 @@ class NasModelForm(forms.ModelForm):
 
 class AbstractRadiusBatchAdminForm(forms.ModelForm):
     number_of_users = forms.IntegerField(required=False,
+                                         validators=[MinValueValidator(1)],
                                          help_text=_('Number of users to be generated'))

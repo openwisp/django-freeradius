@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 
 from django.core.management import BaseCommand
@@ -32,10 +33,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         prefix = options['prefix']
         expiration_date = options['expiration']
+        number_of_users = options['n']
         if expiration_date:
             expiration_date = datetime.strptime(expiration_date, '%d-%m-%Y')
+        if number_of_users < 1:
+            self.stdout.write("The number of users to be generated should be greater than or equal to 1")
+            sys.exit(1)
         batch = RadiusBatch(name=options['name'], prefix=prefix,
                             expiration_date=expiration_date, strategy='prefix')
         batch.save()
-        batch.prefix_add(prefix, options['n'], options['password_length'])
+        batch.prefix_add(prefix, number_of_users, options['password_length'])
         self.stdout.write('Generated a batch of users with prefix {}'.format(prefix))
