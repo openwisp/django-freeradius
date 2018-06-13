@@ -1,0 +1,23 @@
+<!DOCTYPE html>{% load static %}
+<html>
+<head>
+    {% block style %}
+	<link href="{% static 'django-freeradius/css/freeradius.css' %}" rel="stylesheet" />
+    {% endblock %}
+</head>
+<body>
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Password</th>
+    </tr>
+    {% for u in users %}
+    <tr>
+	{% for x in u %}
+        <td>{{ x }}</td>
+	{% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

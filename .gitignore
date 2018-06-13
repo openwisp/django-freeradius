@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.swp
 
 # C extensions
 *.so
@@ -64,6 +65,7 @@ local_settings.py
 *.db
 *.tar.gz
 tests/.env
+media/
 
 #Pycharm projects
 .idea/

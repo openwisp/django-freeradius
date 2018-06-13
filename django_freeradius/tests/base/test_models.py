@@ -1,3 +1,7 @@
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
+
 class BaseTestNas(object):
     def test_string_representation(self):
         nas = self.nas_model(name='entry nasname')
@@ -56,3 +60,31 @@ class BaseTestRadiusGroupUsersModel(object):
     def test_string_representation(self):
         radiusgroupusers = self.radius_groupusers_model(username='entry groupname')
         self.assertEqual(str(radiusgroupusers), radiusgroupusers.username)
+
+
+class BaseTestRadiusBatchModel(object):
+    def test_string_representation(self):
+        radiusbatch = self.radius_batch_model(name='test')
+        self.assertEqual(str(radiusbatch), 'test')
+
+    def test_custom_queryset(self):
+        radiusbatch = self.radius_batch_model.objects.create()
+        User = get_user_model()
+        for i in range(5):
+            user = User.objects.create(username='rohith{}'.format(str(i)))
+            user.set_password('password')
+            user.save()
+            radiusbatch.users.add(user)
+        self.assertEqual(User.objects.all().count(), 5)
+        radiusbatch.delete()
+        self.assertEqual(self.radius_batch_model.objects.all().count(), 0)
+        self.assertEqual(User.objects.all().count(), 0)
+
+    def test_clean_method(self):
+        radiusbatch = self.radius_batch_model.objects.create()
+        with self.assertRaises(ValidationError):
+            radiusbatch.full_clean()
+        radiusbatch = self.radius_batch_model(strategy='csv', prefix='test',
+                                              name='testing')
+        with self.assertRaises(ValidationError):
+            radiusbatch.full_clean()

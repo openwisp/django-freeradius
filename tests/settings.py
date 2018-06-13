@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django_freeradius',
     'rest_framework',
     'django_filters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,12 @@ USE_I18N = False
 USE_L10N = False
 STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+EMAIL_PORT = '1025'
+MEDIA_URL = '/media/'
+
+# during development only
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 TEMPLATES = [
     {
@@ -101,6 +108,7 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "sample_radius.RadiusPostAuth"
     DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
+    DJANGO_FREERADIUS_RADIUSBATCH_MODEL = "sample_radius.RadiusBatch"
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

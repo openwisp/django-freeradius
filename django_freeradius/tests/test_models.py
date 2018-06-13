@@ -4,13 +4,13 @@ from unittest import skipIf
 from django.test import TestCase
 
 from django_freeradius.models import (
-    Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
-    RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
+    RadiusGroupUsers, RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 from .base.test_models import (
-    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusCheck, BaseTestRadiusGroup,
-    BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusGroupUsersModel,
+    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatchModel, BaseTestRadiusCheck,
+    BaseTestRadiusGroup, BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusGroupUsersModel,
     BaseTestRadiusPostAuth, BaseTestRadiusReply, BaseTestRadiusUserGroup,
 )
 
@@ -63,3 +63,8 @@ class TestRadiusGroup(BaseTestRadiusGroup, TestCase):
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestRadiusGroupUsersModel(BaseTestRadiusGroupUsersModel, TestCase):
     radius_groupusers_model = RadiusGroupUsers
+
+
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
+class TestRadiusBatchModel(BaseTestRadiusBatchModel, TestCase):
+    radius_batch_model = RadiusBatch

@@ -1,10 +1,12 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.actions import delete_selected
+from django.contrib.admin.templatetags.admin_static import static
+from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
-from .forms import AbstractRadiusCheckAdminForm, NasModelForm
+from .forms import AbstractRadiusBatchAdminForm, AbstractRadiusCheckAdminForm, NasModelForm
 from .models import _encode_secret
 
 
@@ -150,3 +152,57 @@ class AbstractRadiusPostAuthAdmin(BasePostAuth):
     list_display = ['username', 'reply', 'date']
     list_filter = ['date', 'reply']
     search_fields = ['username', 'reply']
+
+
+class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
+    form = AbstractRadiusBatchAdminForm
+
+    class Media:
+        js = [static('django-freeradius/js/strategy-switcher.js')]
+
+    def number_of_users(self, obj):
+        return obj.users.count()
+
+    number_of_users.short_description = _('number of users')
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj is None:
+            self.exclude = ('pdf', 'users')
+        return super(AbstractRadiusBatchAdmin, self).get_form(request, obj, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        data = form.cleaned_data
+        strategy = data.get('strategy')
+        if not change:
+            if strategy == "csv":
+                if data.get('csvfile', False) and not change:
+                    csvfile = data.get('csvfile')
+                    obj.csvfile_upload(csvfile)
+            elif strategy == "prefix":
+                prefix = data.get('prefix')
+                n = data.get('number_of_users')
+                obj.prefix_add(prefix, n)
+        else:
+            obj.save()
+
+    def delete_model(self, request, obj):
+        obj.users.all().delete()
+        super(AbstractRadiusBatchAdmin, self).delete_model(request, obj)
+
+    actions = ['delete_selected']
+
+    def delete_selected(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
+
+    delete_selected.short_description = _('Delete selected batches')
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super(AbstractRadiusBatchAdmin, self).get_readonly_fields(request, obj)
+        if obj:
+            return ('strategy', 'prefix', 'csvfile', 'number_of_users',
+                    'users', 'pdf', 'expiration_date') + readonly_fields
+        return readonly_fields
+
+
+AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')

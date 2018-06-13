@@ -57,3 +57,24 @@ For example:
 .. code-block:: shell
 
     ./manage.py cleanup_stale_radacct 15
+
+``delete_old_users``
+--------------------
+
+This command deletes users expired before a certain duration of time.
+
+.. code-block:: shell
+
+    ./manage.py delete_old_users --older-than-months <duration_in_months>
+
+Note that the default duration is set to 18 months.
+
+``deactivate_expired_users``
+----------------------------
+
+This command expires the users after their expiration date.
+
+.. code-block:: shell
+
+    ./manage.py deactivate_expired_users
+

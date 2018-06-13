@@ -1,10 +1,25 @@
+import csv
+from io import StringIO
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Count
+from django.utils.crypto import get_random_string
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
 from passlib.hash import lmhash, nthash
+
+from django_freeradius.settings import (
+    BATCH_DEFAULT_PASSWORD_LENGTH, BATCH_MAIL_MESSAGE, BATCH_MAIL_SENDER, BATCH_MAIL_SUBJECT,
+)
+from django_freeradius.utils import (
+    find_available_username, generate_pdf, prefix_generate_users, validate_csvfile,
+)
 
 from .. import settings as app_settings
 
@@ -83,6 +98,11 @@ RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
                         'SMD5-Password',
                         'SSHA-Password',
                         'Crypt-Password']
+
+STRATEGIES = (
+    ('prefix', _('Generate from prefix')),
+    ('csv', _('Import from CSV'))
+)
 
 
 class BaseModel(TimeStampedEditableModel):
@@ -511,3 +531,124 @@ class AbstractRadiusPostAuth(models.Model):
 
     def __str__(self):
         return str(self.username)
+
+
+class AbstractRadiusBatch(TimeStampedEditableModel):
+    name = models.CharField(verbose_name=_('name'),
+                            max_length=128,
+                            help_text=_('A unique batch name'),
+                            db_index=True)
+    strategy = models.CharField(_('strategy'),
+                                max_length=16,
+                                choices=STRATEGIES,
+                                db_index=True,
+                                help_text=_('Import users from a CSV or generate using a prefix'))
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                   blank=True,
+                                   related_name='radius_batch',
+                                   help_text=_('List of users uploaded in this batch'))
+    csvfile = models.FileField(null=True,
+                               blank=True,
+                               verbose_name='CSV',
+                               help_text=_('The csv file containing the user details to be uploaded'))
+    prefix = models.CharField(_('prefix'),
+                              null=True,
+                              blank=True,
+                              max_length=20,
+                              help_text=_('Usernames generated will be of the format [prefix][number]'))
+    pdf = models.FileField(null=True,
+                           blank=True,
+                           verbose_name='PDF',
+                           help_text=_('The pdf file containing list of usernames and passwords'))
+    expiration_date = models.DateField(verbose_name=_('expiration date'),
+                                       null=True,
+                                       blank=True,
+                                       help_text=_('If left blank users will never expire'))
+
+    class Meta:
+        db_table = 'radbatch'
+        verbose_name = _('Batch user creation')
+        verbose_name_plural = _('Batch user creation operations')
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.csvfile and self.prefix or not self.csvfile and not self.prefix:
+            raise ValidationError(
+                _('Only one of the fields csvfile/prefix needs to be non empty'),
+                code='invalid',
+            )
+        if self.strategy == 'csv' and self.prefix or self.strategy == 'prefix' and self.csvfile:
+            raise ValidationError(
+                _('Check your strategy and the respective values provided'),
+                code='invalid',
+            )
+        if self.strategy == 'csv' and self.csvfile:
+            validate_csvfile(self.csvfile.file)
+        super(AbstractRadiusBatch, self).clean()
+
+    def add(self, reader, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
+        User = get_user_model()
+        users_list = []
+        generated_passwords = []
+        for row in reader:
+            if len(row) == 5:
+                username, password, email, first_name, last_name = row
+                if not username and email:
+                    username = email.split('@')[0]
+                username = find_available_username(username, users_list)
+                user = User(username=username, email=email, first_name=first_name, last_name=last_name)
+                cleartext_delimiter = 'cleartext$'
+                if not password:
+                    password = get_random_string(length=password_length)
+                    user.set_password(password)
+                    generated_passwords.append([username, password, email])
+                elif password and password.startswith(cleartext_delimiter):
+                    password = password[len(cleartext_delimiter):]
+                    user.set_password(password)
+                else:
+                    user.password = password
+                user.full_clean()
+                users_list.append(user)
+        for u in users_list:
+            u.save()
+            self.users.add(u)
+        for element in generated_passwords:
+            username, password, user_email = element
+            send_mail(
+                BATCH_MAIL_SUBJECT,
+                BATCH_MAIL_MESSAGE.format(username, password),
+                BATCH_MAIL_SENDER,
+                [user_email]
+            )
+
+    def csvfile_upload(self, csvfile, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
+        csv_data = csvfile.read()
+        csv_data = csv_data.decode("utf-8") if isinstance(csv_data, bytes) else csv_data
+        reader = csv.reader(StringIO(csv_data), delimiter=',')
+        self.full_clean()
+        self.save()
+        self.add(reader, password_length)
+
+    def prefix_add(self, prefix, n, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
+        self.save()
+        users_list, user_password = prefix_generate_users(prefix, n, password_length)
+        for u in users_list:
+            u.save()
+            self.users.add(u)
+        f = generate_pdf(prefix, {'users': user_password})
+        self.pdf = f
+        self.full_clean()
+        self.save()
+
+    def delete(self):
+        self.users.all().delete()
+        super(AbstractRadiusBatch, self).delete()
+
+    def expire(self):
+        users = self.users.all()
+        for u in users:
+            u.is_active = False
+            u.save()

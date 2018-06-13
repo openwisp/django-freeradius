@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.urls import reverse
 
 from django_freeradius import settings
@@ -126,6 +127,13 @@ class BaseTestAdmin(object):
                                     _RADCHECK_ENTRY_PW_UPDATE, follow=True)
         self.assertContains(response, 'ok')
 
+    def test_radiusbatch_change(self):
+        obj = self.radius_batch_model.objects.create(expiration_date='1998-01-28')
+        response = self.client.get(reverse(
+                                   'admin:{0}_radiusbatch_change'.format(self.app_name),
+                                   args=[obj.pk]))
+        self.assertContains(response, 'ok')
+
     def test_radiuscheck_create_weak_passwd(self):
         _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
         _RADCHECK['new_value'] = ''
@@ -209,3 +217,50 @@ class BaseTestAdmin(object):
         self.assertNotContains(response, 'error')
         nas.refresh_from_db()
         self.assertEqual(nas.type, 'my-custom-type')
+
+    def test_radius_batch_save_model(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        add_url = reverse('admin:{0}_radiusbatch_add'.format(self.app_name))
+        csvfile = open('django_freeradius/tests/static/test_batch.csv', 'rt')
+        data = {'expiration_date': '2019-03-20', 'strategy': 'csv', 'csvfile': csvfile, 'name': 'test1'}
+        response = self.client.post(add_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        batch = self.radius_batch_model.objects.first()
+        self.assertEqual(batch.users.count(), 3)
+        change_url = reverse('admin:{0}_radiusbatch_change'.format(self.app_name), args=[batch.pk])
+        response = self.client.post(change_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(batch.users.count(), 3)
+        data = {'expiration_date': '2019-03-20', 'strategy': 'prefix',
+                'prefix': 'openwisp', 'number_of_users': 10, 'name': 'test2'}
+        response = self.client.post(add_url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.radius_batch_model.objects.count(), 2)
+
+    def test_radiusbatch_no_of_users(self):
+        r = self.radius_batch_model.objects.create(strategy='prefix', prefix='openwisp')
+        r.save()
+        path = reverse('admin:{0}_radiusbatch_change'.format(self.app_name), args=[r.pk])
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'field-number_of_users')
+
+    def test_radiusbatch_delete_methods(self):
+        n = User.objects.count()
+        call_command('prefix_add_users', n=10, prefix='test', name='test')
+        self.assertEqual(User.objects.count() - n, 10)
+        r = self.radius_batch_model.objects.first()
+        delete_path = reverse('admin:{0}_radiusbatch_delete'.format(self.app_name), args=[r.pk])
+        response = self.client.post(delete_path, {'post': 'yes'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count() - n, 0)
+        call_command('prefix_add_users', n=10, prefix='test', name='test1')
+        call_command('prefix_add_users', n=10, prefix='test', name='test2')
+        self.assertEqual(User.objects.count() - n, 20)
+        changelist_path = reverse('admin:{0}_radiusbatch_changelist'.format(self.app_name))
+        p_keys = [x.pk for x in self.radius_batch_model.objects.all()]
+        data = {'action': 'delete_selected', '_selected_action': p_keys}
+        response = self.client.post(changelist_path, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count() - n, 0)
