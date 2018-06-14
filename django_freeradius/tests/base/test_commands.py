@@ -87,3 +87,6 @@ class BaseTestCommands(object):
         call_command('prefix_add_users', prefix='gsoc', n=5, name='test1')
         self.assertEqual(self.radius_batch_model.objects.all().count(), 2)
         self.assertEqual(get_user_model().objects.all().count(), 15)
+        with self.assertRaises(SystemExit):
+            call_command('prefix_add_users', prefix='openwisp', n=-5,
+                         name='test2', expiration='28-01-2018')

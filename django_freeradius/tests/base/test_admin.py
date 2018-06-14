@@ -237,6 +237,10 @@ class BaseTestAdmin(object):
         response = self.client.post(add_url, data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.radius_batch_model.objects.count(), 2)
+        data["number_of_users"] = -5
+        response = self.client.post(add_url, data, follow=True)
+        error_message = "Ensure this value is greater than or equal to 1"
+        self.assertTrue(error_message in str(response.content))
 
     def test_radiusbatch_no_of_users(self):
         r = self.radius_batch_model.objects.create(strategy='prefix', prefix='openwisp')
