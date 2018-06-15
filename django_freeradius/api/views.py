@@ -4,16 +4,20 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .serializers import RadiusAccountingSerializer, RadiusPostAuthSerializer
+from .serializers import (
+    RadiusAccountingSerializer, RadiusBatchCsvSerializer, RadiusBatchPrefixSerializer,
+    RadiusPostAuthSerializer,
+)
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 User = get_user_model()
+RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
 @api_view(['POST'])
@@ -75,9 +79,7 @@ class AccountingView(generics.ListCreateAPIView):
     """
     HEADER: Pagination is provided using a Link header
             https://developer.github.com/v3/guides/traversing-with-pagination/
-
     GET: get list of accounting objects
-
     POST: add or update accounting information (start, interim-update, stop);
           does not return any JSON response so that freeradius will avoid
           processing the response without generating warnings
@@ -137,3 +139,81 @@ class AccountingView(generics.ListCreateAPIView):
 
 
 accounting = AccountingView.as_view()
+
+
+class BatchPrefixView(generics.CreateAPIView):
+
+    queryset = RadiusBatch.objects.all()
+    serializer_class = RadiusBatchPrefixSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = RadiusBatchPrefixSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.data.get('name')
+            strategy = self._get_strategy(request)
+            expiration_date = serializer.data.get('expiration_data')
+            prefix = serializer.data.get('prefix')
+            batch = RadiusBatch(name=name, strategy=strategy, expiration_date=expiration_date, prefix=prefix)
+            number_of_users = self._get_number_of_users(request)
+            batch.prefix_add(prefix, number_of_users)
+            response = RadiusBatchPrefixSerializer(batch)
+            return Response(response.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def _get_strategy(self, request):
+        try:
+            s = request.data['strategy']
+            if s == 'prefix':
+                return s
+            else:
+                raise ValidationError({'prefix': [_('This filed must be prefix.')]})
+        except KeyError:
+            raise ValidationError({'strategy': [_('This field is required.')]})
+
+    def _get_number_of_users(self, request):
+        try:
+            n = int(request.data['number_of_users'])
+            if n > 0:
+                return n
+            else:
+                raise ValidationError({'number_of_users': [_('Number of user should be greater than 0.')]})
+
+        except KeyError:
+            raise ValidationError({'number_of_users': [_('This field is required.')]})
+
+
+batchPrefix = BatchPrefixView.as_view()
+
+
+class BatchCsvView(generics.CreateAPIView):
+    queryset = RadiusBatch.objects.all()
+    serializer_class = RadiusBatchCsvSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = RadiusBatchCsvSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.data.get('name')
+            strategy = self._get_strategy(request)
+            expiration_date = serializer.data.get('expiration_data')
+            csvfile = request.FILES['csvfile']
+            batch = RadiusBatch(name=name,
+                                strategy=strategy,
+                                expiration_date=expiration_date,
+                                csvfile=csvfile)
+            batch.csvfile_upload(csvfile)
+            response = RadiusBatchPrefixSerializer(batch)
+            return Response(response.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def _get_strategy(self, request):
+        try:
+            s = request.data['strategy']
+            if s == 'csv':
+                return s
+            else:
+                raise ValidationError({'csv': [_('This filed must be csv.')]})
+        except KeyError:
+            raise ValidationError({'strategy': [_('This field is required.')]})
+
+
+batchCsv = BatchCsvView.as_view()

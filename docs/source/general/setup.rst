@@ -54,13 +54,14 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``django_freeradius`` to ``INSTALLED_APPS``:
+Add ``django_freeradius`` and ``'django_filters`` to ``INSTALLED_APPS``:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         # other apps
         'django_freeradius',
+        'django_filters',
     ]
 
 Add the URLs to your main ``urls.py``:
