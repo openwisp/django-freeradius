@@ -268,3 +268,9 @@ class BaseTestAdmin(object):
         response = self.client.post(changelist_path, data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count() - n, 0)
+
+    def test_radius_batch_csv_help_text(self):
+        add_url = reverse('admin:{0}_radiusbatch_add'.format(self.app_name))
+        response = self.client.get(add_url)
+        docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
+        self.assertContains(response, docs_link)
