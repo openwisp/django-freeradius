@@ -1,6 +1,7 @@
 import csv
 from io import StringIO
 
+import swapper
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -66,3 +67,13 @@ def generate_pdf(prefix, data):
     pisa.CreatePDF(html.encode('utf-8'), dest=f, encoding='utf-8')
     f.seek(0)
     return File(f)
+
+
+def set_default_limits(sender, instance, created, **kwargs):
+    if created:
+        radprofile = swapper.load_model('django_freeradius', 'RadiusProfile')
+        raduserprofile = swapper.load_model('django_freeradius', 'RadiusUserProfile')
+        default_profile = radprofile.objects.filter(default=True)
+        if default_profile.exists():
+            userprofile = raduserprofile(profile=default_profile[0], user=instance)
+            userprofile.save()

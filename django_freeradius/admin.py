@@ -1,14 +1,15 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
 from .base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
     AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
-    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin,
-    AbstractRadiusUserGroupAdmin,
+    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusProfileAdmin,
+    AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
 )
 from .models import (
     Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusGroupUsers, RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    RadiusGroupUsers, RadiusPostAuth, RadiusProfile, RadiusReply, RadiusUserGroup, RadiusUserProfile,
 )
 
 
@@ -64,4 +65,22 @@ class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
 
 @admin.register(RadiusBatch)
 class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
+    pass
+
+
+@admin.register(RadiusProfile)
+class RadiusProfileAdmin(AbstractRadiusProfileAdmin):
+    pass
+
+
+class RadiusUserProfileInline(admin.StackedInline):
+    model = RadiusUserProfile
+    extra = 0
+
+
+admin.site.unregister(get_user_model())
+
+
+@admin.register(get_user_model())
+class UserAdmin(AbstractUserAdmin):
     pass

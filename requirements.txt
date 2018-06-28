@@ -6,3 +6,4 @@ passlib
 django-filter>=1.1.0,<2.0.0
 djangorestframework-link-header-pagination>=0.1.1,<2
 xhtml2pdf==0.2.2
+openwisp-utils>=0.2

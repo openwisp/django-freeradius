@@ -274,3 +274,13 @@ class BaseTestAdmin(object):
         response = self.client.get(add_url)
         docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
         self.assertContains(response, docs_link)
+
+    def test_radius_user_profile_inline_user(self):
+        add_url = reverse('admin:auth_user_add')
+        response = self.client.get(add_url)
+        label_id = 'id_radius_user_profile'
+        self.assertNotContains(response, label_id)
+        user = User.objects.first()
+        change_url = reverse('admin:auth_user_change', args=[user.pk])
+        response = self.client.get(change_url)
+        self.assertContains(response, label_id)

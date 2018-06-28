@@ -1,7 +1,10 @@
-from django.contrib.admin import ModelAdmin
+import swapper
+from django.contrib.admin import ModelAdmin, StackedInline
 from django.contrib.admin.actions import delete_selected
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
+from openwisp_utils.admin import TimeReadonlyAdminMixin
 
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
@@ -206,3 +209,21 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
 
 
 AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')
+
+
+class AbstractRadiusProfileAdmin(TimeStampedEditableAdmin):
+    pass
+
+
+class RadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
+    model = swapper.load_model('django_freeradius', 'RadiusUserProfile')
+    extra = 0
+
+
+class AbstractUserAdmin(BaseUserAdmin):
+    inlines = [RadiusUserProfileInline]
+
+    def get_inline_instances(self, request, obj=None):
+        if obj:
+            return super(AbstractUserAdmin, self).get_inline_instances(request, obj)
+        return []

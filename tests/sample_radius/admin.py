@@ -1,11 +1,12 @@
 import swapper
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from django_freeradius.admin import (
+from django_freeradius.base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
     AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
-    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin,
-    AbstractRadiusUserGroupAdmin,
+    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusProfileAdmin,
+    AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
 )
 
 RadiusGroupReply = swapper.load_model("django_freeradius", "RadiusGroupReply")
@@ -19,6 +20,8 @@ Nas = swapper.load_model("django_freeradius", "Nas")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusGroup = swapper.load_model("django_freeradius", "RadiusGroup")
 RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
+RadiusProfile = swapper.load_model("django_freeradius", "RadiusProfile")
+RadiusUserProfile = swapper.load_model("django_freeradius", "RadiusUserProfile")
 
 
 @admin.register(RadiusGroup)
@@ -73,4 +76,17 @@ class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
 
 @admin.register(RadiusBatch)
 class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
+    pass
+
+
+@admin.register(RadiusProfile)
+class RadiusProfileAdmin(AbstractRadiusProfileAdmin):
+    pass
+
+
+admin.site.unregister(get_user_model())
+
+
+@admin.register(get_user_model())
+class UserAdmin(AbstractUserAdmin):
     pass

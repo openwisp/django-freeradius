@@ -1,6 +1,7 @@
 import csv
 from io import StringIO
 
+import swapper
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -91,13 +92,16 @@ RADOP_REPLY_TYPES = (('=', '='),
                      (':=', ':='),
                      ('+=', '+='))
 
-RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
-                        'NT-Password',
-                        'LM-Password',
-                        'MD5-Password',
-                        'SMD5-Password',
-                        'SSHA-Password',
-                        'Crypt-Password']
+RADCHECK_ATTRIBUTE_TYPES = ['Cleartext-Password',
+                            'NT-Password',
+                            'LM-Password',
+                            'MD5-Password',
+                            'SMD5-Password',
+                            'SSHA-Password',
+                            'Crypt-Password',
+                            'Max-Daily-Session',
+                            'Max-All-Session',
+                            'Max-Daily-Session-Limit']
 
 STRATEGIES = (
     ('prefix', _('Generate from prefix')),
@@ -240,7 +244,7 @@ class AbstractRadiusCheck(BaseModel):
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
                                  max_length=64,
-                                 choices=[(i, i) for i in RADCHECK_PASSWD_TYPE
+                                 choices=[(i, i) for i in RADCHECK_ATTRIBUTE_TYPES
                                           if i not in
                                           app_settings.DISABLED_SECRET_FORMATS],
                                  blank=True,
@@ -652,3 +656,75 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         for u in users:
             u.is_active = False
             u.save()
+
+
+@python_2_unicode_compatible
+class AbstractRadiusProfile(TimeStampedEditableModel):
+    name = models.CharField(verbose_name=_('name'),
+                            max_length=128,
+                            help_text=_('A unique profile name'),
+                            db_index=True)
+    daily_session_limit = models.BigIntegerField(verbose_name=_('daily session limit'),
+                                                 blank=True,
+                                                 null=True)
+    daily_bandwidth_limit = models.BigIntegerField(verbose_name=_('daily bandwidth limit'),
+                                                   blank=True,
+                                                   null=True)
+    max_all_time_limit = models.BigIntegerField(verbose_name=('maximum all time session limit'),
+                                                blank=True,
+                                                null=True)
+    default = models.BooleanField(verbose_name=_('Use this profile as the default profile'),
+                                  default=False)
+
+    class Meta:
+        verbose_name = _('radius profile')
+        verbose_name_plural = _('radius profiles')
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def save(self):
+        if self.default:
+            RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
+            RadiusProfile.objects.filter(default=True).update(default=False)
+        super(AbstractRadiusProfile, self).save()
+
+
+@python_2_unicode_compatible
+class AbstractRadiusUserProfile(TimeStampedEditableModel):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name='radius_user_profile',
+                                on_delete=models.CASCADE)
+    profile = models.ForeignKey('RadiusProfile',
+                                on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'radiususerprofile'
+        verbose_name = _('radius user profile')
+        verbose_name_plural = _('radius user profiles')
+        abstract = True
+
+    def __str__(self):
+        return "{}-{}".format(self.user.username, self.profile.name)
+
+    def save(self):
+        radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
+        attribute_map = {'daily_session_limit': 'Max-Daily-Session',
+                         'daily_bandwidth_limit': 'Max-Daily-Session-Limit',
+                         'max_all_time_limit': 'Max-All-Session'}
+        profile = self.profile
+        username = self.user.username
+        for attr in attribute_map:
+            if getattr(profile, attr):
+                if radcheck.objects.filter(username=username,
+                                           attribute=attribute_map.get(attr)).exists():
+                    check = radcheck.objects.get(username=username,
+                                                 attribute=attribute_map.get(attr))
+                    check.value = getattr(profile, attr)
+                    check.save()
+                else:
+                    radcheck.objects.create(username=self.user.username,
+                                            attribute=attribute_map.get(attr),
+                                            value=getattr(profile, attr))
+        super(AbstractRadiusUserProfile, self).save()
