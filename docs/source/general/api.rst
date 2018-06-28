@@ -156,3 +156,42 @@ Sets the response data to None in order to instruct
 FreeRADIUS to avoid processing the response body
 
 Responds only to **POST**
+
+BatchCsv
+########
+
+.. code-block:: text
+
+    /api/batchCsv
+
+Responds to only **POST**, used to save a RadiuBatch instance and the users from the csv.
+It returns the information of the batch operation and the list of the users generated.
+
+===============    ===============================
+Param              Description
+===============    ===============================
+name               Name of the operation
+strategy           csv
+csvfile            file with the users
+expiration_date    date of expiration of the users
+===============    ===============================
+
+BatchPrefix
+###########
+
+.. code-block:: text
+
+    /api/batchPrefix
+
+Responds to only **POST**, used to save a RadiuBatch instance and generate n users form a prefix.
+It returns the information of the batch operation and the list of the users generated.
+
+===============    ==================================
+Param              Description
+===============    ==================================
+name               Name of the operation
+strategy           prefix
+prefix             prefix for the generation of users
+number_of_users    number of users
+expiration_date    date of expiration of the users
+===============    ==================================
