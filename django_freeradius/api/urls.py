@@ -6,6 +6,6 @@ urlpatterns = [
     url(r'^authorize/$', views.authorize, name='authorize'),
     url(r'^postauth/$', views.postauth, name='postauth'),
     url(r'^accounting/$', views.accounting, name='accounting'),
-    url(r'^batchCsv/$', views.batchCsv, name='batchCsv'),
-    url(r'^batchPrefix/$', views.batchPrefix, name='batchPrefix'),
+    url(r'^v1/batchCsv/$', views.batchCsv, name='batchCsv'),
+    url(r'^v1/batchPrefix/$', views.batchPrefix, name='batchPrefix'),
 ]
