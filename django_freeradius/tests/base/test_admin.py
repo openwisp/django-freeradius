@@ -121,6 +121,14 @@ class BaseTestAdmin(object):
         self.radius_check_model.objects.create(**_RADCHECK)
         _RADCHECK['attribute'] = 'NT-Password'
         self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'MD5-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SMD5-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SSHA-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'Crypt-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
         response = self.client.post(reverse(
                                     'admin:{0}_radiuscheck_change'.format(self.app_name),
                                     args=[obj.pk]),
