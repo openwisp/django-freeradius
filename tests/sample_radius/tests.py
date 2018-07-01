@@ -204,6 +204,14 @@ class TestAdmin(TestCase):
         RadiusCheck.objects.create(**_RADCHECK)
         _RADCHECK['attribute'] = 'NT-Password'
         RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'MD5-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SMD5-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SSHA-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'Crypt-Password'
+        RadiusCheck.objects.create(**_RADCHECK)
         self.client.login(username=_SUPERUSER['username'], password=_SUPERUSER['password'])
         response = self.client.post(reverse('admin:sample_radius_radiuscheck_change', args=[obj.pk]),
                                     _RADCHECK_ENTRY_PW_UPDATE, follow=True)
