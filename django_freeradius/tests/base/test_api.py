@@ -263,6 +263,7 @@ class BaseTestApi(object):
     def test_accounting_400_validation_error(self):
         data = self.acct_post_data
         data['status_type'] = 'Start'
+
         del data['nas_ip_address']
         response = self.post_json(data)
         self.assertEqual(response.status_code, 400)
@@ -464,3 +465,72 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+
+    def test_batchCsv_get_strategy_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        with open('test.csv', 'rb') as f:
+            data = {
+                "name": "test",
+                "strategy": "example",
+                "csvfile": f,
+            }
+            response = self.client.post(reverse('freeradius:batchCsv'), data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {"csv": ["This filed must be csv."]})
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+
+    def test_batchCsv_201(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 0)
+        with open('test.csv', 'wb') as f:
+            f.write("GSoC181,cleartext$abcd,email@gmail.com,firstname,lastname")
+        with open('test.csv', 'rb') as f:
+            data = {
+                "name": "test",
+                "strategy": "csv",
+                "csvfile": f,
+            }
+            response = self.client.post(reverse('freeradius:batchCsv'), data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_batchPrefix_get_strategy_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        data = {
+            "name": "test",
+            "strategy": "example",
+            "prefix": "prefix",
+            "number_of_users": 4,
+        }
+        response = self.client.post(reverse('freeradius:batchPrefix'), data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {"prefix": ["This filed must be prefix."]})
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+
+    def test_batchPrefix_get_number_of_users_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        data = {
+            "name": "test",
+            "strategy": "prefix",
+            "prefix": "prefix",
+            "number_of_users": 0,
+        }
+        response = self.client.post(reverse('freeradius:batchPrefix'), data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {"number_of_users": ["Number of user should be greater than 0."]})
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+
+    def test_batchPrefix_201(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 0)
+        data = {
+            "name": "test",
+            "strategy": "prefix",
+            "prefix": "prefix",
+            "number_of_users": 1,
+        }
+        response = self.client.post(reverse('freeradius:batchPrefix'), data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)

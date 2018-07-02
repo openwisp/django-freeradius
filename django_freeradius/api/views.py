@@ -166,7 +166,7 @@ class BatchPrefixView(generics.CreateAPIView):
             if s == 'prefix':
                 return s
             else:
-                raise ValidationError({'csv': [_('This filed must be prefix.')]})
+                raise ValidationError({'prefix': [_('This filed must be prefix.')]})
         except KeyError:
             raise ValidationError({'strategy': [_('This field is required.')]})
 
