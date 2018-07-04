@@ -10,9 +10,11 @@ django.jQuery(function ($) {
         changeHtml = '<button class="button" id="' + changeId + '">' + gettext('change') + '</button>',
         cancelId = 'cancel-change-radcheck-value',
         cancelHtml = '<button class="button" id="' + cancelId + '">' + gettext('cancel') + '</button>';
-    newValueRow.hide();
-    rawValueRow.find('.readonly').append(changeHtml);
-    newValueInput.after(cancelHtml);
+    if (rawValueRow.find('.readonly').text() !== '') {
+        newValueRow.hide();
+        rawValueRow.find('.readonly').append(changeHtml);
+        newValueInput.after(cancelHtml);
+    }
     // change value operation
     $('#' + changeId).click(function (e) {
         e.preventDefault();
