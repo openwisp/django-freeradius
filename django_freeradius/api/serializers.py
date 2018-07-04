@@ -82,36 +82,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RadiusBatchCsvSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
-    strategy = serializers.CharField()
     users = UserSerializer(many=True, read_only=True)
-    csvfile = serializers.FileField()
     prefix = serializers.CharField(required=False, read_only=True)
-    expiration_date = serializers.DateField(required=False)
     pdf = serializers.FileField(required=False, read_only=True)
 
     class Meta:
         model = RadiusBatch
         fields = '__all__'
 
-    def create(self, validated_data):
-        return RadiusBatch.objects.create(**validated_data)
-
 
 class RadiusBatchPrefixSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(required=False, allow_blank=True)
-    strategy = serializers.CharField()
     users = UserSerializer(many=True, read_only=True)
     csvfile = serializers.FileField(required=False, read_only=True)
-    prefix = serializers.CharField()
-    expiration_date = serializers.DateField(required=False)
     pdf = serializers.FileField(required=False, read_only=True)
-    # serialize the number of users that is not a model field
     number_of_users = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = RadiusBatch
         fields = '__all__'
-
-    def create(self, validated_data):
-        return RadiusBatch.objects.create(**validated_data)

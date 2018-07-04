@@ -79,7 +79,9 @@ class AccountingView(generics.ListCreateAPIView):
     """
     HEADER: Pagination is provided using a Link header
             https://developer.github.com/v3/guides/traversing-with-pagination/
+
     GET: get list of accounting objects
+
     POST: add or update accounting information (start, interim-update, stop);
           does not return any JSON response so that freeradius will avoid
           processing the response without generating warnings
@@ -162,9 +164,9 @@ class BatchPrefixView(generics.CreateAPIView):
 
     def _get_strategy(self, request):
         try:
-            s = request.data['strategy']
-            if s == 'prefix':
-                return s
+            strategy = request.data['strategy']
+            if strategy == 'prefix':
+                return strategy
             else:
                 raise ValidationError({'prefix': [_('This filed must be prefix.')]})
         except KeyError:
