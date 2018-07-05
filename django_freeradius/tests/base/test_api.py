@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
+from rest_framework import status
 
 START_DATE = '2017-08-08 15:16:10+0200'
 
@@ -466,6 +467,18 @@ class BaseTestApi(object):
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
 
+    def test_batchCsv_bad_request_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        with open('test.csv', 'rb') as file:
+            data = {
+                "name": "",
+                "strategy": "",
+                "csvfile": file,
+            }
+            response = self.client.post(reverse('freeradius:batch-csv'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+
     def test_batchCsv_get_strategy_400(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
         text = 'GSoC181,cleartext$abcd,email@gmail.com,firstname,lastname'
@@ -500,6 +513,18 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)
+
+    def test_batchPrefix_bad_request_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        data = {
+            "number_of_users": "",
+            "name": "",
+            "strategy": "",
+            "prefix": "",
+        }
+        response = self.client.post(reverse('freeradius:batch-prefix'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
 
     def test_batchPrefix_get_strategy_400(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
