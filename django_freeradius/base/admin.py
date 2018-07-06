@@ -13,14 +13,8 @@ from .forms import AbstractRadiusBatchAdminForm, AbstractRadiusCheckAdminForm, N
 from .models import _encode_secret
 
 
-class TimeStampedEditableAdmin(ModelAdmin):
-    """
-    ModelAdmin for TimeStampedEditableModel
-    """
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super(TimeStampedEditableAdmin, self).get_readonly_fields(request, obj)
-        return readonly_fields + ('created', 'modified')
+class TimeStampedEditableAdmin(TimeReadonlyAdminMixin, ModelAdmin):
+    pass
 
 
 class ReadOnlyAdmin(ModelAdmin):
