@@ -9,7 +9,7 @@ from .base.admin import (
 )
 from .models import (
     Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusGroupUsers, RadiusPostAuth, RadiusProfile, RadiusReply, RadiusUserGroup, RadiusUserProfile,
+    RadiusGroupUsers, RadiusPostAuth, RadiusProfile, RadiusReply, RadiusUserGroup,
 )
 
 
@@ -73,14 +73,10 @@ class RadiusProfileAdmin(AbstractRadiusProfileAdmin):
     pass
 
 
-class RadiusUserProfileInline(admin.StackedInline):
-    model = RadiusUserProfile
-    extra = 0
+user_model = get_user_model()
+admin.site.unregister(user_model)
 
 
-admin.site.unregister(get_user_model())
-
-
-@admin.register(get_user_model())
+@admin.register(user_model)
 class UserAdmin(AbstractUserAdmin):
     pass

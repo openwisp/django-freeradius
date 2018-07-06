@@ -215,13 +215,13 @@ class AbstractRadiusProfileAdmin(TimeStampedEditableAdmin):
     pass
 
 
-class RadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
+class AbstractRadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
     model = swapper.load_model('django_freeradius', 'RadiusUserProfile')
     extra = 0
 
 
 class AbstractUserAdmin(BaseUserAdmin):
-    inlines = [RadiusUserProfileInline]
+    inlines = [AbstractRadiusUserProfileInline]
 
     def get_inline_instances(self, request, obj=None):
         if obj:
