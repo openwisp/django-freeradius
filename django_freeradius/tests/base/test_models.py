@@ -56,12 +56,6 @@ class BaseTestRadiusGroup(object):
         self.assertEqual(str(radiusgroup), radiusgroup.groupname)
 
 
-class BaseTestRadiusGroupUsersModel(object):
-    def test_string_representation(self):
-        radiusgroupusers = self.radius_groupusers_model(username='entry groupname')
-        self.assertEqual(str(radiusgroupusers), radiusgroupusers.username)
-
-
 class BaseTestRadiusBatchModel(object):
     def test_string_representation(self):
         radiusbatch = self.radius_batch_model(name='test')

@@ -55,32 +55,10 @@ class BaseTestAdmin(object):
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
 
-    def test_radiusgroup_change(self):
-        obj = self.radius_group_model.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
-                                                     groupname='students', priority='1', notes='hh')
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusgroup_change'.format(self.app_name),
-                                   args=[obj.pk]))
-        self.assertContains(response, 'ok')
-
     def test_radiususergroup_change(self):
         obj = self.radius_usergroup_model.objects.create(username='bob', groupname='students', priority='1')
         response = self.client.get(reverse(
                                    'admin:{0}_radiususergroup_change'.format(self.app_name),
-                                   args=[obj.pk]))
-        self.assertContains(response, 'ok')
-
-    def test_radiusgroupusers_change(self):
-        reply = self.radius_reply_model.objects.create(username='bob', attribute='Cleartext-Password',
-                                                       op=':=', value='passbob')
-        check = self.radius_check_model.objects.create(username='bob', attribute='Cleartext-Password',
-                                                       op=':=', value='passbob')
-        obj = self.radius_groupusers_model.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
-                                                          username='bob', groupname='students')
-        obj.radius_reply.add(reply)
-        obj.radius_check.add(check)
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusgroupusers_change'.format(self.app_name),
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
 
