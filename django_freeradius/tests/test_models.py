@@ -4,15 +4,14 @@ from unittest import skipIf
 from django.test import TestCase
 
 from django_freeradius.models import (
-    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusGroupUsers, RadiusPostAuth, RadiusProfile, RadiusReply, RadiusUserGroup, RadiusUserProfile,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroupCheck, RadiusGroupReply, RadiusPostAuth,
+    RadiusProfile, RadiusReply, RadiusUserGroup, RadiusUserProfile,
 )
 
 from .base.test_models import (
     BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatchModel, BaseTestRadiusCheck,
-    BaseTestRadiusGroup, BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusGroupUsersModel,
-    BaseTestRadiusPostAuth, BaseTestRadiusProfileModel, BaseTestRadiusReply, BaseTestRadiusUserGroup,
-    BaseTestRadiusUserProfileModel,
+    BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusPostAuth, BaseTestRadiusProfileModel,
+    BaseTestRadiusReply, BaseTestRadiusUserGroup, BaseTestRadiusUserProfileModel,
 )
 
 
@@ -54,16 +53,6 @@ class TestRadiusUserGroup(BaseTestRadiusUserGroup, TestCase):
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestRadiusPostAuth(BaseTestRadiusPostAuth, TestCase):
     radius_postauth_model = RadiusPostAuth
-
-
-@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusGroup(BaseTestRadiusGroup, TestCase):
-    radius_group_model = RadiusGroup
-
-
-@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusGroupUsersModel(BaseTestRadiusGroupUsersModel, TestCase):
-    radius_groupusers_model = RadiusGroupUsers
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')

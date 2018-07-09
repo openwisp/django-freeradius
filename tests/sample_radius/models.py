@@ -2,9 +2,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from django_freeradius.models import (
-    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck, AbstractRadiusGroup,
-    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers, AbstractRadiusPostAuth,
-    AbstractRadiusProfile, AbstractRadiusReply, AbstractRadiusUserGroup, AbstractRadiusUserProfile,
+    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck,
+    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusPostAuth, AbstractRadiusProfile,
+    AbstractRadiusReply, AbstractRadiusUserGroup, AbstractRadiusUserProfile,
 )
 
 
@@ -13,10 +13,6 @@ class DetailsModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-class RadiusGroup(DetailsModel, AbstractRadiusGroup):
-    pass
 
 
 class RadiusCheck(DetailsModel, AbstractRadiusCheck):
@@ -48,10 +44,6 @@ class RadiusUserGroup(DetailsModel, AbstractRadiusUserGroup):
 
 
 class Nas(DetailsModel, AbstractNas):
-    pass
-
-
-class RadiusGroupUsers(DetailsModel, AbstractRadiusGroupUsers):
     pass
 
 

@@ -117,58 +117,6 @@ class BaseModel(TimeStampedEditableModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroup(BaseModel):
-    id = models.UUIDField(primary_key=True, db_column='id')
-    groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=255,
-                                 unique=True,
-                                 db_index=True)
-    priority = models.IntegerField(verbose_name=_('priority'), default=1)
-    notes = models.CharField(verbose_name=_('notes'),
-                             max_length=64,
-                             blank=True,
-                             null=True)
-
-    class Meta:
-        db_table = 'radiusgroup'
-        verbose_name = _('radius group')
-        verbose_name_plural = _('radius groups')
-        abstract = True
-
-    def __str__(self):
-        return self.groupname
-
-
-@python_2_unicode_compatible
-class AbstractRadiusGroupUsers(BaseModel):
-    id = models.UUIDField(primary_key=True,
-                          db_column='id')
-    username = models.CharField(verbose_name=_('username'),
-                                max_length=64,
-                                unique=True)
-    groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=255,
-                                 unique=True)
-    radius_reply = models.ManyToManyField('RadiusReply',
-                                          verbose_name=_('radius reply'),
-                                          blank=True,
-                                          db_column='radiusreply')
-    radius_check = models.ManyToManyField('RadiusCheck',
-                                          verbose_name=_('radius check'),
-                                          blank=True,
-                                          db_column='radiuscheck')
-
-    class Meta:
-        db_table = 'radiusgroupusers'
-        verbose_name = _('radius group users')
-        verbose_name_plural = _('radius group users')
-        abstract = True
-
-    def __str__(self):
-        return self.username
-
-
-@python_2_unicode_compatible
 class AbstractRadiusReply(BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,

@@ -1,18 +1,16 @@
-===================
+=================
 API Documentation
-===================
-
-
+=================
 
 Accounting
-###########
+##########
 
 .. code-block:: text
 
     /api/accounting
 
 GET
-++++++
++++
 Returns a list of accounting objects
 
 .. code-block:: text
@@ -92,7 +90,6 @@ Pagination
 Pagination is provided using a Link header pagination.
 https://developer.github.com/v3/guides/traversing-with-pagination/
 
-
 .. code-block:: text
 
     {
@@ -121,10 +118,8 @@ stop_time           Stop time
 is_open             If stop_time is null
 ==================  ====================
 
-
-
 Authorize
-##########
+#########
 
 .. code-block:: text
 
@@ -143,10 +138,8 @@ username    Username for the given user
 password    Password for the given user
 ========    ===========================
 
-
-
 PostAuth
-#########
+########
 
 .. code-block:: text
 

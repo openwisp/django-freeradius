@@ -54,14 +54,6 @@ class ReadOnlyAdmin(ModelAdmin):
                                                       extra_context=extra_context)
 
 
-class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
-    pass
-
-
-class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
-    pass
-
-
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
     list_display = ('username', 'attribute', 'is_active',
                     'created', 'valid_until')

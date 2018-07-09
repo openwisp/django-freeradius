@@ -29,7 +29,7 @@ For example:
     ./manage.py delete_old_radacct 365
 
 ``delete_old_postauth``
-------------------------
+-----------------------
 
 This command deletes RADIUS post-auth logs older than <days>.
 

@@ -5,22 +5,10 @@ from swapper import swappable_setting
 from django_freeradius.utils import set_default_limits
 
 from .base.models import (
-    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck, AbstractRadiusGroup,
-    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers, AbstractRadiusPostAuth,
-    AbstractRadiusProfile, AbstractRadiusReply, AbstractRadiusUserGroup, AbstractRadiusUserProfile,
+    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck,
+    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusPostAuth, AbstractRadiusProfile,
+    AbstractRadiusReply, AbstractRadiusUserGroup, AbstractRadiusUserProfile,
 )
-
-
-class RadiusGroup(AbstractRadiusGroup):
-    class Meta(AbstractRadiusGroup.Meta):
-        abstract = False
-        swappable = swappable_setting('django_freeradius', 'RadiusGroup')
-
-
-class RadiusGroupUsers(AbstractRadiusGroupUsers):
-    class Meta(AbstractRadiusGroupUsers.Meta):
-        abstract = False
-        swappable = swappable_setting('django_freeradius', 'RadiusGroupUsers')
 
 
 class RadiusCheck(AbstractRadiusCheck):
