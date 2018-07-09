@@ -56,7 +56,7 @@ class BaseTestRadiusGroup(object):
         self.assertEqual(str(radiusgroup), radiusgroup.groupname)
 
 
-class BaseTestRadiusBatchModel(object):
+class BaseTestRadiusBatch(object):
     def test_string_representation(self):
         radiusbatch = self.radius_batch_model(name='test')
         self.assertEqual(str(radiusbatch), 'test')
@@ -84,7 +84,7 @@ class BaseTestRadiusBatchModel(object):
             radiusbatch.full_clean()
 
 
-class BaseTestRadiusProfileModel(object):
+class BaseTestRadiusProfile(object):
     def test_string_representation(self):
         radiusprofile = self.radius_profile_model(name='test')
         self.assertEqual(str(radiusprofile), 'test')
@@ -105,7 +105,7 @@ class BaseTestRadiusProfileModel(object):
         self.assertEqual(RadiusProfile.objects.filter(default=True).count(), 1)
 
 
-class BaseTestRadiusUserProfileModel(object):
+class BaseTestRadiusUserProfile(object):
     def test_string_representation(self):
         user = get_user_model().objects.create(username="test")
         profile = self.radius_profile_model(name="test")

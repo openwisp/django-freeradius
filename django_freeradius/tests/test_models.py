@@ -9,9 +9,9 @@ from django_freeradius.models import (
 )
 
 from .base.test_models import (
-    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatchModel, BaseTestRadiusCheck,
-    BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusPostAuth, BaseTestRadiusProfileModel,
-    BaseTestRadiusReply, BaseTestRadiusUserGroup, BaseTestRadiusUserProfileModel,
+    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatch, BaseTestRadiusCheck,
+    BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusPostAuth, BaseTestRadiusProfile,
+    BaseTestRadiusReply, BaseTestRadiusUserGroup, BaseTestRadiusUserProfile,
 )
 
 
@@ -56,17 +56,17 @@ class TestRadiusPostAuth(BaseTestRadiusPostAuth, TestCase):
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusBatchModel(BaseTestRadiusBatchModel, TestCase):
+class TestRadiusBatch(BaseTestRadiusBatch, TestCase):
     radius_batch_model = RadiusBatch
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusProfileModel(BaseTestRadiusProfileModel, TestCase):
+class TestRadiusProfile(BaseTestRadiusProfile, TestCase):
     radius_profile_model = RadiusProfile
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusUserProfileModel(BaseTestRadiusUserProfileModel, TestCase):
+class TestRadiusUserProfile(BaseTestRadiusUserProfile, TestCase):
     radius_profile_model = RadiusProfile
     radius_userprofile_model = RadiusUserProfile
     radius_check_model = RadiusCheck
