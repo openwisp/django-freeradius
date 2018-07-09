@@ -1,7 +1,8 @@
+import swapper
 from django.core.management import BaseCommand
 from django.utils.timezone import now
 
-from django_freeradius.models import RadiusBatch
+RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
 class Command(BaseCommand):
