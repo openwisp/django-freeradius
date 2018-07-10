@@ -15,13 +15,33 @@ Adding from admin inteface
 --------------------------
 
 At the url ``/admin/django_freeradius/radiusprofile/`` it is possible to
-edit the profiles for different types of users.
+edit the profiles for different types of users. You can map the profiles to the users
+from the user change page i.e., at the url ``/admin/auth/user/<user_id>/change``.
 
-You will find two default profiles which are created automatically, you can
-customize those ones or create new ones according to your needs.
+You will find two default profiles named Limited User and Power User which are created
+automatically. Limited User could be the profile of any default user and Power user the
+profile of users having unlimited power. You can customize these ones or create new ones
+according to your needs.
 
-**Note on the deafult profile**: keep in mind that the profile flagged as
+**Note on the default profile**: keep in mind that the profile flagged as
 default will by automatically assigned to new users.
+
+There are attributes defined in the RadiusProfile model which help us enforce limits on the users.
+
+``Daily session limit``
+-----------------------
+
+The daily session time limit (in seconds) to be enforced on the users.
+
+``Daily bandwidth limit``
+-------------------------
+
+The daily bandwidth usage limit (in octets) to be enforced on the users.
+
+``Maximum all time session limit``
+----------------------------------
+
+The all time session limit (in seconds) to be enforced on the users.
 
 Configuring the FreeRADIUS rlm_sqlcounter modules
 -------------------------------------------------
