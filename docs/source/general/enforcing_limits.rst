@@ -1,24 +1,37 @@
-======================================
-Enforcing session and bandwidth limits
-======================================
+========================
+Enforcing session limits
+========================
 
-This feature lets the system administrator enforce session and bandwidth limits on the users. Some of the features added here are,
-* Put daily and all time session limits.
-* Put daily bandwidth limits.
-* Default profile for the new users being added.
+This feature lets the system administrator enforce session and
+bandwidth limits on the users.
+
+Some of the features added here are:
+
+* put daily and all time session limits
+* put daily bandwidth limits
+* default profile for the new users being added
 
 Adding from admin inteface
 --------------------------
 
-At the url `/admin/django_freeradius/radiusprofile/` one can add the profiles for different types of users. And add the user profile mappings at the url `/admin/django_freeradius/radiususerprofile/`. This helps admins configure user limits easily.
+At the url ``/admin/django_freeradius/radiusprofile/`` it is possible to
+edit the profiles for different types of users.
+
+You will find two default profiles which are created automatically, you can
+customize those ones or create new ones according to your needs.
+
+**Note on the deafult profile**: keep in mind that the profile flagged as
+default will by automatically assigned to new users.
 
 Configuring the FreeRADIUS rlm_sqlcounter modules
 -------------------------------------------------
 
-The sqlcounter modules should be configured in order to get this feature working. The ``/etc/freeradius/mods-available/sqlcounter`` should look like,
+The sqlcounter modules should be configured in order to get this feature working.
+
+The ``/etc/freeradius/mods-available/sqlcounter`` should look like the following:
 
 .. code-block:: ini
-    
+
     # /etc/freeradius/3.0/mods-available/sqlcounter
     # The dailycounter sqlcounter module which comes by default
     sqlcounter dailycounter {
@@ -47,7 +60,7 @@ The sqlcounter modules should be configured in order to get this feature working
 
         $INCLUDE ${modconfdir}/sql/counter/${dialect}/${.:instance}.conf
     }
-    
+
     # Custom defined dailybandwidthcounter for calculating the data transfer daily
     sqlcounter dailybandwidthcounter {
         counter_name = Max-Daily-Session-Traffic
@@ -61,7 +74,8 @@ The sqlcounter modules should be configured in order to get this feature working
                  AcctStartTime::ABSTIME::INT4 + AcctSessionTime > '%%b'"
     }
 
-Create a symbolic link to ``mods-available/sqlcounter`` at ``mods-available/sqlcounter`` for the sqlcounter modules to get enabled.
+Create a symbolic link to ``mods-available/sqlcounter`` at
+``mods-available/sqlcounter`` for the sqlcounter modules to get enabled.
 
 .. code-block:: ini
 
@@ -88,7 +102,8 @@ Restart freeradius to load new configuration
     # alternatively if you are using systemd
     systemctl restart freeradius
 
-If you are having errors with the importing the sqlcounter modules, try doing the following in your ``radiusd.conf``
+If you are having errors with the importing the sqlcounter modules,
+try doing the following in your ``radiusd.conf``
 
 .. code-block:: ini
 
