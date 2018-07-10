@@ -1,5 +1,8 @@
 import csv
+from base64 import encodestring
+from hashlib import md5, sha1
 from io import StringIO
+from os import urandom
 
 import swapper
 from django.conf import settings
@@ -13,7 +16,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
-from passlib.hash import lmhash, nthash
+from passlib.hash import lmhash, nthash, sha512_crypt
 
 from django_freeradius.settings import (
     BATCH_DEFAULT_PASSWORD_LENGTH, BATCH_MAIL_MESSAGE, BATCH_MAIL_SENDER, BATCH_MAIL_SUBJECT,
@@ -92,16 +95,20 @@ RADOP_REPLY_TYPES = (('=', '='),
                      (':=', ':='),
                      ('+=', '+='))
 
-RADCHECK_ATTRIBUTE_TYPES = ['Cleartext-Password',
-                            'NT-Password',
-                            'LM-Password',
-                            'MD5-Password',
-                            'SMD5-Password',
-                            'SSHA-Password',
-                            'Crypt-Password',
-                            'Max-Daily-Session',
+RADCHECK_ATTRIBUTE_TYPES = ['Max-Daily-Session',
                             'Max-All-Session',
                             'Max-Daily-Session-Limit']
+
+RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
+                        'NT-Password',
+                        'LM-Password',
+                        'MD5-Password',
+                        'SMD5-Password',
+                        'SHA-Password',
+                        'SSHA-Password',
+                        'Crypt-Password']
+
+RADCHECK_ATTRIBUTE_TYPES += RADCHECK_PASSWD_TYPE
 
 STRATEGIES = (
     ('prefix', _('Generate from prefix')),
@@ -159,13 +166,31 @@ class AbstractRadiusCheckQueryset(models.query.QuerySet):
 
 
 def _encode_secret(attribute, new_value=None):
-    if attribute == 'Cleartext-Password':
-        password_renewed = new_value
-    elif attribute == 'NT-Password':
-        password_renewed = nthash.hash(new_value)
+    if attribute == 'NT-Password':
+        attribute_value = nthash.hash(new_value)
     elif attribute == 'LM-Password':
-        password_renewed = lmhash.hash(new_value)
-    return password_renewed
+        attribute_value = lmhash.hash(new_value)
+    elif attribute == 'MD5-Password':
+        attribute_value = md5(new_value.encode('utf-8')).hexdigest()
+    elif attribute == 'SMD5-Password':
+        salt = urandom(4)
+        hash = md5(new_value.encode('utf-8'))
+        hash.update(salt)
+        hash_encoded = encodestring(hash.digest() + salt)
+        attribute_value = hash_encoded.decode('utf-8')[:-1]
+    elif attribute == 'SHA-Password':
+        attribute_value = sha1(new_value.encode('utf-8')).hexdigest()
+    elif attribute == 'SSHA-Password':
+        salt = urandom(4)
+        hash = sha1(new_value.encode('utf-8'))
+        hash.update(salt)
+        hash_encoded = encodestring(hash.digest() + salt)
+        attribute_value = hash_encoded.decode('utf-8')[:-1]
+    elif attribute == 'Crypt-Password':
+        attribute_value = sha512_crypt.hash(new_value)
+    else:
+        attribute_value = new_value
+    return attribute_value
 
 
 class AbstractRadiusCheckManager(models.Manager):
@@ -195,7 +220,6 @@ class AbstractRadiusCheck(BaseModel):
                                  choices=[(i, i) for i in RADCHECK_ATTRIBUTE_TYPES
                                           if i not in
                                           app_settings.DISABLED_SECRET_FORMATS],
-                                 blank=True,
                                  default=app_settings.DEFAULT_SECRET_FORMAT)
     # additional fields to enable more granular checks
     is_active = models.BooleanField(default=True)
