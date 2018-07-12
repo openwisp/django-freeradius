@@ -18,10 +18,13 @@ At the url ``/admin/django_freeradius/radiusprofile/`` it is possible to
 edit the profiles for different types of users. You can map the profiles to the users
 from the user change page i.e., at the url ``/admin/auth/user/<user_id>/change``.
 
-You will find two default profiles named Limited User and Power User which are created
-automatically. Limited User could be the profile of any default user and Power user the
-profile of users having unlimited power. You can customize these ones or create new ones
-according to your needs.
+You will find two profiles which are created automatically:
+
+- ``Limited User`` is the deafult profile for new users, the default limits
+  are 3 hours and 300 MB daily
+- ``Power User`` is a profile you can use to grant unlimited usage
+
+You can customize these profiles or create new ones according to your needs.
 
 **Note on the default profile**: keep in mind that the profile flagged as
 default will by automatically assigned to new users.
