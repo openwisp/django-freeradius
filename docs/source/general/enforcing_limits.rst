@@ -51,7 +51,7 @@ Configuring the FreeRADIUS rlm_sqlcounter modules
 
 The sqlcounter modules should be configured in order to get this feature working.
 
-The ``/etc/freeradius/mods-available/sqlcounter`` should look like the following:
+The ``/etc/freeradius/3.0/mods-available/sqlcounter`` should look like the following:
 
 .. code-block:: ini
 
