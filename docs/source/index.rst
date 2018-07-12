@@ -15,7 +15,7 @@ django-freeradius
 .. image:: https://badge.fury.io/py/django-freeradius.svg
    :target: http://badge.fury.io/py/django-freeradius
 
-Django-freeradius is part of the `OpenWISP project <http://openwrt.org>`_.
+Django-freeradius is part of the `OpenWISP project <http://openwisp.org>`_.
 
 .. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
   :target: http://openwisp.org
