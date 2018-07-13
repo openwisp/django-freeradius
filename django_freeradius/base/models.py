@@ -97,7 +97,7 @@ RADOP_REPLY_TYPES = (('=', '='),
 
 RADCHECK_ATTRIBUTE_TYPES = ['Max-Daily-Session',
                             'Max-All-Session',
-                            'Max-Daily-Session-Limit']
+                            'Max-Daily-Session-Traffic']
 
 RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
                         'NT-Password',
@@ -683,7 +683,7 @@ class AbstractRadiusUserProfile(TimeStampedEditableModel):
     def save(self):
         radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
         attribute_map = {'daily_session_limit': 'Max-Daily-Session',
-                         'daily_bandwidth_limit': 'Max-Daily-Session-Limit',
+                         'daily_bandwidth_limit': 'Max-Daily-Session-Traffic',
                          'max_all_time_limit': 'Max-All-Session'}
         profile = self.profile
         username = self.user.username
