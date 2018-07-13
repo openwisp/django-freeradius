@@ -121,6 +121,10 @@ as follows
     # /etc/freeradius/3.0/sites-enabled/default
 
     authorize {
+       # <api_token> is the token used to provide access to the API
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
     }
 
@@ -128,14 +132,23 @@ as follows
     authenticate {}
 
     post-auth {
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
 
        Post-Auth-Type REJECT {
-            rest
+           update control {
+               &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+           }
+           rest
         }
     }
 
     accounting {
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
     }
 

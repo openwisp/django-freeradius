@@ -2,6 +2,34 @@
 API Documentation
 =================
 
+django-freeradius provides an API for performing all the get and post
+actions. Only authorized users with a token will able to get and post to
+the API. The API token can be configured in the settings which is mandatory.
+
+``DJANGO_FREERADIUS_API_TOKEN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set this variable to the secret API token of your instance.
+Users can send this token as a bearer token or also as a query string.
+FreeRADIUS must be configured to send a bearer token as mentioned in the
+`docs <freeradius.html>`_.
+
+Accessing the API
+-----------------
+
+There are two ways in which you can send the token to access the API.
+
+* Bearer token (recommended)::
+
+      curl -X POST http://localhost:8000/api/authorize/ \
+           -H "Authorization: Bearer <token>" \
+           -d "username=<username>&password=<password>"
+
+* Querystring::
+
+      curl -X POST http://localhost:8000/api/authorize/?token=<token> \
+           -d "username=<username>&password=<password>"
+
 Accounting
 ##########
 
