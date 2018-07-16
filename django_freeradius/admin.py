@@ -1,25 +1,15 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
 from .base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
-    AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
-    AbstractRadiusGroupUsersAdmin, AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin,
-    AbstractRadiusUserGroupAdmin,
+    AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin, AbstractRadiusPostAuthAdmin,
+    AbstractRadiusProfileAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
 )
 from .models import (
-    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusGroupUsers, RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroupCheck, RadiusGroupReply, RadiusPostAuth,
+    RadiusProfile, RadiusReply, RadiusUserGroup,
 )
-
-
-@admin.register(RadiusGroup)
-class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
-    pass
-
-
-@admin.register(RadiusGroupUsers)
-class RadiusGroupUsersAdmin(AbstractRadiusGroupUsersAdmin):
-    pass
 
 
 @admin.register(RadiusCheck)
@@ -64,4 +54,18 @@ class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
 
 @admin.register(RadiusBatch)
 class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
+    pass
+
+
+@admin.register(RadiusProfile)
+class RadiusProfileAdmin(AbstractRadiusProfileAdmin):
+    pass
+
+
+user_model = get_user_model()
+admin.site.unregister(user_model)
+
+
+@admin.register(user_model)
+class UserAdmin(AbstractUserAdmin):
     pass

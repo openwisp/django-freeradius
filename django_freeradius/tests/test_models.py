@@ -4,14 +4,14 @@ from unittest import skipIf
 from django.test import TestCase
 
 from django_freeradius.models import (
-    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusGroupUsers, RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroupCheck, RadiusGroupReply, RadiusPostAuth,
+    RadiusProfile, RadiusReply, RadiusUserGroup, RadiusUserProfile,
 )
 
 from .base.test_models import (
-    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatchModel, BaseTestRadiusCheck,
-    BaseTestRadiusGroup, BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusGroupUsersModel,
-    BaseTestRadiusPostAuth, BaseTestRadiusReply, BaseTestRadiusUserGroup,
+    BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatch, BaseTestRadiusCheck,
+    BaseTestRadiusGroupCheck, BaseTestRadiusGroupReply, BaseTestRadiusPostAuth, BaseTestRadiusProfile,
+    BaseTestRadiusReply, BaseTestRadiusUserGroup, BaseTestRadiusUserProfile,
 )
 
 
@@ -56,15 +56,17 @@ class TestRadiusPostAuth(BaseTestRadiusPostAuth, TestCase):
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusGroup(BaseTestRadiusGroup, TestCase):
-    radius_group_model = RadiusGroup
-
-
-@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusGroupUsersModel(BaseTestRadiusGroupUsersModel, TestCase):
-    radius_groupusers_model = RadiusGroupUsers
-
-
-@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestRadiusBatchModel(BaseTestRadiusBatchModel, TestCase):
+class TestRadiusBatch(BaseTestRadiusBatch, TestCase):
     radius_batch_model = RadiusBatch
+
+
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
+class TestRadiusProfile(BaseTestRadiusProfile, TestCase):
+    radius_profile_model = RadiusProfile
+
+
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
+class TestRadiusUserProfile(BaseTestRadiusUserProfile, TestCase):
+    radius_profile_model = RadiusProfile
+    radius_userprofile_model = RadiusUserProfile
+    radius_check_model = RadiusCheck

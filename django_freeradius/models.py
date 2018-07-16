@@ -1,22 +1,14 @@
+from django.contrib.auth import get_user_model
+from django.db.models import signals
 from swapper import swappable_setting
 
+from django_freeradius.utils import set_default_limits
+
 from .base.models import (
-    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck, AbstractRadiusGroup,
-    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusGroupUsers, AbstractRadiusPostAuth,
-    AbstractRadiusReply, AbstractRadiusUserGroup,
+    AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck,
+    AbstractRadiusGroupCheck, AbstractRadiusGroupReply, AbstractRadiusPostAuth, AbstractRadiusProfile,
+    AbstractRadiusReply, AbstractRadiusUserGroup, AbstractRadiusUserProfile,
 )
-
-
-class RadiusGroup(AbstractRadiusGroup):
-    class Meta(AbstractRadiusGroup.Meta):
-        abstract = False
-        swappable = swappable_setting('django_freeradius', 'RadiusGroup')
-
-
-class RadiusGroupUsers(AbstractRadiusGroupUsers):
-    class Meta(AbstractRadiusGroupUsers.Meta):
-        abstract = False
-        swappable = swappable_setting('django_freeradius', 'RadiusGroupUsers')
 
 
 class RadiusCheck(AbstractRadiusCheck):
@@ -71,3 +63,18 @@ class RadiusBatch(AbstractRadiusBatch):
     class Meta(AbstractRadiusBatch.Meta):
         abstract = False
         swappable = swappable_setting('django_freeradius', 'RadiusBatch')
+
+
+class RadiusProfile(AbstractRadiusProfile):
+    class Meta(AbstractRadiusProfile.Meta):
+        abstract = False
+        swappable = swappable_setting('django_freeradius', 'RadiusProfile')
+
+
+class RadiusUserProfile(AbstractRadiusUserProfile):
+    class Meta(AbstractRadiusUserProfile.Meta):
+        abstract = False
+        swappable = swappable_setting('django_freeradius', 'RadiusUserProfile')
+
+
+signals.post_save.connect(set_default_limits, sender=get_user_model())

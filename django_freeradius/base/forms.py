@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import RAD_NAS_TYPES, AbstractNas, AbstractRadiusCheck
+from .models import RAD_NAS_TYPES, RADCHECK_PASSWD_TYPE, AbstractNas, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 nas_type_field = AbstractNas._meta.get_field('type')
@@ -19,10 +19,8 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
                           '! % - _ + = [ ] { } : , . ? < > ( ) ; ')
     # custom field not backed by database
     new_value = forms.CharField(label=_('Value'), required=False,
-                                min_length=8,
                                 max_length=radcheck_value_field.max_length,
-                                widget=forms.PasswordInput(),
-                                help_text=_secret_help_text)
+                                widget=forms.PasswordInput(),)
 
     def clean_attribute(self):
         if self.data['attribute'] not in app_settings.DISABLED_SECRET_FORMATS:
@@ -31,10 +29,11 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
     def clean_new_value(self):
         if not self.data['new_value']:
             return None
-        for regexp in app_settings.RADCHECK_SECRET_VALIDATORS.values():
-            found = re.findall(regexp, self.data['new_value'])
-            if not found:
-                raise ValidationError(self._secret_help_text)
+        if self.data['attribute'] in RADCHECK_PASSWD_TYPE:
+            for regexp in app_settings.RADCHECK_SECRET_VALIDATORS.values():
+                found = re.findall(regexp, self.data['new_value'])
+                if not found:
+                    raise ValidationError(self._secret_help_text)
         return self.cleaned_data['new_value']
 
     class Meta:

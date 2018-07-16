@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('name', models.CharField(db_index=True, help_text='A unique batch name', max_length=128, verbose_name='name')),
-                ('strategy', models.CharField(choices=[('prefix', 'PREFIX'), ('csv', 'CSV')], db_index=True, help_text='Import users from a CSV or generate using a prefix', max_length=16, verbose_name='strategy')),
+                ('strategy', models.CharField(choices=[('prefix', 'Generate from prefix'), ('csv', 'Import from CSV')], db_index=True, help_text='Import users from a CSV or generate using a prefix', max_length=16, verbose_name='strategy')),
                 ('csvfile', models.FileField(blank=True, help_text='The csv file containing the user details to be uploaded', null=True, upload_to='', verbose_name='CSV')),
                 ('prefix', models.CharField(blank=True, help_text='Usernames generated will be of the format [prefix][number]', max_length=20, null=True, verbose_name='prefix')),
                 ('pdf', models.FileField(blank=True, help_text='The pdf file containing list of usernames and passwords', null=True, upload_to='', verbose_name='PDF')),
@@ -83,11 +83,7 @@ class Migration(migrations.Migration):
                 ('users', models.ManyToManyField(blank=True, help_text='List of users uploaded in this batch', related_name='radius_batch', to=settings.AUTH_USER_MODEL)),
                 ('details', models.CharField(blank=True, max_length=64, null=True, verbose_name='details')),
             ],
-            options={
-                'verbose_name': 'Batch user creation',
-                'verbose_name_plural': 'Batch user creation operations',
-                'abstract': False,
-            },
+            options={},
         ),
         migrations.CreateModel(
             name='RadiusCheck',
@@ -221,5 +217,22 @@ class Migration(migrations.Migration):
             model_name='radiusgroupusers',
             name='radius_reply',
             field=models.ManyToManyField(blank=True, db_column='radiusreply', to=settings.DJANGO_FREERADIUS_RADIUSREPLY_MODEL, verbose_name='radius reply'),
+        ),
+        migrations.CreateModel(
+            name='RadiusProfile',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
+                ('name', models.CharField(db_index=True, help_text='A unique profile name', max_length=128, verbose_name='name')),
+                ('daily_session_limit', models.BigIntegerField(blank=True, null=True, verbose_name='daily session limit')),
+                ('daily_bandwidth_limit', models.BigIntegerField(blank=True, null=True, verbose_name='daily bandwidth limit')),
+                ('max_all_time_limit', models.BigIntegerField(blank=True, null=True, verbose_name='maximum all time session limit')),
+                ('default', models.BooleanField(default=False, verbose_name='Use this profile as the default profile')),
+                ('details', models.CharField(blank=True, max_length=64, null=True, verbose_name='details')),
+            ],
+            options={
+                'abstract': False,
+            },
         ),
     ]

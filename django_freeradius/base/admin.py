@@ -1,7 +1,10 @@
-from django.contrib.admin import ModelAdmin
+import swapper
+from django.contrib.admin import ModelAdmin, StackedInline
 from django.contrib.admin.actions import delete_selected
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
+from openwisp_utils.admin import TimeReadonlyAdminMixin
 
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
@@ -10,14 +13,8 @@ from .forms import AbstractRadiusBatchAdminForm, AbstractRadiusCheckAdminForm, N
 from .models import _encode_secret
 
 
-class TimeStampedEditableAdmin(ModelAdmin):
-    """
-    ModelAdmin for TimeStampedEditableModel
-    """
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super(TimeStampedEditableAdmin, self).get_readonly_fields(request, obj)
-        return readonly_fields + ('created', 'modified')
+class TimeStampedEditableAdmin(TimeReadonlyAdminMixin, ModelAdmin):
+    pass
 
 
 class ReadOnlyAdmin(ModelAdmin):
@@ -55,14 +52,6 @@ class ReadOnlyAdmin(ModelAdmin):
         return super(ReadOnlyAdmin, self).change_view(request,
                                                       object_id,
                                                       extra_context=extra_context)
-
-
-class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
-    pass
-
-
-class AbstractRadiusGroupUsersAdmin(TimeStampedEditableAdmin):
-    pass
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
@@ -206,3 +195,21 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
 
 
 AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')
+
+
+class AbstractRadiusProfileAdmin(TimeStampedEditableAdmin):
+    pass
+
+
+class AbstractRadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
+    model = swapper.load_model('django_freeradius', 'RadiusUserProfile')
+    extra = 0
+
+
+class AbstractUserAdmin(BaseUserAdmin):
+    inlines = [AbstractRadiusUserProfileInline]
+
+    def get_inline_instances(self, request, obj=None):
+        if obj:
+            return super(AbstractUserAdmin, self).get_inline_instances(request, obj)
+        return []

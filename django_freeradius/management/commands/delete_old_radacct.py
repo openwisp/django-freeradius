@@ -1,9 +1,10 @@
 from datetime import timedelta
 
+import swapper
 from django.core.management import BaseCommand
 from django.utils.timezone import now
 
-from django_freeradius.models import RadiusAccounting
+RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 
 
 class Command(BaseCommand):

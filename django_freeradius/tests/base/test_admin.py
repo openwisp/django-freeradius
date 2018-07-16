@@ -55,32 +55,10 @@ class BaseTestAdmin(object):
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
 
-    def test_radiusgroup_change(self):
-        obj = self.radius_group_model.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
-                                                     groupname='students', priority='1', notes='hh')
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusgroup_change'.format(self.app_name),
-                                   args=[obj.pk]))
-        self.assertContains(response, 'ok')
-
     def test_radiususergroup_change(self):
         obj = self.radius_usergroup_model.objects.create(username='bob', groupname='students', priority='1')
         response = self.client.get(reverse(
                                    'admin:{0}_radiususergroup_change'.format(self.app_name),
-                                   args=[obj.pk]))
-        self.assertContains(response, 'ok')
-
-    def test_radiusgroupusers_change(self):
-        reply = self.radius_reply_model.objects.create(username='bob', attribute='Cleartext-Password',
-                                                       op=':=', value='passbob')
-        check = self.radius_check_model.objects.create(username='bob', attribute='Cleartext-Password',
-                                                       op=':=', value='passbob')
-        obj = self.radius_groupusers_model.objects.create(id='870df8e8-3107-4487-8316-81e089b8c2cf',
-                                                          username='bob', groupname='students')
-        obj.radius_reply.add(reply)
-        obj.radius_check.add(check)
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusgroupusers_change'.format(self.app_name),
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
 
@@ -120,6 +98,16 @@ class BaseTestAdmin(object):
         _RADCHECK['attribute'] = 'LM-Password'
         self.radius_check_model.objects.create(**_RADCHECK)
         _RADCHECK['attribute'] = 'NT-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'MD5-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SMD5-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SHA-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'SSHA-Password'
+        self.radius_check_model.objects.create(**_RADCHECK)
+        _RADCHECK['attribute'] = 'Crypt-Password'
         self.radius_check_model.objects.create(**_RADCHECK)
         response = self.client.post(reverse(
                                     'admin:{0}_radiuscheck_change'.format(self.app_name),
@@ -274,3 +262,13 @@ class BaseTestAdmin(object):
         response = self.client.get(add_url)
         docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
         self.assertContains(response, docs_link)
+
+    def test_radius_user_profile_inline_user(self):
+        add_url = reverse('admin:auth_user_add')
+        response = self.client.get(add_url)
+        label_id = 'id_radius_user_profile'
+        self.assertNotContains(response, label_id)
+        user = User.objects.first()
+        change_url = reverse('admin:auth_user_change', args=[user.pk])
+        response = self.client.get(change_url)
+        self.assertContains(response, label_id)

@@ -1,10 +1,12 @@
 import sys
 from datetime import datetime
 
+import swapper
 from django.core.management import BaseCommand
 
-from django_freeradius.models import RadiusBatch
 from django_freeradius.settings import BATCH_DEFAULT_PASSWORD_LENGTH
+
+RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
 class Command(BaseCommand):

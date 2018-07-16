@@ -104,11 +104,11 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "sample_radius.RadiusGroupCheck"
     DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "sample_radius.RadiusAccounting"
     DJANGO_FREERADIUS_NAS_MODEL = "sample_radius.Nas"
-    DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "sample_radius.RadiusGroupUsers"
     DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "sample_radius.RadiusUserGroup"
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "sample_radius.RadiusPostAuth"
-    DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "sample_radius.RadiusGroup"
     DJANGO_FREERADIUS_RADIUSBATCH_MODEL = "sample_radius.RadiusBatch"
+    DJANGO_FREERADIUS_RADIUSPROFILE_MODEL = "sample_radius.RadiusProfile"
+    DJANGO_FREERADIUS_RADIUSUSERPROFILE_MODEL = "sample_radius.RadiusUserProfile"
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

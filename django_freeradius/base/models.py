@@ -1,6 +1,10 @@
 import csv
+from base64 import encodestring
+from hashlib import md5, sha1
 from io import StringIO
+from os import urandom
 
+import swapper
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -12,7 +16,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
-from passlib.hash import lmhash, nthash
+from passlib.hash import lmhash, nthash, sha512_crypt
 
 from django_freeradius.settings import (
     BATCH_DEFAULT_PASSWORD_LENGTH, BATCH_MAIL_MESSAGE, BATCH_MAIL_SENDER, BATCH_MAIL_SUBJECT,
@@ -91,13 +95,20 @@ RADOP_REPLY_TYPES = (('=', '='),
                      (':=', ':='),
                      ('+=', '+='))
 
+RADCHECK_ATTRIBUTE_TYPES = ['Max-Daily-Session',
+                            'Max-All-Session',
+                            'Max-Daily-Session-Traffic']
+
 RADCHECK_PASSWD_TYPE = ['Cleartext-Password',
                         'NT-Password',
                         'LM-Password',
                         'MD5-Password',
                         'SMD5-Password',
+                        'SHA-Password',
                         'SSHA-Password',
                         'Crypt-Password']
+
+RADCHECK_ATTRIBUTE_TYPES += RADCHECK_PASSWD_TYPE
 
 STRATEGIES = (
     ('prefix', _('Generate from prefix')),
@@ -110,58 +121,6 @@ class BaseModel(TimeStampedEditableModel):
 
     class Meta:
         abstract = True
-
-
-@python_2_unicode_compatible
-class AbstractRadiusGroup(BaseModel):
-    id = models.UUIDField(primary_key=True, db_column='id')
-    groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=255,
-                                 unique=True,
-                                 db_index=True)
-    priority = models.IntegerField(verbose_name=_('priority'), default=1)
-    notes = models.CharField(verbose_name=_('notes'),
-                             max_length=64,
-                             blank=True,
-                             null=True)
-
-    class Meta:
-        db_table = 'radiusgroup'
-        verbose_name = _('radius group')
-        verbose_name_plural = _('radius groups')
-        abstract = True
-
-    def __str__(self):
-        return self.groupname
-
-
-@python_2_unicode_compatible
-class AbstractRadiusGroupUsers(BaseModel):
-    id = models.UUIDField(primary_key=True,
-                          db_column='id')
-    username = models.CharField(verbose_name=_('username'),
-                                max_length=64,
-                                unique=True)
-    groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=255,
-                                 unique=True)
-    radius_reply = models.ManyToManyField('RadiusReply',
-                                          verbose_name=_('radius reply'),
-                                          blank=True,
-                                          db_column='radiusreply')
-    radius_check = models.ManyToManyField('RadiusCheck',
-                                          verbose_name=_('radius check'),
-                                          blank=True,
-                                          db_column='radiuscheck')
-
-    class Meta:
-        db_table = 'radiusgroupusers'
-        verbose_name = _('radius group users')
-        verbose_name_plural = _('radius group users')
-        abstract = True
-
-    def __str__(self):
-        return self.username
 
 
 @python_2_unicode_compatible
@@ -207,13 +166,31 @@ class AbstractRadiusCheckQueryset(models.query.QuerySet):
 
 
 def _encode_secret(attribute, new_value=None):
-    if attribute == 'Cleartext-Password':
-        password_renewed = new_value
-    elif attribute == 'NT-Password':
-        password_renewed = nthash.hash(new_value)
+    if attribute == 'NT-Password':
+        attribute_value = nthash.hash(new_value)
     elif attribute == 'LM-Password':
-        password_renewed = lmhash.hash(new_value)
-    return password_renewed
+        attribute_value = lmhash.hash(new_value)
+    elif attribute == 'MD5-Password':
+        attribute_value = md5(new_value.encode('utf-8')).hexdigest()
+    elif attribute == 'SMD5-Password':
+        salt = urandom(4)
+        hash = md5(new_value.encode('utf-8'))
+        hash.update(salt)
+        hash_encoded = encodestring(hash.digest() + salt)
+        attribute_value = hash_encoded.decode('utf-8')[:-1]
+    elif attribute == 'SHA-Password':
+        attribute_value = sha1(new_value.encode('utf-8')).hexdigest()
+    elif attribute == 'SSHA-Password':
+        salt = urandom(4)
+        hash = sha1(new_value.encode('utf-8'))
+        hash.update(salt)
+        hash_encoded = encodestring(hash.digest() + salt)
+        attribute_value = hash_encoded.decode('utf-8')[:-1]
+    elif attribute == 'Crypt-Password':
+        attribute_value = sha512_crypt.hash(new_value)
+    else:
+        attribute_value = new_value
+    return attribute_value
 
 
 class AbstractRadiusCheckManager(models.Manager):
@@ -240,10 +217,9 @@ class AbstractRadiusCheck(BaseModel):
                           default=':=')
     attribute = models.CharField(verbose_name=_('attribute'),
                                  max_length=64,
-                                 choices=[(i, i) for i in RADCHECK_PASSWD_TYPE
+                                 choices=[(i, i) for i in RADCHECK_ATTRIBUTE_TYPES
                                           if i not in
                                           app_settings.DISABLED_SECRET_FORMATS],
-                                 blank=True,
                                  default=app_settings.DEFAULT_SECRET_FORMAT)
     # additional fields to enable more granular checks
     is_active = models.BooleanField(default=True)
@@ -652,3 +628,75 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         for u in users:
             u.is_active = False
             u.save()
+
+
+@python_2_unicode_compatible
+class AbstractRadiusProfile(TimeStampedEditableModel):
+    name = models.CharField(verbose_name=_('name'),
+                            max_length=128,
+                            help_text=_('A unique profile name'),
+                            db_index=True)
+    daily_session_limit = models.BigIntegerField(verbose_name=_('daily session limit'),
+                                                 blank=True,
+                                                 null=True)
+    daily_bandwidth_limit = models.BigIntegerField(verbose_name=_('daily bandwidth limit'),
+                                                   blank=True,
+                                                   null=True)
+    max_all_time_limit = models.BigIntegerField(verbose_name=('maximum all time session limit'),
+                                                blank=True,
+                                                null=True)
+    default = models.BooleanField(verbose_name=_('Use this profile as the default profile'),
+                                  default=False)
+
+    class Meta:
+        verbose_name = _('radius profile')
+        verbose_name_plural = _('radius profiles')
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def save(self):
+        if self.default:
+            RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
+            RadiusProfile.objects.filter(default=True).update(default=False)
+        super(AbstractRadiusProfile, self).save()
+
+
+@python_2_unicode_compatible
+class AbstractRadiusUserProfile(TimeStampedEditableModel):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name='radius_user_profile',
+                                on_delete=models.CASCADE)
+    profile = models.ForeignKey('RadiusProfile',
+                                on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'radiususerprofile'
+        verbose_name = _('radius user profile')
+        verbose_name_plural = _('radius user profiles')
+        abstract = True
+
+    def __str__(self):
+        return "{}-{}".format(self.user.username, self.profile.name)
+
+    def save(self):
+        radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
+        attribute_map = {'daily_session_limit': 'Max-Daily-Session',
+                         'daily_bandwidth_limit': 'Max-Daily-Session-Traffic',
+                         'max_all_time_limit': 'Max-All-Session'}
+        profile = self.profile
+        username = self.user.username
+        for attr in attribute_map:
+            if getattr(profile, attr):
+                if radcheck.objects.filter(username=username,
+                                           attribute=attribute_map.get(attr)).exists():
+                    check = radcheck.objects.get(username=username,
+                                                 attribute=attribute_map.get(attr))
+                    check.value = getattr(profile, attr)
+                    check.save()
+                else:
+                    radcheck.objects.create(username=self.user.username,
+                                            attribute=attribute_map.get(attr),
+                                            value=getattr(profile, attr))
+        super(AbstractRadiusUserProfile, self).save()
