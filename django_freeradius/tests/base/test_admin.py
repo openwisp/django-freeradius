@@ -272,3 +272,16 @@ class BaseTestAdmin(object):
         change_url = reverse('admin:auth_user_change', args=[user.pk])
         response = self.client.get(change_url)
         self.assertContains(response, label_id)
+
+    def test_radius_profile_list(self):
+        self.radius_profile_model(name='test',
+                                  default=False,
+                                  daily_session_limit=55800,
+                                  daily_bandwidth_limit=200000000,
+                                  max_all_time_limit=91800).save()
+
+        url = reverse('admin:{0}_radiusprofile_changelist'.format(self.app_name))
+        response = self.client.get(url)
+        self.assertContains(response, '15.5')
+        self.assertContains(response, '25.5')
+        self.assertContains(response, '200')
