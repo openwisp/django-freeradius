@@ -198,7 +198,30 @@ AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')
 
 
 class AbstractRadiusProfileAdmin(TimeStampedEditableAdmin):
-    pass
+    list_display = ['name',
+                    'get_daily_session_limit',
+                    'get_daily_bandwidth_limit',
+                    'get_max_all_time_limit',
+                    'created',
+                    'modified']
+
+    def get_daily_session_limit(self, obj):
+        # returns daily session limit in hours
+        if obj.daily_session_limit:
+            return round(obj.daily_session_limit / float(3600), 2)
+    get_daily_session_limit.short_description = _('daily session limit (hours)')
+
+    def get_daily_bandwidth_limit(self, obj):
+        # returns daily bandwidth limit in megabytes
+        if obj.daily_bandwidth_limit:
+            return int(obj.daily_bandwidth_limit / 1000 ** 2)
+    get_daily_bandwidth_limit.short_description = _('daily bandwidth limit (MB)')
+
+    def get_max_all_time_limit(self, obj):
+        # returns max all time limit in hours
+        if obj.max_all_time_limit:
+            return round(obj.max_all_time_limit / float(3600), 2)
+    get_max_all_time_limit.short_description = _('maximum all time limit (hours)')
 
 
 class AbstractRadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
