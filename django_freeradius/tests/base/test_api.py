@@ -5,27 +5,50 @@ from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
 
+from django_freeradius.settings import API_TOKEN
+
 START_DATE = '2017-08-08 15:16:10+0200'
+
+auth_header = "Bearer {}".format(API_TOKEN)
+token_querystring = "?token={}".format(API_TOKEN)
 
 
 class BaseTestApi(object):
     def test_disabled_user_login(self):
         User.objects.create_user(username='barbar', password='molly', is_active=False)
         response = self.client.post(reverse('freeradius:authorize'),
-                                    {'username': 'barbar', 'password': 'molly'})
+                                    {'username': 'barbar', 'password': 'molly'},
+                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+
+    def test_authorize_no_token_403(self):
+        User.objects.create_user(username='molly', password='barbar')
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'molly', 'password': 'barbar'})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data, {'detail': 'Token authentication failed'})
 
     def test_authorize_200(self):
         User.objects.create_user(username='molly', password='barbar')
         response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'molly', 'password': 'barbar'},
+                                    HTTP_AUTHORIZATION=auth_header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
+
+    def test_authorize_200_querystring(self):
+        User.objects.create_user(username='molly', password='barbar')
+        post_url = "{}{}".format(reverse('freeradius:authorize'), token_querystring)
+        response = self.client.post(post_url,
                                     {'username': 'molly', 'password': 'barbar'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
 
     def test_authorize_401(self):
         response = self.client.post(reverse('freeradius:authorize'),
-                                    {'username': 'baldo', 'password': 'ugo'})
+                                    {'username': 'baldo', 'password': 'ugo'},
+                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
 
@@ -34,7 +57,21 @@ class BaseTestApi(object):
         params = {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept',
                   'called_station_id': '00-11-22-33-44-55:hostname',
                   'calling_station_id': '00:26:b9:20:5f:10'}
-        response = self.client.post(reverse('freeradius:postauth'), params)
+        response = self.client.post(reverse('freeradius:postauth'),
+                                    params,
+                                    HTTP_AUTHORIZATION=auth_header)
+        params['password'] = ''
+        self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data, None)
+
+    def test_postauth_accept_201_querystring(self):
+        self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
+        params = {'username': 'molly', 'password': 'barbar', 'reply': 'Access-Accept',
+                  'called_station_id': '00-11-22-33-44-55:hostname',
+                  'calling_station_id': '00:26:b9:20:5f:10'}
+        post_url = "{}{}".format(reverse('freeradius:postauth'), token_querystring)
+        response = self.client.post(post_url, params)
         params['password'] = ''
         self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
         self.assertEqual(response.status_code, 201)
@@ -43,7 +80,9 @@ class BaseTestApi(object):
     def test_postauth_reject_201(self):
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
         params = {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject'}
-        response = self.client.post(reverse('freeradius:postauth'), params)
+        response = self.client.post(reverse('freeradius:postauth'),
+                                    params,
+                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(self.radius_postauth_model.objects.filter(username='molly',
                                                                    password='barba').count(), 1)
         self.assertEqual(response.status_code, 201)
@@ -53,15 +92,23 @@ class BaseTestApi(object):
         params = {'username': 'molly', 'password': 'barba', 'reply': 'Access-Reject',
                   'called_station_id': '',
                   'calling_station_id': ''}
-        response = self.client.post(reverse('freeradius:postauth'), params)
+        response = self.client.post(reverse('freeradius:postauth'),
+                                    params,
+                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
 
     def test_postauth_400(self):
-        response = self.client.post(reverse('freeradius:postauth'), {})
+        response = self.client.post(reverse('freeradius:postauth'), {},
+                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
         self.assertEqual(response.status_code, 400)
+
+    def test_postauth_no_token_403(self):
+        response = self.client.post(reverse('freeradius:postauth'), {})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data, {'detail': 'Token authentication failed'})
 
     _acct_url = reverse('freeradius:accounting')
     _acct_initial_data = {
@@ -103,6 +150,7 @@ class BaseTestApi(object):
         """
         return self.client.post(self._acct_url,
                                 data=json.dumps(data),
+                                HTTP_AUTHORIZATION=auth_header,
                                 content_type='application/json')
 
     def assertAcctData(self, ra, data):
@@ -121,6 +169,11 @@ class BaseTestApi(object):
                 data_value = _type(data_value)
             self.assertEqual(ra_value, data_value, msg=key)
 
+    def test_accounting_no_token_403(self):
+        response = self.client.post(self._acct_url, {})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data, {'detail': 'Token authentication failed'})
+
     @freeze_time(START_DATE)
     def test_accounting_start_200(self):
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
@@ -128,6 +181,21 @@ class BaseTestApi(object):
         data = self.acct_post_data
         data['status_type'] = 'Start'
         response = self.post_json(data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
+        self.assertEqual(self.radius_accounting_model.objects.count(), 1)
+        ra.refresh_from_db()
+        self.assertAcctData(ra, data)
+
+    @freeze_time(START_DATE)
+    def test_accounting_start_200_querystring(self):
+        self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+        ra = self.radius_accounting_model.objects.create(**self._acct_initial_data)
+        data = self.acct_post_data
+        data['status_type'] = 'Start'
+        post_url = "{}{}".format(self._acct_url, token_querystring)
+        response = self.client.post(post_url, json.dumps(data),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
@@ -288,7 +356,8 @@ class BaseTestApi(object):
                           input_octets=4440909,
                           output_octets=1119074409))
         self.radius_accounting_model.objects.create(**data3)
-        response = self.client.get('{0}?page_size=1&page=1'.format(self._acct_url))
+        response = self.client.get('{0}?page_size=1&page=1'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -296,7 +365,8 @@ class BaseTestApi(object):
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
         self.assertEqual(item['output_octets'], data1['output_octets'])
         self.assertEqual(item['input_octets'], data1['input_octets'])
-        response = self.client.get('{0}?page_size=1&page=2'.format(self._acct_url))
+        response = self.client.get('{0}?page_size=1&page=2'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -304,7 +374,8 @@ class BaseTestApi(object):
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['input_octets'], data2['input_octets'])
         self.assertEqual(item['called_station_id'], '00-27-22-F3-FA-F1:hostname')
-        response = self.client.get('{0}?page_size=1&page=3'.format(self._acct_url))
+        response = self.client.get('{0}?page_size=1&page=3'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -322,7 +393,8 @@ class BaseTestApi(object):
         data2.update(dict(username='admin',
                           unique_id='99144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?username=test_user'.format(self._acct_url))
+        response = self.client.get('{0}?username=test_user'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -337,7 +409,8 @@ class BaseTestApi(object):
         data2.update(dict(called_station_id='C0-CA-40-FE-E1-9D',
                           unique_id='85144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?called_station_id=E0-CA-40-EE-D1-0D'.format(self._acct_url))
+        response = self.client.get('{0}?called_station_id=E0-CA-40-EE-D1-0D'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -352,7 +425,8 @@ class BaseTestApi(object):
         data2.update(dict(calling_station_id='5c:6d:c2:80:a7:4c',
                           unique_id='85144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?calling_station_id=4c:8d:c2:80:a7:4c'.format(self._acct_url))
+        response = self.client.get('{0}?calling_station_id=4c:8d:c2:80:a7:4c'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -367,7 +441,8 @@ class BaseTestApi(object):
         data2.update(dict(start_time='2018-03-02T00:43:24.020460+01:00',
                           unique_id='85144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-02'))
+        response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-02'),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -383,7 +458,8 @@ class BaseTestApi(object):
         data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
                           unique_id='85144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02'))
+        response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02'),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -398,12 +474,14 @@ class BaseTestApi(object):
         data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
                           unique_id='85144d60'))
         self.radius_accounting_model.objects.create(**data2)
-        response = self.client.get('{0}?is_open=true'.format(self._acct_url))
+        response = self.client.get('{0}?is_open=true'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
         self.assertEqual(item['stop_time'], None)
-        response = self.client.get('{0}?is_open=false'.format(self._acct_url))
+        response = self.client.get('{0}?is_open=false'.format(self._acct_url),
+                                   HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]

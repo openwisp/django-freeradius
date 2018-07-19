@@ -35,3 +35,5 @@ BATCH_PDF_TEMPLATE = getattr(settings,
                                 os.path.dirname(__file__),
                                 'templates/django_freeradius/prefix_pdf.html')
                              )
+
+API_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_API_TOKEN', None)

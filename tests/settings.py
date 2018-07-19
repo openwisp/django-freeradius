@@ -58,6 +58,9 @@ MEDIA_URL = '/media/'
 # during development only
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# change this to something secret in production
+DJANGO_FREERADIUS_API_TOKEN = "djangofreeradiusapitoken"
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
