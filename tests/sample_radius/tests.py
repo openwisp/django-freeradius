@@ -111,6 +111,7 @@ class TestAdmin(BaseTestAdmin, TestCase):
 class TestApi(BaseTestApi, TestCase):
     radius_postauth_model = RadiusPostAuth
     radius_accounting_model = RadiusAccounting
+    radius_batch_model = RadiusBatch
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
