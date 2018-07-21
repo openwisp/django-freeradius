@@ -81,21 +81,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class RadiusBatchCsvSerializer(serializers.ModelSerializer):
+class RadiusBatchSerializer(serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
-    prefix = serializers.CharField(required=False, read_only=True)
+    prefix = serializers.CharField(required=False)
+    csvfile = serializers.FileField(required=False)
     pdf = serializers.FileField(required=False, read_only=True)
-
-    class Meta:
-        model = RadiusBatch
-        fields = '__all__'
-
-
-class RadiusBatchPrefixSerializer(serializers.ModelSerializer):
-    users = UserSerializer(many=True, read_only=True)
-    csvfile = serializers.FileField(required=False, read_only=True)
-    pdf = serializers.FileField(required=False, read_only=True)
-    number_of_users = serializers.IntegerField(write_only=True)
+    number_of_users = serializers.IntegerField(required=False, write_only=True)
 
     class Meta:
         model = RadiusBatch
