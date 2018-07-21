@@ -1,13 +1,17 @@
 import drf_link_header_pagination
 import swapper
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from django_freeradius.settings import API_TOKEN
 
 from .serializers import RadiusAccountingSerializer, RadiusBatchSerializer, RadiusPostAuthSerializer
 
@@ -17,20 +21,39 @@ User = get_user_model()
 RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
-@api_view(['POST'])
-def authorize(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    try:
-        user = User.objects.get(username=username, is_active=True)
-    except User.DoesNotExist:
-        user = None
-    if user and user.check_password(password):
-        return Response({'control:Auth-Type': 'Accept'}, status=200)
-    return Response({'control:Auth-Type': 'Reject'}, status=401)
+class TokenAuthentication(BaseAuthentication):
+    def authenticate(self, request):
+        if request.META.get('HTTP_AUTHORIZATION', False):
+            headers = request.META.get('HTTP_AUTHORIZATION').split(',')
+            for header in headers:
+                token = header.split(' ')[1]
+                if token == API_TOKEN:
+                    return (AnonymousUser(), None)
+        if request.GET.get('token') == API_TOKEN:
+            return (AnonymousUser(), None)
+        raise AuthenticationFailed('Token authentication failed')
+
+
+class AuthorizeView(APIView):
+    authentication_classes = (TokenAuthentication, )
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        try:
+            user = User.objects.get(username=username, is_active=True)
+        except User.DoesNotExist:
+            user = None
+        if user and user.check_password(password):
+            return Response({'control:Auth-Type': 'Accept'}, status=200)
+        return Response({'control:Auth-Type': 'Reject'}, status=401)
+
+
+authorize = AuthorizeView.as_view()
 
 
 class PostAuthView(generics.CreateAPIView):
+    authentication_classes = (TokenAuthentication, )
     serializer_class = RadiusPostAuthSerializer
 
     def post(self, request, *args, **kwargs):
@@ -83,6 +106,7 @@ class AccountingView(generics.ListCreateAPIView):
           does not return any JSON response so that freeradius will avoid
           processing the response without generating warnings
     """
+    authentication_classes = (TokenAuthentication, )
     queryset = RadiusAccounting.objects.all()
     serializer_class = RadiusAccountingSerializer
     pagination_class = AccountingViewPagination

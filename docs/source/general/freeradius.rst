@@ -71,6 +71,7 @@ Example configuration using the PostgreSQL database:
     password = "<password>"
     radius_db = "radius"
 
+.. _configure-rest-module:
 
 Configure the REST module
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -121,6 +122,10 @@ as follows
     # /etc/freeradius/3.0/sites-enabled/default
 
     authorize {
+       # <api_token> is the token used to provide access to the API
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
     }
 
@@ -128,14 +133,23 @@ as follows
     authenticate {}
 
     post-auth {
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
 
        Post-Auth-Type REJECT {
-            rest
+           update control {
+               &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+           }
+           rest
         }
     }
 
     accounting {
+       update control {
+           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
+       }
        rest
     }
 
@@ -207,6 +221,76 @@ An example using MySQL is:
                              AND is_active = TRUE \
                              AND valid_until >= CURDATE() \
                              ORDER BY id"
+
+Using Radius Checks for Authorization Information
+-------------------------------------------------
+
+Traditionally, when using an SQL backend with Freeradius, user authorization information such as User-Name and
+`"known good" <https://freeradius.org/radiusd/man/rlm_pap.html>`_ password are stored using the *radcheck*
+table provided by Freeradius' default SQL schema.  Django-Freeradius utilizes Freeradius'
+`rlm_rest <https://networkradius.com/doc/current/raddb/mods-available/rest.html>`_ module in order to
+take advantage of the built in user management and authentication capabilities of Django.
+(See :ref:`configure-rest-module` and `User authentication in Django <https://docs.djangoproject.com/en/dev/topics/auth/>`_)
+
+For existing Freeradius deployments or in cases where it is preferred to utilize Freeradius' *radcheck* table for
+storing user credentials it is possible to utilize `rlm_sql <https://wiki.freeradius.org/modules/Rlm_sql>`_
+instead of `rlm_rest <https://networkradius.com/doc/current/raddb/mods-available/rest.html>`_ for authorization.
+
+.. note::
+    Bypassing the Django-Freeradius' REST API for authorization means you will have to manually create
+    Radius Check 'password' entries for each user you want to authenticate with Freeradius.
+
+Password hashing
+^^^^^^^^^^^^^^^^
+
+By default Django will use `PBKDF2 <https://en.wikipedia.org/wiki/PBKDF2>`_ to store all passwords in the database.
+(See `Password management in Django <https://docs.djangoproject.com/en/dev/topics/auth/passwords/)>`_).
+The default password hashing and storage algorithms in Django are not compatible with those used by Freeradius.
+Therefore, a default set of Freeradius compatible password storage methods have been provided for deployments that make use
+of Radius Checks for user credentials.
+
+* Cleartext-Password
+* NT-Password
+* LM-Password
+* MD5-Password
+* SMD5-Password
+* SHA-Password
+* SSHA-Password
+* Crypt-Password
+
+.. note::
+    Only the Crypt-Password hashing attribute is recommended for new entries as it makes
+    use of the sha512_crypt feature supported by most Unix/Linux operating systems.
+    (See `passlib.hash <https://passlib.readthedocs.io/en/stable/lib/passlib.hash.html#active-unix-hashes>`_)
+    The other password hashing algorithms have been provided for backward compatibility.
+
+Configuration
+^^^^^^^^^^^^^
+
+To configure support for accessing user credentials with Radius Checks edit the ``authorize`` section
+of the ``/etc/freeradius/3.0/sites-available/default`` configuration file as follows
+
+.. code-block:: ini
+
+    # /etc/freeradius/3.0/sites-available/default
+
+    authorize {
+       #rest
+       sql
+    }
+
+At the url ``/admin/django_freeradius/radiuscheck/`` you can add new Radius Check entries with one of the supported hashing/storage methods mentioned above.
+
+Additional Password Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Freeradius supports additional password hashing algorithms which are listed in the Freeradius
+`rlm_pap <https://freeradius.org/radiusd/man/rlm_pap.html>`_ documentation.  If your existing
+deployment makes use of one of these or you would like to request an addition to Django-Freeradius
+please see the documentation section on :doc:`/general/contributing`.
+
+Keep in mind that using Radius Checks for accessing user credentials is considered an edge case in Django-Freeradius.
+Full compatibility with new and existing features is not guaranteed.
 
 Debugging
 ---------

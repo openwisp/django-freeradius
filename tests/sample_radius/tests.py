@@ -104,6 +104,7 @@ class TestAdmin(BaseTestAdmin, TestCase):
     radius_postauth_model = RadiusPostAuth
     radius_reply_model = RadiusReply
     radius_usergroup_model = RadiusUserGroup
+    radius_profile_model = RadiusProfile
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
