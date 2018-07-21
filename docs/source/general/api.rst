@@ -178,34 +178,29 @@ FreeRADIUS to avoid processing the response body
 
 Responds only to **POST**
 
-BatchCsv
+Batch
 ########
 
 .. code-block:: text
 
-    /api/batchCsv
+    /api/batch
 
-Responds to only **POST**, used to save a RadiuBatch instance and the users from the csv.
+Responds to only **POST**, used to save a RadiuBatch instance.
 It returns the information of the batch operation and the list of the users generated.
+It is possible to generate the users of the RadiusBatch with two different strategies: csv or prefix.
+
+The csv method needs the following parameters:
 
 ===============    ===============================
 Param              Description
 ===============    ===============================
 name               Name of the operation
-strategy           csv
+strategy           "csv"
 csvfile            file with the users
 expiration_date    date of expiration of the users
 ===============    ===============================
 
-BatchPrefix
-###########
-
-.. code-block:: text
-
-    /api/batchPrefix
-
-Responds to only **POST**, used to save a RadiuBatch instance and generate n users form a prefix.
-It returns the information of the batch operation and the list of the users generated.
+These others are for the prefix method:
 
 ===============    ==================================
 Param              Description
