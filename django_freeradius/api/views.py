@@ -182,7 +182,6 @@ class BatchView(generics.CreateAPIView):
                                     csvfile=csvfile)
                 batch.csvfile_upload(csvfile)
                 response = RadiusBatchSerializer(batch)
-                return Response(response.data, status=status.HTTP_201_CREATED)
             elif strategy == 'prefix':
                 prefix = serializer.data.get('prefix')
                 batch = RadiusBatch(name=name,
@@ -193,7 +192,7 @@ class BatchView(generics.CreateAPIView):
                 number_of_users_validated = self._validate_number_of_users(number_of_users)
                 batch.prefix_add(prefix, number_of_users_validated)
                 response = RadiusBatchSerializer(batch)
-                return Response(response.data, status=status.HTTP_201_CREATED)
+            return Response(response.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def _validate_number_of_users(self, number):
