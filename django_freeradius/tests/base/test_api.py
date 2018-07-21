@@ -571,7 +571,25 @@ class BaseTestApi(object):
         self.assertEqual(response.data, {"number_of_users": ["Number of users should be greater than 0."]})
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
 
-    def test_batch_201(self):
+    def test_batch_csv_201(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 0)
+        text = 'user,cleartext$abcd,email@gmail.com,firstname,lastname'
+        with open('test.csv', 'wb') as file:
+            text2 = text.encode('utf-8')
+            file.write(text2)
+        with open('test.csv', 'rb') as file:
+            data = {
+                "name": "test",
+                "strategy": "csv",
+                "csvfile": file,
+            }
+            response = self.client.post(reverse('freeradius:batch'), data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_batch_prefix_201(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
         self.assertEqual(User.objects.count(), 0)
         data = {
