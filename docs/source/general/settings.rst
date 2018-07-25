@@ -72,3 +72,18 @@ It is the number of months after which the expired users are deleted.
 It is the template used to generate the pdf when users are being generated using the batch add users feature using the prefix.
 
 The value should be the absolute path to the template of the pdf.
+
+``DJANGO_FREERADIUS_API_TOKEN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is the token used for authorizing to the API. Set it to a secret token
+with more than 15 characters of length. Eg::
+
+    DJANGO_FREERADIUS_API_TOKEN = "openwispgsoc2018"
+
+Batch mail settings
+~~~~~~~~~~~~~~~~~~~
+
+    * `DJANGO_FREERADIUS_BATCH_MAIL_SUBJECT <importing_users.html#django-freeradius-batch-mail-subject>`_
+    * `DJANGO_FREERADIUS_BATCH_MAIL_MESSAGE <importing_users.html#django-freeradius-batch-mail-message>`_
+    * `DJANGO_FREERADIUS_BATCH_MAIL_SENDER <importing_users.html#django-freeradius-batch-mail-sender>`_
