@@ -324,11 +324,13 @@ class AbstractRadiusAccounting(models.Model):
     called_station_id = models.CharField(verbose_name=_('called station ID'),
                                          max_length=50,
                                          db_column='calledstationid',
+                                         db_index=True,
                                          blank=True,
                                          null=True)
     calling_station_id = models.CharField(verbose_name=_('calling station ID'),
                                           max_length=50,
                                           db_column='callingstationid',
+                                          db_index=True,
                                           blank=True,
                                           null=True)
     terminate_cause = models.CharField(verbose_name=_('termination cause'),
