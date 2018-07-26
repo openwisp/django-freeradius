@@ -8,6 +8,7 @@ import model_utils.fields
 import swapper
 import uuid
 
+
 def add_default_profiles(apps, schema_editor):
     RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
     default_profile = RadiusProfile.objects.filter(default=True)
@@ -20,6 +21,7 @@ def add_default_profiles(apps, schema_editor):
                                    daily_session_limit=172800,
                                    daily_bandwidth_limit=100000000000)
         power_user.save()
+
 
 def add_default_profile_to_existing_users(apps, schema_editor):
     User = get_user_model()
@@ -35,9 +37,16 @@ def add_default_profile_to_existing_users(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('django_freeradius', '0015_radiusbatch'), ('django_freeradius', '0016_radiusprofile'), ('django_freeradius', '0017_radiususerprofile'), ('django_freeradius', '0018_add_default_profile'), ('django_freeradius', '0019_auto_20180705_1745'), ('django_freeradius', '0020_auto_20180708_1237'), ('django_freeradius', '0021_auto_20180709_2139'), ('django_freeradius', '0022_auto_20180713_1713')]
-
+    replaces = [
+        ('django_freeradius', '0015_radiusbatch'),
+        ('django_freeradius', '0016_radiusprofile'),
+        ('django_freeradius', '0017_radiususerprofile'),
+        ('django_freeradius', '0018_add_default_profile'),
+        ('django_freeradius', '0019_auto_20180705_1745'),
+        ('django_freeradius', '0020_auto_20180708_1237'),
+        ('django_freeradius', '0021_auto_20180709_2139'),
+        ('django_freeradius', '0022_auto_20180713_1713')
+    ]
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('django_freeradius', '__first__'),
