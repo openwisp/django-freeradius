@@ -189,17 +189,10 @@ class BatchView(generics.CreateAPIView):
                                     expiration_date=expiration_date,
                                     prefix=prefix)
                 number_of_users = int(request.data['number_of_users'])
-                number_of_users_validated = self._validate_number_of_users(number_of_users)
-                batch.prefix_add(prefix, number_of_users_validated)
+                batch.prefix_add(prefix, number_of_users)
                 response = RadiusBatchSerializer(batch)
             return Response(response.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def _validate_number_of_users(self, number):
-        if number > 0:
-            return number
-        else:
-            raise ValidationError({'number_of_users': [_('Number of users should be greater than 0.')]})
 
 
 batch = BatchView.as_view()

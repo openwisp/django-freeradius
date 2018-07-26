@@ -332,7 +332,6 @@ class BaseTestApi(object):
     def test_accounting_400_validation_error(self):
         data = self.acct_post_data
         data['status_type'] = 'Start'
-
         del data['nas_ip_address']
         response = self.post_json(data)
         self.assertEqual(response.status_code, 400)
@@ -550,25 +549,11 @@ class BaseTestApi(object):
         data = {
             "name": "",
             "strategy": "prefix",
-            "number_of_users": "",
+            "number_of_users": -1,
             "prefix": "",
-
         }
         response = self.client.post(reverse('freeradius:batch'), data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(self.radius_batch_model.objects.count(), 0)
-
-    def test_batch_validate_number_of_users_400(self):
-        self.assertEqual(self.radius_batch_model.objects.count(), 0)
-        data = {
-            "name": "test",
-            "strategy": "prefix",
-            "prefix": "prefix",
-            "number_of_users": 0,
-        }
-        response = self.client.post(reverse('freeradius:batch'), data)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {"number_of_users": ["Number of users should be greater than 0."]})
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
 
     def test_batch_csv_201(self):

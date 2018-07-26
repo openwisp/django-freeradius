@@ -86,7 +86,7 @@ class RadiusBatchSerializer(serializers.ModelSerializer):
     prefix = serializers.CharField(required=False)
     csvfile = serializers.FileField(required=False)
     pdf = serializers.FileField(required=False, read_only=True)
-    number_of_users = serializers.IntegerField(required=False, write_only=True)
+    number_of_users = serializers.IntegerField(required=False, write_only=True, min_value=1)
 
     class Meta:
         model = RadiusBatch
