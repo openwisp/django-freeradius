@@ -185,9 +185,9 @@ Batch
 
     /api/batch
 
-Responds to only **POST**, used to save a RadiuBatch instance.
+Responds only to **POST**, used to save a ``RadiusBatch`` instance.
 It returns the information of the batch operation and the list of the users generated.
-It is possible to generate the users of the RadiusBatch with two different strategies: csv or prefix.
+It is possible to generate the users of the ``RadiusBatch`` with two different strategies: csv or prefix.
 
 The csv method needs the following parameters:
 
