@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
+from rest_framework import status
 
 from django_freeradius.settings import API_TOKEN
 
@@ -542,3 +543,47 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 0)
+
+    def test_batch_bad_request_400(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        data = {
+            "name": "",
+            "strategy": "prefix",
+            "number_of_users": -1,
+            "prefix": "",
+        }
+        response = self.client.post(reverse('freeradius:batch'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+
+    def test_batch_csv_201(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 0)
+        text = 'user,cleartext$abcd,email@gmail.com,firstname,lastname'
+        with open('test.csv', 'wb') as file:
+            text2 = text.encode('utf-8')
+            file.write(text2)
+        with open('test.csv', 'rb') as file:
+            data = {
+                "name": "test",
+                "strategy": "csv",
+                "csvfile": file,
+            }
+            response = self.client.post(reverse('freeradius:batch'), data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_batch_prefix_201(self):
+        self.assertEqual(self.radius_batch_model.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 0)
+        data = {
+            "name": "test",
+            "strategy": "prefix",
+            "prefix": "prefix",
+            "number_of_users": 1,
+        }
+        response = self.client.post(reverse('freeradius:batch'), data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.radius_batch_model.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)

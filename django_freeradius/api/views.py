@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
@@ -13,11 +13,12 @@ from rest_framework.views import APIView
 
 from django_freeradius.settings import API_TOKEN
 
-from .serializers import RadiusAccountingSerializer, RadiusPostAuthSerializer
+from .serializers import RadiusAccountingSerializer, RadiusBatchSerializer, RadiusPostAuthSerializer
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 User = get_user_model()
+RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
 class TokenAuthentication(BaseAuthentication):
@@ -161,3 +162,37 @@ class AccountingView(generics.ListCreateAPIView):
 
 
 accounting = AccountingView.as_view()
+
+
+class BatchView(generics.CreateAPIView):
+    queryset = RadiusBatch.objects.all()
+    serializer_class = RadiusBatchSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = RadiusBatchSerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.data.get('name')
+            expiration_date = serializer.data.get('expiration_data')
+            strategy = serializer.data.get('strategy')
+            if strategy == 'csv':
+                csvfile = request.FILES['csvfile']
+                batch = RadiusBatch(name=name,
+                                    strategy=strategy,
+                                    expiration_date=expiration_date,
+                                    csvfile=csvfile)
+                batch.csvfile_upload(csvfile)
+                response = RadiusBatchSerializer(batch)
+            elif strategy == 'prefix':
+                prefix = serializer.data.get('prefix')
+                batch = RadiusBatch(name=name,
+                                    strategy=strategy,
+                                    expiration_date=expiration_date,
+                                    prefix=prefix)
+                number_of_users = int(request.data['number_of_users'])
+                batch.prefix_add(prefix, number_of_users)
+                response = RadiusBatchSerializer(batch)
+            return Response(response.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+batch = BatchView.as_view()
