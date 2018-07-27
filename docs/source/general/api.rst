@@ -21,13 +21,13 @@ There are two ways in which you can send the token to access the API.
 
 * Bearer token (recommended)::
 
-      curl -X POST http://localhost:8000/api/authorize/ \
+      curl -X POST http://localhost:8000/api/v1/authorize/ \
            -H "Authorization: Bearer <token>" \
            -d "username=<username>&password=<password>"
 
 * Querystring::
 
-      curl -X POST http://localhost:8000/api/authorize/?token=<token> \
+      curl -X POST http://localhost:8000/api/v1/authorize/?token=<token> \
            -d "username=<username>&password=<password>"
 
 Accounting
@@ -35,7 +35,7 @@ Accounting
 
 .. code-block:: text
 
-    /api/accounting
+    /api/v1/accounting
 
 GET
 +++
@@ -43,7 +43,7 @@ Returns a list of accounting objects
 
 .. code-block:: text
 
-    GET /api/accounting
+    GET /api/v1/accounting
 
 .. code-block:: json
 
@@ -123,8 +123,8 @@ https://developer.github.com/v3/guides/traversing-with-pagination/
     {
       ....
       ....
-      link: <http://testserver/api/accounting/?page=2&page_size=1>; rel=\"next\",
-            <http://testserver/api/accounting/?page=3&page_size=1>; rel=\"last\"
+      link: <http://testserver/api/v1/accounting/?page=2&page_size=1>; rel=\"next\",
+            <http://testserver/api/v1/accounting/?page=3&page_size=1>; rel=\"last\"
       ....
       ....
     }
@@ -151,13 +151,13 @@ Authorize
 
 .. code-block:: text
 
-    /api/authorize
+    /api/v1/authorize
 
 Responds to only **POST**, used for authorizing a given username and password.
 
 .. code-block:: text
 
-    POST /api/authorize HTTP/1.1 username=testuser&password=testpassword
+    POST /api/v1/authorize HTTP/1.1 username=testuser&password=testpassword
 
 ========    ===========================
 Param       Description
@@ -171,7 +171,7 @@ PostAuth
 
 .. code-block:: text
 
-    /api/postauth
+    /api/v1/postauth
 
 Sets the response data to None in order to instruct
 FreeRADIUS to avoid processing the response body
@@ -183,7 +183,7 @@ Batch
 
 .. code-block:: text
 
-    /api/batch
+    /api/v1/batch
 
 Responds only to **POST**, used to save a ``RadiusBatch`` instance.
 It returns the information of the batch operation and the list of the users generated.

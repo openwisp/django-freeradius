@@ -4,5 +4,5 @@ from .api import urls as api
 
 app_name = 'freeradius'
 urlpatterns = [
-    url(r'^api/', include(api)),
+    url(r'^api/v1/', include(api)),
 ]

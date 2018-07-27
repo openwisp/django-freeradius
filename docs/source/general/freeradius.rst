@@ -88,7 +88,7 @@ Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/rad
     connect_uri = "<url>"
 
     authorize {
-        uri = "${..connect_uri}/api/authorize/"
+        uri = "${..connect_uri}/api/v1/authorize/"
         method = 'post'
         body = 'json'
         data = '{"username": "%{User-Name}", "password": "%{User-Password}"}'
@@ -99,7 +99,7 @@ Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/rad
     authenticate {}
 
     post-auth {
-        uri = "${..connect_uri}/api/postauth/"
+        uri = "${..connect_uri}/api/v1/postauth/"
         method = 'post'
         body = 'json'
         data = '{"username": "%{User-Name}", "password": "%{User-Password}", "reply": "%{reply:Packet-Type}", "called_station_id": "%{Called-Station-ID}", "calling_station_id": "%{Calling-Station-ID}"}'
@@ -107,7 +107,7 @@ Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/rad
     }
 
     accounting {
-        uri = "${..connect_uri}/api/accounting/"
+        uri = "${..connect_uri}/api/v1/accounting/"
         method = 'post'
         body = 'json'
         data = '{"status_type": "%{Acct-Status-Type}", "session_id": "%{Acct-Session-Id}", "unique_id": "%{Acct-Unique-Session-Id}", "username": "%{User-Name}", "realm": "%{Realm}", "nas_ip_address": "%{NAS-IP-Address}", "nas_port_id": "%{NAS-Port}", "nas_port_type": "%{NAS-Port-Type}", "session_time": "%{Acct-Session-Time}", "authentication": "%{Acct-Authentic}", "input_octets": "%{Acct-Input-Octets}", "output_octets": "%{Acct-Output-Octets}", "called_station_id": "%{Called-Station-Id}", "calling_station_id": "%{Calling-Station-Id}", "terminate_cause": "%{Acct-Terminate-Cause}", "service_type": "%{Service-Type}", "framed_protocol": "%{Framed-Protocol}", "framed_ip_address": "%{Framed-IP-Address}"}'
