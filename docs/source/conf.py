@@ -19,8 +19,10 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('.'))))
+
 from django_freeradius import VERSION, get_version
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('.'))))
 
 # -- General configuration ------------------------------------------------
 
