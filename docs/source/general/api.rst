@@ -2,22 +2,34 @@
 API Documentation
 =================
 
-django-freeradius provides an API for performing all the get and post
-actions. Only authorized users with a token will able to get and post to
-the API. The API token can be configured in the settings which is mandatory.
+django-freeradius provides an API that can be used by freeradius to perform
+the following operations:
 
-``DJANGO_FREERADIUS_API_TOKEN``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- authorize
+- accounting
+- postauth
 
-Set this variable to the secret API token of your instance.
-Users can send this token as a bearer token or also as a query string.
-FreeRADIUS must be configured to send a bearer token as mentioned in the
-`docs <freeradius.html>`_.
+The API also provides other features that can be useful to perform integrations
+with third-party software.
 
-Accessing the API
------------------
+API Token
+---------
 
-There are two ways in which you can send the token to access the API.
+Only requests containing the right API token will able to talk to the API.
+
+Remember to set API token of your instance by setting
+``DJANGO_FREERADIUS_API_TOKEN`` in your django ``settings.py``.
+
+It is highly recommended that you use a hard to guess value, longer than 15 characters
+containing both letters and numbers. Eg:
+
+.. code-block:: python
+
+    DJANGO_FREERADIUS_API_TOKEN = "165f9a790787fc38e5cc12c1640db2300648d9a2"
+
+HTTP clients must send this token, either in the form of a `bearer token
+<https://swagger.io/docs/specification/authentication/bearer-authentication/>`_
+or in the form of a query string parameter as shown below.
 
 * Bearer token (recommended)::
 
@@ -30,15 +42,21 @@ There are two ways in which you can send the token to access the API.
       curl -X POST http://localhost:8000/api/v1/authorize/?token=<token> \
            -d "username=<username>&password=<password>"
 
+Requests which contain an invalid token will receive a ``403`` HTTP error.
+
+For information on how to configure FreeRADIUS to send the bearer token, see
+`Configure the REST module <freeradius.html#configure-the-rest-module>`_.
+
 Accounting
-##########
+----------
 
 .. code-block:: text
 
     /api/v1/accounting
 
 GET
-+++
+~~~
+
 Returns a list of accounting objects
 
 .. code-block:: text
@@ -79,7 +97,8 @@ Returns a list of accounting objects
 
 
 POST
-++++
+~~~~
+
 Add or update accounting information (start, interim-update, stop);
 does not return any JSON response so that freeradius will avoid
 processing the response without generating warnings
@@ -115,6 +134,7 @@ framed_ip_address         framed IP address
 
 Pagination
 ++++++++++
+
 Pagination is provided using a Link header pagination.
 https://developer.github.com/v3/guides/traversing-with-pagination/
 
@@ -133,6 +153,7 @@ Note: Default page size is 10, which can be overridden using the `page_size` par
 
 Filters
 +++++++
+
 The JSON objects returned using the GET endpoint can be filtered/queried using specific parameters.
 
 ==================  ====================
@@ -147,7 +168,7 @@ is_open             If stop_time is null
 ==================  ====================
 
 Authorize
-#########
+---------
 
 .. code-block:: text
 
@@ -167,23 +188,28 @@ password    Password for the given user
 ========    ===========================
 
 PostAuth
-########
+--------
 
 .. code-block:: text
 
     /api/v1/postauth
 
 Sets the response data to None in order to instruct
-FreeRADIUS to avoid processing the response body
+FreeRADIUS to avoid processing the response body.
 
-Responds only to **POST**
+Responds only to **POST**.
 
-Batch
-########
+Batch user creation
+-------------------
 
 .. code-block:: text
 
     /api/v1/batch
+
+
+.. note::
+  This API endpoint allows to use the features described in :doc:`importing_users`
+  and :doc:`generating_users`.
 
 Responds only to **POST**, used to save a ``RadiusBatch`` instance.
 It returns the information of the batch operation and the list of the users generated.
