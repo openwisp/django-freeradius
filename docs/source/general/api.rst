@@ -187,6 +187,9 @@ username    Username for the given user
 password    Password for the given user
 ========    ===========================
 
+See also `DJANGO_FREERADIUS_API_AUTHORIZE_REJECT
+<settings.html#django-freeradius-api-authorize-reject>`_.
+
 PostAuth
 --------
 

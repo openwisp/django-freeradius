@@ -27,3 +27,4 @@ BATCH_PDF_TEMPLATE = getattr(settings,
                                 'templates/django_freeradius/prefix_pdf.html')
                              )
 API_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_API_TOKEN', None)
+API_AUTHORIZE_REJECT = getattr(settings, 'DJANGO_FREERADIUS_API_AUTHORIZE_REJECT', False)

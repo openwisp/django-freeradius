@@ -6,12 +6,12 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 
-from django_freeradius.settings import API_TOKEN
+from django_freeradius import settings as app_settings
 
 START_DATE = '2017-08-08 15:16:10+0200'
 
-auth_header = "Bearer {}".format(API_TOKEN)
-token_querystring = "?token={}".format(API_TOKEN)
+auth_header = "Bearer {}".format(app_settings.API_TOKEN)
+token_querystring = "?token={}".format(app_settings.API_TOKEN)
 
 
 class BaseTestApi(object):
@@ -20,8 +20,8 @@ class BaseTestApi(object):
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'barbar', 'password': 'molly'},
                                     HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
 
     def test_authorize_no_token_403(self):
         User.objects.create_user(username='molly', password='barbar')
@@ -46,12 +46,12 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
 
-    def test_authorize_401(self):
+    def test_authorize_failed(self):
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'baldo', 'password': 'ugo'},
                                     HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
 
     def test_postauth_accept_201(self):
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
@@ -587,3 +587,30 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)
+
+
+class BaseTestApiReject(object):
+    @classmethod
+    def setUpClass(cls):
+        app_settings.API_AUTHORIZE_REJECT = True
+
+    @classmethod
+    def tearDownClass(cls):
+        app_settings.API_AUTHORIZE_REJECT = False
+
+    def test_disabled_user_login(self):
+        User.objects.create_user(username='barbar',
+                                 password='molly',
+                                 is_active=False)
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'barbar', 'password': 'molly'},
+                                    HTTP_AUTHORIZATION=auth_header)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+
+    def test_authorize_401(self):
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'baldo', 'password': 'ugo'},
+                                    HTTP_AUTHORIZATION=auth_header)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})

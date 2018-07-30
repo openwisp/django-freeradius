@@ -78,6 +78,22 @@ The value should be the absolute path to the template of the pdf.
 
 See `API Token <api.html#api-token>`_.
 
+``DJANGO_FREERADIUS_API_AUTHORIZE_REJECT``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``False``
+
+Indicates wether the `Authorize API view <api.html#Authorize>`_ will return
+``{"control:Auth-Type": "Reject"}`` or not.
+
+Rejecting an authorization request explicitly will prevent freeradius from
+attempting to perform authorization with other mechanisms (eg: radius checks, LDAP, etc.).
+
+When set to ``False``, if an authorization request fails, the API will respond with
+``None``, which will allow freeradius to keep attempting to authorize the request
+with other freeradius modules.
+
+Set this to ``True`` if you are performing authorization exclusively through the REST API.
 
 Batch mail settings
 ~~~~~~~~~~~~~~~~~~~

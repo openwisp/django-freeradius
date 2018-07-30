@@ -4,7 +4,7 @@ from unittest import skipIf
 import swapper
 from django.test import TestCase
 
-from .base.test_api import BaseTestApi
+from .base.test_api import BaseTestApi, BaseTestApiReject
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
@@ -16,3 +16,8 @@ class TestApi(BaseTestApi, TestCase):
     radius_postauth_model = RadiusPostAuth
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
+
+
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
+class TestApiReject(BaseTestApiReject, TestCase):
+    pass

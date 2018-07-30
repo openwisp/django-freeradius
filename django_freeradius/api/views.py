@@ -11,7 +11,7 @@ from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_freeradius.settings import API_TOKEN
+from django_freeradius import settings as app_settings
 
 from .serializers import RadiusAccountingSerializer, RadiusBatchSerializer, RadiusPostAuthSerializer
 
@@ -27,9 +27,9 @@ class TokenAuthentication(BaseAuthentication):
             headers = request.META.get('HTTP_AUTHORIZATION').split(',')
             for header in headers:
                 token = header.split(' ')[1]
-                if token == API_TOKEN:
+                if token == app_settings.API_TOKEN:
                     return (AnonymousUser(), None)
-        if request.GET.get('token') == API_TOKEN:
+        if request.GET.get('token') == app_settings.API_TOKEN:
             return (AnonymousUser(), None)
         raise AuthenticationFailed('Token authentication failed')
 
@@ -46,7 +46,10 @@ class AuthorizeView(APIView):
             user = None
         if user and user.check_password(password):
             return Response({'control:Auth-Type': 'Accept'}, status=200)
-        return Response({'control:Auth-Type': 'Reject'}, status=401)
+        if app_settings.API_AUTHORIZE_REJECT:
+            return Response({'control:Auth-Type': 'Reject'}, status=401)
+        else:
+            return Response(None, status=200)
 
 
 authorize = AuthorizeView.as_view()
