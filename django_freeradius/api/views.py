@@ -110,7 +110,7 @@ class AccountingView(generics.ListCreateAPIView):
           processing the response without generating warnings
     """
     authentication_classes = (TokenAuthentication, )
-    queryset = RadiusAccounting.objects.all()
+    queryset = RadiusAccounting.objects.all().order_by('-start_time')
     serializer_class = RadiusAccountingSerializer
     pagination_class = AccountingViewPagination
     filter_backends = (DjangoFilterBackend,)

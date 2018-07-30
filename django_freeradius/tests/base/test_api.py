@@ -362,10 +362,10 @@ class BaseTestApi(object):
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
-        self.assertEqual(item['username'], 'admin')
+        self.assertEqual(item['output_octets'], data3['output_octets'])
+        self.assertEqual(item['input_octets'], data3['input_octets'])
+        self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
-        self.assertEqual(item['output_octets'], data1['output_octets'])
-        self.assertEqual(item['input_octets'], data1['input_octets'])
         response = self.client.get('{0}?page_size=1&page=2'.format(self._acct_url),
                                    HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(len(response.json()), 1)
@@ -380,10 +380,10 @@ class BaseTestApi(object):
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
-        self.assertEqual(item['output_octets'], data3['output_octets'])
-        self.assertEqual(item['input_octets'], data3['input_octets'])
-        self.assertEqual(item['nas_ip_address'], '172.16.64.91')
+        self.assertEqual(item['username'], 'admin')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
+        self.assertEqual(item['output_octets'], data1['output_octets'])
+        self.assertEqual(item['input_octets'], data1['input_octets'])
 
     def test_accounting_filter_username(self):
         data1 = self.acct_post_data
