@@ -115,14 +115,14 @@ Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/rad
     }
 
 Configure the ``authorize``, ``authenticate`` and ``postauth`` section
-as follows
+as follows, substituting the occurrences of ``<api_token>`` with the value
+of `DJANGO_FREERADIUS_API_TOKEN <api.html#api-token>`_:
 
 .. code-block:: ini
 
     # /etc/freeradius/3.0/sites-enabled/default
 
     authorize {
-       # <api_token> is the token used to provide access to the API
        update control {
            &REST-HTTP-Header += "Authorization: Bearer <api_token>"
        }

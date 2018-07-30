@@ -76,10 +76,8 @@ The value should be the absolute path to the template of the pdf.
 ``DJANGO_FREERADIUS_API_TOKEN``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is the token used for authorizing to the API. Set it to a secret token
-with more than 15 characters of length. Eg::
+See `API Token <api.html#api-token>`_.
 
-    DJANGO_FREERADIUS_API_TOKEN = "openwispgsoc2018"
 
 Batch mail settings
 ~~~~~~~~~~~~~~~~~~~

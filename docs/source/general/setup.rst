@@ -54,7 +54,11 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``django_freeradius`` and ``'django_filters`` to ``INSTALLED_APPS``:
+In the django ``settings.py`` file of your project, do the following:
+
+- add ``django_freeradius`` and ``django_filters`` to ``INSTALLED_APPS``
+- set ``DJANGO_FREERADIUS_API_TOKEN`` (see `API Token <api.html#api-token>`_
+  for more information):
 
 .. code-block:: python
 
@@ -63,6 +67,8 @@ Add ``django_freeradius`` and ``'django_filters`` to ``INSTALLED_APPS``:
         'django_freeradius',
         'django_filters',
     ]
+
+    DJANGO_FREERADIUS_API_TOKEN = '<a-long-secret-value-of-your-choice>'
 
 Add the URLs to your main ``urls.py``:
 
