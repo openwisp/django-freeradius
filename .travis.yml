@@ -40,6 +40,7 @@ before_install:
   - ./runisort
   - npm install -g jslint
   - jslint ./django_freeradius/static/django-freeradius/js/*.js
+  - ./runsphinx-build
 
 install:
   - pip install $DJANGO
@@ -48,7 +49,6 @@ install:
 before_script:
   - if [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/freeradius_test' ]; then psql -c "CREATE DATABASE freeradius_test;" -U postgres; fi
   - mysql -e "CREATE DATABASE IF NOT EXISTS freeradius_test;"
-  - ./runsphinx-build
   - ./tests/manage.py migrate
   # ensure no migrations pending but show output for easier debugging
   - |
