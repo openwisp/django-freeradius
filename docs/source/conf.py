@@ -20,9 +20,9 @@
 import os
 import sys
 
-from django_freeradius import VERSION, get_version
-
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('.'))))
+
+from django_freeradius import VERSION, get_version
 
 # -- General configuration ------------------------------------------------
 
