@@ -27,7 +27,8 @@ class ReadOnlyAdmin(ModelAdmin):
 
     def get_actions(self, request):
         actions = super(ReadOnlyAdmin, self).get_actions(request)
-        del actions["delete_selected"]
+        if 'delete_selected' in actions:  # pragma: no cover
+            del actions['delete_selected']
         return actions
 
     def has_add_permission(self, request):
