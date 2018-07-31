@@ -61,14 +61,12 @@ class BaseTestRadiusBatch(object):
         radiusbatch = self.radius_batch_model(name='test')
         self.assertEqual(str(radiusbatch), 'test')
 
-    def test_custom_queryset(self):
-        radiusbatch = self.radius_batch_model.objects.create()
+    def test_delete_method(self):
+        radiusbatch = self.radius_batch_model.objects.create(strategy='prefix',
+                                                             prefix='test',
+                                                             name='test')
+        radiusbatch.prefix_add('test', 5)
         User = get_user_model()
-        for i in range(5):
-            user = User.objects.create(username='rohith{}'.format(str(i)))
-            user.set_password('password')
-            user.save()
-            radiusbatch.users.add(user)
         self.assertEqual(User.objects.all().count(), 5)
         radiusbatch.delete()
         self.assertEqual(self.radius_batch_model.objects.all().count(), 0)

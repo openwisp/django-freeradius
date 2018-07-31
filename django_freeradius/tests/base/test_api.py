@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.timezone import now
@@ -560,10 +561,10 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
         self.assertEqual(User.objects.count(), 0)
         text = 'user,cleartext$abcd,email@gmail.com,firstname,lastname'
-        with open('test.csv', 'wb') as file:
+        with open('{}/test.csv'.format(settings.MEDIA_ROOT), 'wb') as file:
             text2 = text.encode('utf-8')
             file.write(text2)
-        with open('test.csv', 'rb') as file:
+        with open('{}/test.csv'.format(settings.MEDIA_ROOT), 'rb') as file:
             data = {
                 "name": "test",
                 "strategy": "csv",
