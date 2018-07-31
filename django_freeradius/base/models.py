@@ -1,4 +1,5 @@
 import csv
+import os
 from base64 import encodestring
 from hashlib import md5, sha1
 from io import StringIO
@@ -617,6 +618,7 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
             u.save()
             self.users.add(u)
         f = generate_pdf(prefix, {'users': user_password})
+        f.name = f.name.split('/')[-1]
         self.pdf = f
         self.full_clean()
         self.save()
@@ -624,12 +626,22 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
     def delete(self):
         self.users.all().delete()
         super(AbstractRadiusBatch, self).delete()
+        self._remove_files()
 
     def expire(self):
         users = self.users.all()
         for u in users:
             u.is_active = False
             u.save()
+
+    def _remove_files(self):
+        strategy_filemap = {
+            'prefix': 'pdf',
+            'csv': 'csvfile'
+        }
+        path = getattr(self, strategy_filemap.get(self.strategy)).path
+        if os.path.isfile(path):
+            os.remove(path)
 
 
 @python_2_unicode_compatible
