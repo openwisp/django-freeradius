@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import migrations, models
 import django.db.migrations.operations.special
 import django.db.models.deletion
@@ -9,8 +8,18 @@ import swapper
 import uuid
 
 
+def get_model(apps, model_path):
+    app, model = model_path.split('.')
+    return apps.get_model(app, model)
+
+
+def get_swapped_model(apps, app_name, model_name):
+    model_path = swapper.get_model_name(app_name, model_name)
+    return get_model(apps, model_path)
+
+
 def add_default_profiles(apps, schema_editor):
-    RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
+    RadiusProfile = get_swapped_model(apps, 'django_freeradius', 'RadiusProfile')
     default_profile = RadiusProfile.objects.filter(default=True)
     if not default_profile.exists():
         limited_user = RadiusProfile(name="Limited User", default=True,
@@ -24,9 +33,9 @@ def add_default_profiles(apps, schema_editor):
 
 
 def add_default_profile_to_existing_users(apps, schema_editor):
-    User = get_user_model()
-    RadiusUserProfile = swapper.load_model('django_freeradius', 'RadiusUserProfile')
-    RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
+    User = get_model(apps, settings.AUTH_USER_MODEL)
+    RadiusUserProfile = get_swapped_model(apps, 'django_freeradius', 'RadiusUserProfile')
+    RadiusProfile = get_swapped_model(apps, 'django_freeradius', 'RadiusProfile')
     default_profile = RadiusProfile.objects.filter(default=True)
     if default_profile.exists():
         users = User.objects.all()
