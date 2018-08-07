@@ -37,7 +37,7 @@ if sys.argv[-1] == 'publish':
 setup(
     name='django-freeradius',
     version=get_version(),
-    license='BSD',
+    license='GPL3',
     author='Fiorella De Luca',
     author_email='deluca_fiorella@yahoo.it',
     description='Django reusable app that provides an admin interface to a freeradius database',
