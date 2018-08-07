@@ -16,14 +16,10 @@ branches:
 
 env:
   matrix:
-   - DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
-   - DJANGO="django>=2.0,<2.1" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
-   - SAMPLE_APP=1 DJANGO="django>=2.0,<2.1" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
-   # TODO:
-   # when django 2.1 is released, we should test django 2.0 with sqlite on the
-   # line below while updating the lines above to use django 2.1
-   # (testing all databases for every django version is overkill)
-   - DJANGO="https://www.djangoproject.com/download/2.1rc1/tarball/" DATABASE_URL='sqlite:///django-freeradius.db'
+   - DJANGO="django>=2.1,<2.2" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+   - DJANGO="django>=2.1,<2.2" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
+   - SAMPLE_APP=1 DJANGO="django>=2.1,<2.2" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+   - DJANGO="django>=2.0,<2.1" DATABASE_URL='sqlite:///django-freeradius.db'
 
 before_install:
   - pip install -U pip wheel
