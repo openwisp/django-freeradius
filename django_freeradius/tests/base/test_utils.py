@@ -13,9 +13,11 @@ class BaseTestUtils(object):
         self.assertEqual(find_available_username('rohith', []), 'rohith2')
 
     def test_validate_csvfile(self):
+        invalid_csv_path = self._get_path('static/test_batch_invalid.csv')
+        improper_csv_path = self._get_path('static/test_batch_improper.csv')
         with self.assertRaises(ValidationError) as error:
-            validate_csvfile(open('django_freeradius/tests/static/test_batch_invalid.csv', 'rt'))
+            validate_csvfile(open(invalid_csv_path, 'rt'))
         self.assertTrue('Enter a valid email address' in error.exception.message)
         with self.assertRaises(ValidationError) as error:
-            validate_csvfile(open('django_freeradius/tests/static/test_batch_improper.csv', 'rt'))
+            validate_csvfile(open(improper_csv_path, 'rt'))
         self.assertTrue('Improper CSV format' in error.exception.message)

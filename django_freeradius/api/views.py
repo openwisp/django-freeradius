@@ -179,23 +179,27 @@ class BatchView(generics.CreateAPIView):
             strategy = serializer.data.get('strategy')
             if strategy == 'csv':
                 csvfile = request.FILES['csvfile']
-                batch = RadiusBatch(name=name,
-                                    strategy=strategy,
-                                    expiration_date=expiration_date,
-                                    csvfile=csvfile)
+                options = dict(name=name, strategy=strategy,
+                               expiration_date=expiration_date,
+                               csvfile=csvfile)
+                batch = self._create_batch(serializer, **options)
                 batch.csvfile_upload(csvfile)
                 response = RadiusBatchSerializer(batch)
             elif strategy == 'prefix':
                 prefix = serializer.data.get('prefix')
-                batch = RadiusBatch(name=name,
-                                    strategy=strategy,
-                                    expiration_date=expiration_date,
-                                    prefix=prefix)
+                options = dict(name=name, strategy=strategy,
+                               expiration_date=expiration_date,
+                               prefix=prefix)
+                batch = self._create_batch(serializer, **options)
                 number_of_users = int(request.data['number_of_users'])
                 batch.prefix_add(prefix, number_of_users)
                 response = RadiusBatchSerializer(batch)
             return Response(response.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def _create_batch(self, serializer, **kwargs):
+        batch = RadiusBatch(**kwargs)
+        return batch
 
 
 batch = BatchView.as_view()

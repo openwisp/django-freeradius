@@ -1,0 +1,8 @@
+# flake8: noqa
+from .base.batch_add_users import BaseBatchAddUsersCommand
+from .base.cleanup_stale_radacct import BaseCleanupRadacctCommand
+from .base.deactivate_expired_users import BaseDeactivateExpiredUsersCommand
+from .base.delete_old_postauth import BaseDeleteOldPostauthCommand
+from .base.delete_old_radacct import BaseDeleteOldRadacctCommand
+from .base.delete_old_users import BaseDeleteOldUsersCommand
+from .base.prefix_add_users import BasePrefixAddUsersCommand

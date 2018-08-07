@@ -2,10 +2,12 @@ import os
 from unittest import skipUnless
 
 import swapper
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from django_freeradius.tests import ApiParamsMixin, CallCommandMixin, CreateRadiusObjectsMixin, FileMixin
 from django_freeradius.tests.base.test_admin import BaseTestAdmin
-from django_freeradius.tests.base.test_api import BaseTestApi
+from django_freeradius.tests.base.test_api import BaseTestApi, BaseTestApiReject
 from django_freeradius.tests.base.test_batch_add_users import BaseTestCSVUpload
 from django_freeradius.tests.base.test_commands import BaseTestCommands
 from django_freeradius.tests.base.test_models import (
@@ -36,64 +38,65 @@ _RADCHECK_ENTRY_PW_UPDATE = {'username': 'Monica', 'new_value': 'Cam0_liX',
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestNas(BaseTestNas, TestCase):
+class TestNas(BaseTestNas, TestCase, CreateRadiusObjectsMixin):
     nas_model = Nas
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusAccounting(BaseTestRadiusAccounting, TestCase):
+class TestRadiusAccounting(BaseTestRadiusAccounting, TestCase, CreateRadiusObjectsMixin):
     radius_accounting_model = RadiusAccounting
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusCheck(BaseTestRadiusCheck, TestCase):
+class TestRadiusCheck(BaseTestRadiusCheck, TestCase, CreateRadiusObjectsMixin):
     radius_check_model = RadiusCheck
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusReply(BaseTestRadiusReply, TestCase):
+class TestRadiusReply(BaseTestRadiusReply, TestCase, CreateRadiusObjectsMixin):
     radius_reply_model = RadiusReply
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusGroupReply(BaseTestRadiusGroupReply, TestCase):
+class TestRadiusGroupReply(BaseTestRadiusGroupReply, TestCase, CreateRadiusObjectsMixin):
     radius_groupreply_model = RadiusGroupReply
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusGroupCheck(BaseTestRadiusGroupCheck, TestCase):
+class TestRadiusGroupCheck(BaseTestRadiusGroupCheck, TestCase, CreateRadiusObjectsMixin):
     radius_groupcheck_model = RadiusGroupCheck
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusUserGroup(BaseTestRadiusUserGroup, TestCase):
+class TestRadiusUserGroup(BaseTestRadiusUserGroup, TestCase, CreateRadiusObjectsMixin):
     radius_usergroup_model = RadiusUserGroup
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusPostAuth(BaseTestRadiusPostAuth, TestCase):
+class TestRadiusPostAuth(BaseTestRadiusPostAuth, TestCase, CreateRadiusObjectsMixin):
     radius_postauth_model = RadiusPostAuth
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusBatch(BaseTestRadiusBatch, TestCase):
+class TestRadiusBatch(BaseTestRadiusBatch, TestCase, CreateRadiusObjectsMixin):
     radius_batch_model = RadiusBatch
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusProfile(BaseTestRadiusProfile, TestCase):
+class TestRadiusProfile(BaseTestRadiusProfile, TestCase, CreateRadiusObjectsMixin):
     radius_profile_model = RadiusProfile
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestRadiusUserProfile(BaseTestRadiusUserProfile, TestCase):
+class TestRadiusUserProfile(BaseTestRadiusUserProfile, TestCase, CreateRadiusObjectsMixin):
     radius_profile_model = RadiusProfile
     radius_userprofile_model = RadiusUserProfile
     radius_check_model = RadiusCheck
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestAdmin(BaseTestAdmin, TestCase):
+class TestAdmin(BaseTestAdmin, TestCase, CreateRadiusObjectsMixin,
+                FileMixin, CallCommandMixin):
     app_name = "sample_radius"
     nas_model = Nas
     radius_accounting_model = RadiusAccounting
@@ -108,24 +111,32 @@ class TestAdmin(BaseTestAdmin, TestCase):
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestApi(BaseTestApi, TestCase):
+class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
     radius_postauth_model = RadiusPostAuth
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
+    user_model = get_user_model()
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestCommands(BaseTestCommands, TestCase):
+class TestCommands(BaseTestCommands, TestCase, CreateRadiusObjectsMixin,
+                   FileMixin, CallCommandMixin):
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
     radius_postauth_model = RadiusPostAuth
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestCSVUpload(BaseTestCSVUpload, TestCase):
+class TestCSVUpload(BaseTestCSVUpload, TestCase,
+                    CreateRadiusObjectsMixin, FileMixin):
     radius_batch_model = RadiusBatch
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
-class TestUtils(BaseTestUtils, TestCase):
+class TestUtils(BaseTestUtils, TestCase, CreateRadiusObjectsMixin, FileMixin):
+    pass
+
+
+@skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
+class TestApiReject(BaseTestApiReject, TestCase, CreateRadiusObjectsMixin):
     pass
