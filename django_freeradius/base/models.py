@@ -138,8 +138,8 @@ class AbstractRadiusReply(BaseModel):
 
     class Meta:
         db_table = 'radreply'
-        verbose_name = _('radius reply')
-        verbose_name_plural = _('radius replies')
+        verbose_name = _('reply')
+        verbose_name_plural = _('replies')
         abstract = True
 
     def __str__(self):
@@ -232,8 +232,8 @@ class AbstractRadiusCheck(BaseModel):
 
     class Meta:
         db_table = 'radcheck'
-        verbose_name = _('radius check')
-        verbose_name_plural = _('radius checks')
+        verbose_name = _('check')
+        verbose_name_plural = _('checks')
         abstract = True
 
     def __str__(self):
@@ -426,8 +426,8 @@ class AbstractRadiusUserGroup(BaseModel):
 
     class Meta:
         db_table = 'radusergroup'
-        verbose_name = _('radius user group association')
-        verbose_name_plural = _('radius user group associations')
+        verbose_name = _('user group')
+        verbose_name_plural = _('user groups')
         abstract = True
 
     def __str__(self):
@@ -448,8 +448,8 @@ class AbstractRadiusGroupReply(BaseModel):
 
     class Meta:
         db_table = 'radgroupreply'
-        verbose_name = _('radius group reply')
-        verbose_name_plural = _('radius group replies')
+        verbose_name = _('group reply')
+        verbose_name_plural = _('group replies')
         abstract = True
 
     def __str__(self):
@@ -470,8 +470,8 @@ class AbstractRadiusGroupCheck(BaseModel):
 
     class Meta:
         db_table = 'radgroupcheck'
-        verbose_name = _('radius group check')
-        verbose_name_plural = _('radius group checks')
+        verbose_name = _('group check')
+        verbose_name_plural = _('group checks')
         abstract = True
 
     def __str__(self):
@@ -504,8 +504,8 @@ class AbstractRadiusPostAuth(models.Model):
 
     class Meta:
         db_table = 'radpostauth'
-        verbose_name = _('radius post authentication log')
-        verbose_name_plural = _('radius post authentication logs')
+        verbose_name = _('post auth')
+        verbose_name_plural = _('post auth log')
         abstract = True
 
     def __str__(self):
@@ -546,8 +546,8 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radbatch'
-        verbose_name = _('Batch user creation')
-        verbose_name_plural = _('Batch user creation operations')
+        verbose_name = _('batch user creation')
+        verbose_name_plural = _('batch user creation operations')
         abstract = True
 
     def __str__(self):
@@ -663,8 +663,8 @@ class AbstractRadiusProfile(TimeStampedEditableModel):
                                   default=False)
 
     class Meta:
-        verbose_name = _('radius profile')
-        verbose_name_plural = _('radius profiles')
+        verbose_name = _('limit profile')
+        verbose_name_plural = _('limit profiles')
         abstract = True
 
     def __str__(self):
@@ -687,8 +687,8 @@ class AbstractRadiusUserProfile(TimeStampedEditableModel):
 
     class Meta:
         db_table = 'radiususerprofile'
-        verbose_name = _('radius user profile')
-        verbose_name_plural = _('radius user profiles')
+        verbose_name = _('user profile')
+        verbose_name_plural = _('user profiles')
         abstract = True
 
     def __str__(self):

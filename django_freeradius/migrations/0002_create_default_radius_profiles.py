@@ -103,8 +103,8 @@ class Migration(migrations.Migration):
                 ('users', models.ManyToManyField(blank=True, help_text='List of users uploaded in this batch', related_name='radius_batch', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Batch user creation',
-                'verbose_name_plural': 'Batch user creation operations',
+                'verbose_name': 'batch user creation',
+                'verbose_name_plural': 'batch user creation operations',
                 'db_table': 'radbatch',
                 'abstract': False,
                 'swappable': 'DJANGO_FREERADIUS_RADIUSBATCH_MODEL',
@@ -123,8 +123,8 @@ class Migration(migrations.Migration):
                 ('default', models.BooleanField(default=False, verbose_name='Use this profile as the default profile')),
             ],
             options={
-                'verbose_name': 'radius profile',
-                'verbose_name_plural': 'radius profiles',
+                'verbose_name': 'limit profile',
+                'verbose_name_plural': 'limit profiles',
                 'abstract': False,
                 'swappable': 'DJANGO_FREERADIUS_RADIUSPROFILE_MODEL',
             },
@@ -139,8 +139,8 @@ class Migration(migrations.Migration):
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='radius_user_profile', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'radius user profile',
-                'verbose_name_plural': 'radius user profiles',
+                'verbose_name': 'user profile',
+                'verbose_name_plural': 'user profiles',
                 'db_table': 'radiususerprofile',
                 'abstract': False,
                 'swappable': 'DJANGO_FREERADIUS_RADIUSUSERPROFILE_MODEL',

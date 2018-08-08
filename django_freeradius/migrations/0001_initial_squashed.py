@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
     ]
     initial = True
     dependencies = [('django_freeradius', '__first__')]
-    
+
     operations = [
         migrations.CreateModel(
             name='Nas',
@@ -99,9 +99,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSCHECK_MODEL',
                 'db_table': 'radcheck',
-                'verbose_name_plural': 'radius checks',
+                'verbose_name_plural': 'checks',
                 'abstract': False,
-                'verbose_name': 'radius check',
+                'verbose_name': 'check',
             },
         ),
         migrations.CreateModel(
@@ -118,9 +118,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL',
                 'db_table': 'radgroupcheck',
-                'verbose_name_plural': 'radius group checks',
+                'verbose_name_plural': 'group checks',
                 'abstract': False,
-                'verbose_name': 'radius group check',
+                'verbose_name': 'group check',
             },
         ),
         migrations.CreateModel(
@@ -137,9 +137,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL',
                 'db_table': 'radgroupreply',
-                'verbose_name_plural': 'radius group replies',
+                'verbose_name_plural': 'group replies',
                 'abstract': False,
-                'verbose_name': 'radius group reply',
+                'verbose_name': 'group reply',
             },
         ),
         migrations.CreateModel(
@@ -156,9 +156,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL',
                 'db_table': 'radpostauth',
-                'verbose_name_plural': 'radius post authentication logs',
+                'verbose_name_plural': 'post auth log',
                 'abstract': False,
-                'verbose_name': 'radius post authentication log',
+                'verbose_name': 'post auth',
             },
         ),
         migrations.CreateModel(
@@ -175,9 +175,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSREPLY_MODEL',
                 'db_table': 'radreply',
-                'verbose_name_plural': 'radius replies',
+                'verbose_name_plural': 'replies',
                 'abstract': False,
-                'verbose_name': 'radius reply',
+                'verbose_name': 'reply',
             },
         ),
         migrations.CreateModel(
@@ -193,9 +193,9 @@ class Migration(migrations.Migration):
             options={
                 'swappable': 'DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL',
                 'db_table': 'radusergroup',
-                'verbose_name_plural': 'radius user group associations',
+                'verbose_name_plural': 'user groups',
                 'abstract': False,
-                'verbose_name': 'radius user group association',
+                'verbose_name': 'user group',
             },
         ),
     ]
