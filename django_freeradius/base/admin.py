@@ -149,9 +149,16 @@ BasePostAuth = ReadOnlyAdmin if not app_settings.EDITABLE_POSTAUTH else ModelAdm
 
 
 class AbstractRadiusPostAuthAdmin(BasePostAuth):
-    list_display = ['username', 'reply', 'date']
+    list_display = ['username',
+                    'reply',
+                    'calling_station_id',
+                    'called_station_id',
+                    'date']
     list_filter = ['date', 'reply']
-    search_fields = ['username', 'reply']
+    search_fields = ['username',
+                     'reply',
+                     'calling_station_id',
+                     'called_station_id']
 
 
 class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
