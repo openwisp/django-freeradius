@@ -228,7 +228,8 @@ take advantage of the built in user management and authentication capabilities o
 
 For existing Freeradius deployments or in cases where it is preferred to utilize Freeradius' *radcheck* table for
 storing user credentials it is possible to utilize `rlm_sql <https://wiki.freeradius.org/modules/Rlm_sql>`_
-instead of `rlm_rest <https://networkradius.com/doc/current/raddb/mods-available/rest.html>`_ for authorization.
+in parallel with (or instead of) `rlm_rest <https://networkradius.com/doc/current/raddb/mods-available/rest.html>`_
+for authorization.
 
 .. note::
     Bypassing the Django-Freeradius' REST API for authorization means you will have to manually create
@@ -269,11 +270,12 @@ of the ``/etc/freeradius/3.0/sites-available/default`` configuration file as fol
     # /etc/freeradius/3.0/sites-available/default
 
     authorize {
-       #rest
-       sql
+        rest
+        sql
     }
 
-At the url ``/admin/django_freeradius/radiuscheck/`` you can add new Radius Check entries with one of the supported hashing/storage methods mentioned above.
+At the url ``/admin/django_freeradius/radiuscheck/`` you can add new Radius Check
+entries with one of the supported hashing/storage methods mentioned above.
 
 Additional Password Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
