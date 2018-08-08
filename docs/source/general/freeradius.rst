@@ -122,35 +122,29 @@ of `DJANGO_FREERADIUS_API_TOKEN <api.html#api-token>`_:
 
     # /etc/freeradius/3.0/sites-enabled/default
 
+    api_token_header = "Authorization: Bearer <api_token>"
+
     authorize {
-       update control {
-           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
-       }
-       rest
+        update control { &REST-HTTP-Header += "${...api_token_header}" }
+        rest
     }
 
     # this section can be left empty
     authenticate {}
 
     post-auth {
-       update control {
-           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
-       }
-       rest
+        update control { &REST-HTTP-Header += "${...api_token_header}" }
+        rest
 
-       Post-Auth-Type REJECT {
-           update control {
-               &REST-HTTP-Header += "Authorization: Bearer <api_token>"
-           }
-           rest
+        Post-Auth-Type REJECT {
+            update control { &REST-HTTP-Header += "${....api_token_header}" }
+            rest
         }
     }
 
     accounting {
-       update control {
-           &REST-HTTP-Header += "Authorization: Bearer <api_token>"
-       }
-       rest
+        update control { &REST-HTTP-Header += "${...api_token_header}" }
+        rest
     }
 
 For accounting configuration you need to verify that in pre-accounting we have:
