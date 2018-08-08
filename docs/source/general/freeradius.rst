@@ -16,7 +16,7 @@ First of all, become root:
 
 .. code-block:: shell
 
-    sudo -i
+    sudo -s
 
 .. note::
     If you use a recent version of Debian like **Stretch** (9) or Ubuntu **Zesty** (17),
