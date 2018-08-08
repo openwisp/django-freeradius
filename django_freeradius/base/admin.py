@@ -93,11 +93,21 @@ BaseAccounting = ReadOnlyAdmin if not app_settings.EDITABLE_ACCOUNTING else Mode
 
 
 class AbstractRadiusAccountingAdmin(BaseAccounting):
-    list_display = ('nas_ip_address', 'username', 'session_time',
-                    'input_octets', 'output_octets',
-                    'start_time', 'stop_time')
-    search_fields = ('unique_id', 'username', 'nas_ip_address')
-    list_filter = ('start_time', 'stop_time')
+    list_display = ['session_id',
+                    'username',
+                    'session_time',
+                    'input_octets',
+                    'output_octets',
+                    'calling_station_id',
+                    'called_station_id',
+                    'start_time',
+                    'stop_time']
+    search_fields = ['unique_id',
+                     'username',
+                     'calling_station_id',
+                     'called_station_id',
+                     'nas_ip_address']
+    list_filter = ['start_time', 'stop_time']
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):
