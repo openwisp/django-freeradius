@@ -1,11 +1,13 @@
 import swapper
-from django.contrib.auth.models import Group, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.utils import timezone
 from rest_framework import serializers
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
 RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
+User = get_user_model()
 
 
 class RadiusPostAuthSerializer(serializers.ModelSerializer):

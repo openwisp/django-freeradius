@@ -62,9 +62,8 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(str(radiusbatch), 'test')
 
     def test_delete_method(self):
-        radiusbatch = self.radius_batch_model.objects.create(strategy='prefix',
-                                                             prefix='test',
-                                                             name='test')
+        options = dict(strategy='prefix', prefix='test', name='test')
+        radiusbatch = self._create_radius_batch(**options)
         radiusbatch.prefix_add('test', 5)
         User = get_user_model()
         self.assertEqual(User.objects.all().count(), 5)
@@ -73,11 +72,11 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(User.objects.all().count(), 0)
 
     def test_clean_method(self):
-        radiusbatch = self.radius_batch_model.objects.create()
+        radiusbatch = self._create_radius_batch()
         with self.assertRaises(ValidationError):
             radiusbatch.full_clean()
-        radiusbatch = self.radius_batch_model(strategy='csv', prefix='test',
-                                              name='testing')
+        options = dict(strategy='csv', prefix='test', name='test')
+        radiusbatch = self._create_radius_batch(**options)
         with self.assertRaises(ValidationError):
             radiusbatch.full_clean()
 
@@ -89,37 +88,28 @@ class BaseTestRadiusProfile(object):
 
     def test_save_method(self):
         RadiusProfile = self.radius_profile_model
-        radiusprofile = RadiusProfile(name='test',
-                                      default=True,
-                                      daily_session_limit=10)
-        radiusprofile.save()
+        options = dict(name='test', default=True, daily_session_limit=10)
+        self._create_radius_profile(**options)
         self.assertEqual(RadiusProfile.objects.all().count(), 3)
         self.assertEqual(RadiusProfile.objects.filter(default=True).count(), 1)
-        radiusprofile = RadiusProfile(name='test1',
-                                      default=True,
-                                      daily_session_limit=20)
-        radiusprofile.save()
+        options.update(dict(name='test1', daily_session_limit=20))
+        self._create_radius_profile(**options)
         self.assertEqual(RadiusProfile.objects.all().count(), 4)
         self.assertEqual(RadiusProfile.objects.filter(default=True).count(), 1)
 
 
 class BaseTestRadiusUserProfile(object):
     def test_string_representation(self):
+        self._create_radius_profile(**dict(name='test'))
         user = get_user_model().objects.create(username="test")
-        profile = self.radius_profile_model(name="test")
-        profile.save()
-        radiususerprofile = self.radius_userprofile_model(user=user,
-                                                          profile=profile)
+        radiususerprofile = self.radius_userprofile_model.objects.get(user=user)
         self.assertEqual(str(radiususerprofile), 'test-test')
 
     def test_save_method(self):
-        RadiusProfile = self.radius_profile_model
         RadiusCheck = self.radius_check_model
         RadiusUserProfile = self.radius_userprofile_model
-        radiusprofile = RadiusProfile(name='test',
-                                      default=True,
-                                      daily_session_limit=10)
-        radiusprofile.save()
+        options = dict(name='test', default=True, daily_session_limit=10)
+        radiusprofile = self._create_radius_profile(**options)
         get_user_model().objects.create(username="test")
         self.assertEqual(RadiusUserProfile.objects.all().count(), 1)
         self.assertEqual(RadiusCheck.objects.all().count(), 1)

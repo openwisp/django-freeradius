@@ -73,8 +73,8 @@ def generate_pdf(prefix, data):
 def set_default_limits(sender, instance, created, **kwargs):
     if created:
         radprofile = swapper.load_model('django_freeradius', 'RadiusProfile')
-        raduserprofile = swapper.load_model('django_freeradius', 'RadiusUserProfile')
         default_profile = radprofile.objects.filter(default=True)
         if default_profile.exists():
-            userprofile = raduserprofile(profile=default_profile[0], user=instance)
+            profile = default_profile[0]
+            userprofile = profile._create_user_profile(**dict(user=instance))
             userprofile.save()

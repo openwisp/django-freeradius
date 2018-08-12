@@ -676,6 +676,13 @@ class AbstractRadiusProfile(TimeStampedEditableModel):
             RadiusProfile.objects.filter(default=True).update(default=False)
         super(AbstractRadiusProfile, self).save()
 
+    def _create_user_profile(self, **kwargs):
+        RadiusUserProfile = swapper.load_model('django_freeradius', 'RadiusUserProfile')
+        options = dict(profile=self)
+        options.update(kwargs)
+        userprofile = RadiusUserProfile(**options)
+        return userprofile
+
 
 @python_2_unicode_compatible
 class AbstractRadiusUserProfile(TimeStampedEditableModel):
@@ -710,7 +717,13 @@ class AbstractRadiusUserProfile(TimeStampedEditableModel):
                     check.value = getattr(profile, attr)
                     check.save()
                 else:
-                    radcheck.objects.create(username=self.user.username,
-                                            attribute=attribute_map.get(attr),
-                                            value=getattr(profile, attr))
+                    options = dict(username=self.user.username,
+                                   attribute=attribute_map.get(attr),
+                                   value=getattr(profile, attr))
+                    check = self._get_instance(**options)
+                    check.save()
         super(AbstractRadiusUserProfile, self).save()
+
+    def _get_instance(self, **kwargs):
+        radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
+        return radcheck(**kwargs)
