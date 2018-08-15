@@ -28,4 +28,17 @@ django.jQuery(function ($) {
         newValueRow.hide();
         rawValueRow.show();
     });
+    var value_field = $("#id_new_value");
+    function setValueInputType() {
+        var selected_attribute = $('.field-attribute option:selected').text();
+        if (selected_attribute === "Max-Daily-Session" ||
+                selected_attribute === "Max-All-Session" ||
+                selected_attribute === "Max-Daily-Session-Traffic") {
+            value_field.prop("type", "text");
+        } else {
+            value_field.prop("type", "password");
+        }
+    }
+    $("#change-radcheck-value").click(setValueInputType);
+    $(".field-attribute").change(setValueInputType);
 });
