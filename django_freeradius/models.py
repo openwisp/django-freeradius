@@ -1,8 +1,4 @@
-from django.contrib.auth import get_user_model
-from django.db.models import signals
 from swapper import swappable_setting
-
-from django_freeradius.utils import set_default_limits
 
 from .base.models import (
     AbstractNas, AbstractRadiusAccounting, AbstractRadiusBatch, AbstractRadiusCheck,
@@ -75,6 +71,3 @@ class RadiusUserProfile(AbstractRadiusUserProfile):
     class Meta(AbstractRadiusUserProfile.Meta):
         abstract = False
         swappable = swappable_setting('django_freeradius', 'RadiusUserProfile')
-
-
-signals.post_save.connect(set_default_limits, sender=get_user_model())
