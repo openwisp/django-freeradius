@@ -2,21 +2,22 @@
 Management commands
 ===================
 
-Management commands serve many purposes, for example: database cleaning.
+These management commands are necessary for enabling certain features and
+for database cleanup.
 
-Management commands can be used with:
+Example usage:
 
 .. code-block:: shell
 
     cd tests/
     ./manage.py <commad> <args>
 
-In this page we list the management commands currently available in django-freeradius.
+In this page we list the management commands currently available in **django-freeradius**.
 
 ``delete_old_radacct``
 ----------------------
 
-This command deletes RADIUS accounting sessions older than <days>.
+This command deletes RADIUS accounting sessions older than ``<days>``.
 
 .. code-block:: shell
 
@@ -31,7 +32,7 @@ For example:
 ``delete_old_postauth``
 -----------------------
 
-This command deletes RADIUS post-auth logs older than <days>.
+This command deletes RADIUS post-auth logs older than ``<days>``.
 
 .. code-block:: shell
 
@@ -46,7 +47,8 @@ For example:
 ``cleanup_stale_radacct``
 -------------------------
 
-This command closes stale RADIUS sessions that have remained open for the number of days specified.
+This command closes stale RADIUS sessions that have remained open for
+the number of specified ``<days>``.
 
 .. code-block:: shell
 
@@ -58,23 +60,27 @@ For example:
 
     ./manage.py cleanup_stale_radacct 15
 
+``deactivate_expired_users``
+----------------------------
+
+.. note::
+  `Find out more about this feature in its dedicated page <./generating_users.html>`_
+
+This command deactivates expired user accounts which were created temporarily
+(eg: for en event) and have an expiration date set.
+
+.. code-block:: shell
+
+    ./manage.py deactivate_expired_users
+
 ``delete_old_users``
 --------------------
 
-This command deletes users expired before a certain duration of time.
+This command deletes users that have expired (and should have been deactivated by
+``deactivate_expired_users``) for more than the specified ``<duration_in_months>``.
 
 .. code-block:: shell
 
     ./manage.py delete_old_users --older-than-months <duration_in_months>
 
 Note that the default duration is set to 18 months.
-
-``deactivate_expired_users``
-----------------------------
-
-This command expires the users after their expiration date.
-
-.. code-block:: shell
-
-    ./manage.py deactivate_expired_users
-
