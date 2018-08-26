@@ -97,14 +97,25 @@ The ``/etc/freeradius/3.0/mods-available/sqlcounter`` should look like the follo
                  AcctStartTime::ABSTIME::INT4 + AcctSessionTime > '%%b'"
     }
 
-Create a symbolic link to ``mods-available/sqlcounter`` at
-``mods-available/sqlcounter`` for the sqlcounter modules to get enabled.
+Now let's enable the ``sqlcounter`` in a special way, the ``modules`` section
+of ``radiusd.conf`` should look as follows:
+
+.. note::
+  We have to use this special way because of a `bug in freeradius
+  <http://lists.freeradius.org/pipermail/freeradius-users/2015-February/075870.html>`_.
+  This should be solved in a future release of freeradius.
 
 .. code-block:: ini
 
-    ln -s /etc/freeradius/3.0/mods-available/sqlcounter /etc/freeradius/3.0/mods-enabled/sqlcounter
+    # /etc/freeradius/3.0/radiusd.conf
+    modules {
+        # ..
+        $INCLUDE mods-enabled
+        $INCLUDE mods-available/sqlcounter
+        # ..
+    }
 
-Add the sqlcounter modules to the authorize section.
+Add the sqlcounter modules to the authorize section as follows:
 
 .. code-block:: ini
 
@@ -117,26 +128,10 @@ Add the sqlcounter modules to the authorize section.
         dailybandwidthcounter
     }
 
-Restart freeradius to load new configuration
+Now restart freeradius to load new configuration:
 
 .. code-block:: ini
 
     service freeradius restart
     # alternatively if you are using systemd
     systemctl restart freeradius
-
-If you are having errors with the importing the sqlcounter modules,
-try doing the following in your ``radiusd.conf``
-
-.. code-block:: ini
-
-    # /etc/freeradius/3.0/radiusd.conf
-    modules {
-        # ..
-        $INCLUDE mods-enabled/sql
-        $INCLUDE mods-enabled/sqlcounter
-        $INCLUDE mods-enabled
-        # ..
-    }
-
-This issue has been fixed in the latest patch of FreeRADIUS in the v3.0.x branch.
