@@ -2,6 +2,7 @@ import os
 from unittest import skipUnless
 
 import swapper
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -116,6 +117,7 @@ class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
     user_model = get_user_model()
+    auth_header = "Bearer {}".format(settings.DJANGO_FREERADIUS_API_TOKEN)
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
@@ -139,4 +141,4 @@ class TestUtils(BaseTestUtils, TestCase, CreateRadiusObjectsMixin, FileMixin):
 
 @skipUnless(os.environ.get('SAMPLE_APP', False), 'Running tests on standard django_freeradius models')
 class TestApiReject(BaseTestApiReject, TestCase, CreateRadiusObjectsMixin):
-    pass
+    auth_header = "Bearer {}".format(settings.DJANGO_FREERADIUS_API_TOKEN)

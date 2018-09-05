@@ -5,6 +5,8 @@ import swapper
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from django_freeradius import settings as app_settings
+
 from . import ApiParamsMixin, CreateRadiusObjectsMixin
 from .base.test_api import BaseTestApi, BaseTestApiReject
 
@@ -19,8 +21,9 @@ class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
     user_model = get_user_model()
+    auth_header = "Bearer {}".format(app_settings.API_TOKEN)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestApiReject(BaseTestApiReject, TestCase, CreateRadiusObjectsMixin):
-    pass
+    auth_header = "Bearer {}".format(app_settings.API_TOKEN)
