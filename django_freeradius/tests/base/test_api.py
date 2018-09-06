@@ -11,7 +11,6 @@ from django_freeradius import settings as app_settings
 
 START_DATE = '2017-08-08 15:16:10+0200'
 
-auth_header = "Bearer {}".format(app_settings.API_TOKEN)
 token_querystring = "?token={}".format(app_settings.API_TOKEN)
 User = get_user_model()
 
@@ -22,7 +21,7 @@ class BaseTestApi(object):
         self._create_user(**options)
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'barbar', 'password': 'molly'},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
 
@@ -39,7 +38,7 @@ class BaseTestApi(object):
         self._create_user(**options)
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'molly', 'password': 'barbar'},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
 
@@ -55,7 +54,7 @@ class BaseTestApi(object):
     def test_authorize_failed(self):
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'baldo', 'password': 'ugo'},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
 
@@ -64,7 +63,7 @@ class BaseTestApi(object):
         params = self._get_postauth_params()
         response = self.client.post(reverse('freeradius:postauth'),
                                     params,
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         params['password'] = ''
         self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
         self.assertEqual(response.status_code, 201)
@@ -86,7 +85,7 @@ class BaseTestApi(object):
         params = self._get_postauth_params(**params)
         response = self.client.post(reverse('freeradius:postauth'),
                                     params,
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(self.radius_postauth_model.objects.filter(username='molly',
                                                                    password='barba').count(), 1)
         self.assertEqual(response.status_code, 201)
@@ -99,14 +98,14 @@ class BaseTestApi(object):
         params = self._get_postauth_params(**params)
         response = self.client.post(reverse('freeradius:postauth'),
                                     params,
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
 
     def test_postauth_400(self):
         response = self.client.post(reverse('freeradius:postauth'), {},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
         self.assertEqual(response.status_code, 400)
 
@@ -155,7 +154,7 @@ class BaseTestApi(object):
         """
         return self.client.post(self._acct_url,
                                 data=json.dumps(data),
-                                HTTP_AUTHORIZATION=auth_header,
+                                HTTP_AUTHORIZATION=self.auth_header,
                                 content_type='application/json')
 
     def assertAcctData(self, ra, data):
@@ -381,7 +380,7 @@ class BaseTestApi(object):
                           output_octets=1119074409))
         self._create_radius_accounting(**data3)
         response = self.client.get('{0}?page_size=1&page=1'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -390,7 +389,7 @@ class BaseTestApi(object):
         self.assertEqual(item['nas_ip_address'], '172.16.64.91')
         self.assertEqual(item['calling_station_id'], '5c:7d:c1:72:a7:3b')
         response = self.client.get('{0}?page_size=1&page=2'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -399,7 +398,7 @@ class BaseTestApi(object):
         self.assertEqual(item['input_octets'], data2['input_octets'])
         self.assertEqual(item['called_station_id'], '00-27-22-F3-FA-F1:hostname')
         response = self.client.get('{0}?page_size=1&page=3'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -418,7 +417,7 @@ class BaseTestApi(object):
                           unique_id='99144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?username=test_user'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -434,7 +433,7 @@ class BaseTestApi(object):
                           unique_id='85144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?called_station_id=E0-CA-40-EE-D1-0D'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -450,7 +449,7 @@ class BaseTestApi(object):
                           unique_id='85144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?calling_station_id=4c:8d:c2:80:a7:4c'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -466,7 +465,7 @@ class BaseTestApi(object):
                           unique_id='85144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-02'),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -483,7 +482,7 @@ class BaseTestApi(object):
                           unique_id='85144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02'),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -499,13 +498,13 @@ class BaseTestApi(object):
                           unique_id='85144d60'))
         self._create_radius_accounting(**data2)
         response = self.client.get('{0}?is_open=true'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
         self.assertEqual(item['stop_time'], None)
         response = self.client.get('{0}?is_open=false'.format(self._acct_url),
-                                   HTTP_AUTHORIZATION=auth_header)
+                                   HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
@@ -630,13 +629,13 @@ class BaseTestApiReject(object):
                                  is_active=False)
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'barbar', 'password': 'molly'},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
 
     def test_authorize_401(self):
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'baldo', 'password': 'ugo'},
-                                    HTTP_AUTHORIZATION=auth_header)
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
