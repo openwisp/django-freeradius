@@ -82,9 +82,9 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('name', models.CharField(db_index=True, help_text='A unique profile name', max_length=128, verbose_name='name')),
-                ('daily_session_limit', models.BigIntegerField(blank=True, null=True, verbose_name='daily session limit')),
-                ('daily_bandwidth_limit', models.BigIntegerField(blank=True, null=True, verbose_name='daily bandwidth limit')),
-                ('max_all_time_limit', models.BigIntegerField(blank=True, null=True, verbose_name='maximum all time session limit')),
+                ('daily_session_limit', models.BigIntegerField(blank=True, help_text='Hours', null=True, verbose_name='daily session limit')),
+                ('daily_bandwidth_limit', models.BigIntegerField(blank=True, help_text='Megabytes (MB)', null=True, verbose_name='daily bandwidth limit')),
+                ('max_all_time_limit', models.BigIntegerField(blank=True, help_text='Hours', null=True, verbose_name='maximum all time session limit')),
                 ('default', models.BooleanField(default=False, verbose_name='Use this profile as the default profile')),
             ],
             options={

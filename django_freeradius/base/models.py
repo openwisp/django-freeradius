@@ -651,12 +651,15 @@ class AbstractRadiusProfile(TimeStampedEditableModel):
                             help_text=_('A unique profile name'),
                             db_index=True)
     daily_session_limit = models.BigIntegerField(verbose_name=_('daily session limit'),
+                                                 help_text="Hours",
                                                  blank=True,
                                                  null=True)
     daily_bandwidth_limit = models.BigIntegerField(verbose_name=_('daily bandwidth limit'),
+                                                   help_text="Megabytes (MB)",
                                                    blank=True,
                                                    null=True)
     max_all_time_limit = models.BigIntegerField(verbose_name=('maximum all time session limit'),
+                                                help_text="Hours",
                                                 blank=True,
                                                 null=True)
     default = models.BooleanField(verbose_name=_('Use this profile as the default profile'),
