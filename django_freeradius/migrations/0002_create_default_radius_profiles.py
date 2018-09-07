@@ -4,7 +4,6 @@ import django.db.migrations.operations.special
 import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
-import swapper
 import uuid
 
 from . import add_default_profiles, add_default_profile_to_existing_users
