@@ -516,7 +516,8 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
     name = models.CharField(verbose_name=_('name'),
                             max_length=128,
                             help_text=_('A unique batch name'),
-                            db_index=True)
+                            db_index=True,
+                            unique=True)
     strategy = models.CharField(_('strategy'),
                                 max_length=16,
                                 choices=STRATEGIES,
@@ -649,7 +650,8 @@ class AbstractRadiusProfile(TimeStampedEditableModel):
     name = models.CharField(verbose_name=_('name'),
                             max_length=128,
                             help_text=_('A unique profile name'),
-                            db_index=True)
+                            db_index=True,
+                            unique=True)
     daily_session_limit = models.BigIntegerField(verbose_name=_('daily session limit'),
                                                  help_text="Hours",
                                                  blank=True,
