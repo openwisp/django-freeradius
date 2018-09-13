@@ -11,7 +11,6 @@ from django_freeradius import settings as app_settings
 
 START_DATE = '2017-08-08 15:16:10+0200'
 
-token_querystring = "?token={}".format(app_settings.API_TOKEN)
 User = get_user_model()
 
 
@@ -45,7 +44,7 @@ class BaseTestApi(object):
     def test_authorize_200_querystring(self):
         options = dict(username='molly', password='barbar')
         self._create_user(**options)
-        post_url = "{}{}".format(reverse('freeradius:authorize'), token_querystring)
+        post_url = "{}{}".format(reverse('freeradius:authorize'), self.token_querystring)
         response = self.client.post(post_url,
                                     {'username': 'molly', 'password': 'barbar'})
         self.assertEqual(response.status_code, 200)
@@ -72,7 +71,7 @@ class BaseTestApi(object):
     def test_postauth_accept_201_querystring(self):
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
         params = self._get_postauth_params()
-        post_url = "{}{}".format(reverse('freeradius:postauth'), token_querystring)
+        post_url = "{}{}".format(reverse('freeradius:postauth'), self.token_querystring)
         response = self.client.post(post_url, params)
         params['password'] = ''
         self.assertEqual(self.radius_postauth_model.objects.filter(**params).count(), 1)
@@ -200,7 +199,7 @@ class BaseTestApi(object):
         data = self.acct_post_data
         data['status_type'] = 'Start'
         data = self._get_accounting_params(**data)
-        post_url = "{}{}".format(self._acct_url, token_querystring)
+        post_url = "{}{}".format(self._acct_url, self.token_querystring)
         response = self.client.post(post_url, json.dumps(data),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
