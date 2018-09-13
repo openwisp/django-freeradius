@@ -22,6 +22,7 @@ class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
     radius_batch_model = RadiusBatch
     user_model = get_user_model()
     auth_header = "Bearer {}".format(app_settings.API_TOKEN)
+    token_querystring = "?token={}".format(app_settings.API_TOKEN)
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
