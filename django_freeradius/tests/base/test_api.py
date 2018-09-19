@@ -574,7 +574,8 @@ class BaseTestApi(object):
             "number_of_users": -1,
             "prefix": "",
         }
-        response = self.client.post(reverse('freeradius:batch'), data)
+        response = self.client.post(reverse('freeradius:batch'), data,
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
 
@@ -592,7 +593,8 @@ class BaseTestApi(object):
                 "csvfile": file,
             }
             data = self._get_extra_params(**data)
-            response = self.client.post(reverse('freeradius:batch'), data)
+            response = self.client.post(reverse('freeradius:batch'), data,
+                                        HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)
@@ -607,7 +609,8 @@ class BaseTestApi(object):
             "number_of_users": 1,
         }
         data = self._get_extra_params(**data)
-        response = self.client.post(reverse('freeradius:batch'), data)
+        response = self.client.post(reverse('freeradius:batch'), data,
+                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)

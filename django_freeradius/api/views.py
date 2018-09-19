@@ -168,6 +168,7 @@ accounting = AccountingView.as_view()
 
 
 class BatchView(generics.CreateAPIView):
+    authentication_classes = (TokenAuthentication, )
     queryset = RadiusBatch.objects.all()
     serializer_class = RadiusBatchSerializer
 

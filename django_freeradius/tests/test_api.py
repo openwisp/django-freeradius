@@ -15,8 +15,12 @@ RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
+class ApiTestCase(ApiParamsMixin, CreateRadiusObjectsMixin, TestCase):
+    pass
+
+
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
+class TestApi(BaseTestApi, ApiTestCase):
     radius_postauth_model = RadiusPostAuth
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
@@ -26,5 +30,6 @@ class TestApi(BaseTestApi, TestCase, CreateRadiusObjectsMixin, ApiParamsMixin):
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestApiReject(BaseTestApiReject, TestCase, CreateRadiusObjectsMixin):
+class TestApiReject(BaseTestApiReject, ApiTestCase):
     auth_header = "Bearer {}".format(app_settings.API_TOKEN)
+    token_querystring = "?token={}".format(app_settings.API_TOKEN)
