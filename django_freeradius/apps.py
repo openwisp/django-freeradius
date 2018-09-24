@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import signals
 
-from django_freeradius.utils import set_default_limits
+from django_freeradius.utils import set_default_group, update_user_related_records
 
 from .settings import API_TOKEN
 
@@ -18,8 +18,9 @@ class DjangoFreeradiusConfig(AppConfig):
                                        'is either not set or is less than 15 characters.')
 
     def connect_signals(self):
-        signals.post_save.connect(set_default_limits,
-                                  sender=get_user_model())
+        User = get_user_model()
+        signals.post_save.connect(update_user_related_records, sender=User)
+        signals.post_save.connect(set_default_group, sender=User)
 
     def ready(self):
         self.check_settings()

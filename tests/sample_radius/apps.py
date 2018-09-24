@@ -1,5 +1,5 @@
-from django.apps import AppConfig
+from django_freeradius.apps import DjangoFreeradiusConfig
 
 
-class SampleRadiusConfig(AppConfig):
+class SampleRadiusConfig(DjangoFreeradiusConfig):
     name = 'sample_radius'

@@ -12,7 +12,20 @@ radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 nas_type_field = AbstractNas._meta.get_field('type')
 
 
-class AbstractRadiusCheckAdminForm(forms.ModelForm):
+class ModeSwitcherForm(forms.ModelForm):
+    MODE_CHOICES = (
+        ('-', '----- {0} -----'.format(_('Please select an option'))),
+        ('guided', _('Guided (dropdown)')),
+        ('custom', _('Custom (text input)'))
+    )
+    mode = forms.ChoiceField(choices=MODE_CHOICES)
+
+    class Media:
+        js = ('django-freeradius/js/mode-switcher.js',)
+        css = {'all': ('django-freeradius/css/mode-switcher.css',)}
+
+
+class RadiusCheckForm(ModeSwitcherForm):
     _secret_help_text = _('The secret must contains lowercase'
                           ' and uppercase characters, '
                           ' number and at least one of these symbols:'
@@ -36,12 +49,12 @@ class AbstractRadiusCheckAdminForm(forms.ModelForm):
                     raise ValidationError(self._secret_help_text)
         return self.cleaned_data['new_value']
 
-    class Meta:
-        model = AbstractRadiusCheck
-        fields = '__all__'
+    class Media:
+        js = ('django-freeradius/js/radcheck.js',)
+        css = {'all': ('django-freeradius/css/radcheck.css',)}
 
 
-class NasModelForm(forms.ModelForm):
+class NasForm(forms.ModelForm):
     """
     Allows users to easily select a NAS type from
     a predefined list or to define a custom type
@@ -55,13 +68,13 @@ class NasModelForm(forms.ModelForm):
                                   help_text=_('or define a custom type'))
 
 
-class AbstractRadiusBatchAdminForm(forms.ModelForm):
+class RadiusBatchForm(forms.ModelForm):
     number_of_users = forms.IntegerField(required=False,
                                          validators=[MinValueValidator(1)],
                                          help_text=_('Number of users to be generated'))
 
     def __init__(self, *args, **kwargs):
-        super(AbstractRadiusBatchAdminForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.fields.get('csvfile'):
             docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
             help_text = "Refer to the <b><u><a href='{}'>docs</a></u></b> for more \

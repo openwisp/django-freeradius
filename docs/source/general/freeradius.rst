@@ -18,39 +18,71 @@ First of all, become root:
 
     sudo -s
 
-.. note::
-    If you use a recent version of Debian like **Stretch** (9) or Ubuntu **Zesty** (17),
-    you can skip the following command and use the official repositories if you prefer.
-
 Let's add the PPA repository for the Freeradius 3.x stable branch:
+
+.. note::
+    If you use a recent version of Debian like **Stretch** (9) or Ubuntu **Bionic** (18),
+    you should skip the following command and use the official repositories.
 
 .. code-block:: shell
 
     apt-add-repository ppa:freeradius/stable-3.0
-    apt-get update
 
-Now you can install the packages we need:
+Update the list of available packages:
 
 .. code-block:: shell
 
-    apt-get install freeradius freeradius-postgresql freeradius-rest
-    # if mysql instead of postgresql
-    apt-get install freeradius freeradius-mysql freeradius-rest
+    apt update
+
+These packages are always needed:
+
+.. code-block:: shell
+
+    apt install freeradius freeradius-rest
+
+If you use MySQL:
+
+.. code-block:: shell
+
+    apt install freeradius-mysql
+
+If you use PostgreSQL:
+
+.. code-block:: shell
+
+    apt install freeradius-postgresql
 
 Configuring Freeradius 3
 ------------------------
 
-For a complete reference on how to configure freeradius please read the `Freeradius wiki, configuration files <http://wiki.freeradius.org/config/Configuration-files>`_ and their `configuration tutorial <http://wiki.freeradius.org/guide/HOWTO>`_.
+For a complete reference on how to configure freeradius please read the
+`Freeradius wiki, configuration files <http://wiki.freeradius.org/config/Configuration-files>`_
+and their `configuration tutorial <http://wiki.freeradius.org/guide/HOWTO>`_.
 
 .. note::
-    The path to freeradius configuration could be different on your system. This article use the `/etc/freeradius/3.0/` directory that ships with Debian Stretch
+    The path to freeradius configuration could be different on your system.
+    This article use the ``/etc/freeradius/`` directory that ships with recent
+    debian distributions and its derivatives
 
-Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_ for the available configuration values.
+Refer to the `mods-available documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/home.html>`_
+for the available configuration values.
+
+Enable the configured modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First of all enable the ``sql`` and ``rest`` modules:
+
+.. code-block:: shell
+
+    ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
+    ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
 
 Configure the SQL module
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once you have configured properly an SQL server, e.g. PostgreSQL:, and you can connect with a username and password edit the file ``/etc/freeradius/3.0/mods-available/sql`` to configure Freeradius to use the relational database.
+Once you have configured properly an SQL server, e.g. PostgreSQL:, and you can
+connect with a username and password edit the file ``/etc/freeradius/mods-available/sql``
+to configure Freeradius to use the relational database.
 
 Change the configuration for ``driver``, ``dialect``, ``server``, ``port``, ``login``, ``password``, ``radius_db`` as you need to fit your SQL server configuration.
 
@@ -60,7 +92,8 @@ Example configuration using the PostgreSQL database:
 
 .. code-block:: ini
 
-    # /etc/freeradius/3.0/mods-available/sql
+    # /etc/freeradius/mods-available/sql
+
     driver = "rlm_sql_postgresql"
     dialect = "postgresql"
 
@@ -71,19 +104,94 @@ Example configuration using the PostgreSQL database:
     password = "<password>"
     radius_db = "radius"
 
+.. _configure-sqlcounters:
+
+Configure the SQL counters
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``sqlcounter`` module is used to `enforce session limits <./enforcing_limits.html>`_.
+
+The ``mods-available/sqlcounter`` should look like the following:
+
+.. code-block:: ini
+
+    # /etc/freeradius/mods-available/sqlcounter
+
+    # The dailycounter is included by default in the freeradius conf
+    sqlcounter dailycounter {
+        sql_module_instance = sql
+        dialect = ${modules.sql.dialect}
+
+        counter_name = Daily-Session-Time
+        check_name = Max-Daily-Session
+        reply_name = Session-Timeout
+
+        key = User-Name
+        reset = daily
+
+        $INCLUDE ${modconfdir}/sql/counter/${dialect}/${.:instance}.conf
+    }
+
+    # The noresetcounter is included by default in the freeradius conf
+    sqlcounter noresetcounter {
+        sql_module_instance = sql
+        dialect = ${modules.sql.dialect}
+
+        counter_name = Max-All-Session-Time
+        check_name = Max-All-Session
+        key = User-Name
+        reset = never
+
+        $INCLUDE ${modconfdir}/sql/counter/${dialect}/${.:instance}.conf
+    }
+
+    # The dailybandwidthcounter is added for django-freeradius
+    sqlcounter dailybandwidthcounter {
+       counter_name = Max-Daily-Session-Traffic
+       check_name = Max-Daily-Session-Traffic
+       sql_module_instance = sql
+       key = 'User-Name'
+       reset = daily
+       query = "SELECT SUM(acctinputoctets + acctoutputoctets) \
+                FROM radacct \
+                WHERE UserName='%{${key}}' \
+                AND UNIX_TIMESTAMP(acctstarttime) + acctsessiontime > '%%b'"
+    }
+
+Now we need enable the ``sqlcounter`` in a special way, the ``modules`` section
+of ``radiusd.conf`` should look as follows:
+
+.. note::
+  We have to use this special way because of a `bug in freeradius
+  <http://lists.freeradius.org/pipermail/freeradius-users/2015-February/075870.html>`_.
+  This should be solved in a future release of freeradius.
+
+.. code-block:: ini
+
+    # /etc/freeradius/radiusd.conf
+    modules {
+        # ..
+        $INCLUDE mods-enabled
+        $INCLUDE mods-available/sqlcounter
+        # ..
+    }
+
 .. _configure-rest-module:
 
 Configure the REST module
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Configure the rest module by editing the file ``/etc/freeradius/3.0/mods-enabled/rest``, substituting
-``<url>`` with your django project's URL, (for example, if you are testing a development environment, the URL could be ``http://127.0.0.1:8000``, otherwise in production could be something like ``https://openwisp2.mydomain.org``)-
+Configure the rest module by editing the file ``/etc/freeradius/mods-enabled/rest``,
+substituting ``<url>`` with your django project's URL, (for example, if you are
+testing a development environment, the URL could be ``http://127.0.0.1:8000``,
+otherwise in production could be something like ``https://openwisp2.mydomain.org``)-
 
-Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/rest.html>`_ for the available configuration values.
+Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/raddb/mods-available/rest.html>`_
+for the available configuration values.
 
 .. code-block:: ini
 
-    # /etc/freeradius/3.0/mods-enabled/rest
+    # /etc/freeradius/mods-enabled/rest
 
     connect_uri = "<url>"
 
@@ -114,19 +222,26 @@ Refer to the `rest module documentation <http://networkradius.com/doc/3.0.10/rad
         tls = ${..tls}
     }
 
+Configure the site
+^^^^^^^^^^^^^^^^^^
+
 Configure the ``authorize``, ``authenticate`` and ``postauth`` section
 as follows, substituting the occurrences of ``<api_token>`` with the value
 of `DJANGO_FREERADIUS_API_TOKEN <api.html#api-token>`_:
 
 .. code-block:: ini
 
-    # /etc/freeradius/3.0/sites-enabled/default
+    # /etc/freeradius/sites-enabled/default
 
     api_token_header = "Authorization: Bearer <api_token>"
 
     authorize {
         update control { &REST-HTTP-Header += "${...api_token_header}" }
         rest
+        sql
+        dailycounter
+        noresetcounter
+        dailybandwidthcounter
     }
 
     # this section can be left empty
@@ -147,7 +262,7 @@ of `DJANGO_FREERADIUS_API_TOKEN <api.html#api-token>`_:
         rest
     }
 
-For accounting configuration you need to verify that in pre-accounting we have:
+Please also ensure that ``acct_unique`` is present in tge ``pre-accounting`` section:
 
 .. code-block:: ini
 
@@ -157,15 +272,8 @@ For accounting configuration you need to verify that in pre-accounting we have:
         # ...
     }
 
-Enable the configured modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Now enable the ``sql`` and ``rest`` modules:
-
-.. code-block:: shell
-
-    ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/sql
-    ln -s /etc/freeradius/3.0/mods-available/rest /etc/freeradius/3.0/mods-enabled/rest
+Restart freeradius to make the configuration effective
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Restart freeradius to load the new configuration:
 
@@ -175,12 +283,17 @@ Restart freeradius to load the new configuration:
     # alternatively if you are using systemd
     systemctl restart freeradius
 
-You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_ for further details on how to configure other modules.
+You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_
+for further details on how to configure other modules.
 
 Reconfigure the development environment using PostgreSQL
---------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You'll have to reconfigure the development environment as well before being able to use django-radius for managing the freeradius databases. Create a file `tests/local_settings.py` and add the following code to configure the database.
+You'll have to reconfigure the development environment as well before being able
+to use django-freeradius for managing the freeradius databases.
+
+If you have installed for development, create a file ``tests/local_settings.py``
+and add the following code to configure the database:
 
 .. code-block:: python
 
@@ -196,7 +309,8 @@ You'll have to reconfigure the development environment as well before being able
         },
      }
 
-Make sure the database by the name <db_name> is created and also the role <db_user> with <db_password> as password.
+Make sure the database by the name ``<db_name>`` is created and also the
+role ``<db_user>`` with ``<db_password>`` as password.
 
 Radius Checks: ``is_active`` & ``valid_until``
 ----------------------------------------------
@@ -208,7 +322,7 @@ An example using MySQL is:
 
 .. code-block:: ini
 
-    # /etc/freeradius/3.0/mods-config/sql/main/mysql/queries.conf
+    # /etc/freeradius/mods-config/sql/main/mysql/queries.conf
     authorize_check_query = "SELECT id, username, attribute, value, op \
                              FROM ${authcheck_table} \
                              WHERE username = '%{SQL-User-Name}' \
@@ -262,20 +376,21 @@ of Radius Checks for user credentials.
 Configuration
 ^^^^^^^^^^^^^
 
-To configure support for accessing user credentials with Radius Checks edit the ``authorize`` section
-of the ``/etc/freeradius/3.0/sites-available/default`` configuration file as follows
+To configure support for accessing user credentials with Radius Checks ensure
+the ``authorize`` section of your site as follows contains the ``sql`` module:
 
 .. code-block:: ini
 
-    # /etc/freeradius/3.0/sites-available/default
+    # /etc/freeradius/sites-available/default
 
     authorize {
-        rest
-        sql
+        # ...
+        sql  # <-- the sql module
+        # ...
     }
 
-At the url ``/admin/django_freeradius/radiuscheck/`` you can add new Radius Check
-entries with one of the supported hashing/storage methods mentioned above.
+Now you can add new Radius Check entries with one of the
+supported hashing/storage methods mentioned above.
 
 Additional Password Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

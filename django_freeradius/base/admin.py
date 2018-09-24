@@ -1,4 +1,5 @@
 import swapper
+from django.contrib import messages
 from django.contrib.admin import ModelAdmin, StackedInline
 from django.contrib.admin.actions import delete_selected
 from django.contrib.admin.templatetags.admin_static import static
@@ -9,7 +10,7 @@ from openwisp_utils.admin import TimeReadonlyAdminMixin
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
-from .forms import AbstractRadiusBatchAdminForm, AbstractRadiusCheckAdminForm, NasModelForm
+from .forms import ModeSwitcherForm, NasForm, RadiusBatchForm, RadiusCheckForm
 from .models import _encode_secret
 
 
@@ -56,15 +57,30 @@ class ReadOnlyAdmin(ModelAdmin):
 
 
 class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
-    list_display = ('username', 'attribute', 'is_active',
-                    'created', 'valid_until')
-    search_fields = ('username', 'value')
-    list_filter = (DuplicateListFilter, ExpiredListFilter, 'created',
-                   'modified', 'valid_until')
-    readonly_fields = ('value',)
-    form = AbstractRadiusCheckAdminForm
-    fields = ['username', 'op', 'attribute', 'value', 'new_value',
-              'is_active', 'valid_until', 'notes', 'created', 'modified']
+    list_display = ['username', 'attribute', 'op',
+                    'value', 'is_active', 'valid_until',
+                    'created', 'modified']
+    search_fields = ['username', 'value']
+    list_filter = [DuplicateListFilter,
+                   ExpiredListFilter,
+                   'created',
+                   'modified',
+                   'valid_until']
+    readonly_fields = ['value']
+    form = RadiusCheckForm
+    fields = ['mode',
+              'user',
+              'username',
+              'op',
+              'attribute',
+              'value',
+              'new_value',
+              'is_active',
+              'valid_until',
+              'notes',
+              'created',
+              'modified']
+    autocomplete_fields = ['user']
     actions = [disable_action, enable_action, delete_selected]
 
     def save_model(self, request, obj, form, change):
@@ -80,13 +96,20 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
             fields.remove('value')
         return fields
 
-    class Media:
-        js = ('django-freeradius/js/radcheck.js',)
-        css = {'all': ('django-freeradius/css/radcheck.css',)}
-
 
 class AbstractRadiusReplyAdmin(TimeStampedEditableAdmin):
-    pass
+    list_display = ['username', 'attribute', 'op',
+                    'value', 'created', 'modified']
+    autocomplete_fields = ['user']
+    form = ModeSwitcherForm
+    fields = ['mode',
+              'user',
+              'username',
+              'attribute',
+              'op',
+              'value',
+              'created',
+              'modified']
 
 
 BaseAccounting = ReadOnlyAdmin if not app_settings.EDITABLE_ACCOUNTING else ModelAdmin
@@ -111,7 +134,7 @@ class AbstractRadiusAccountingAdmin(BaseAccounting):
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):
-    form = NasModelForm
+    form = NasForm
     fieldsets = (
         (None, {
             'fields': (
@@ -133,15 +156,88 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
         css = {'all': ('django-freeradius/css/nas.css',)}
 
 
+class RadiusGroupCheckInline(TimeReadonlyAdminMixin, StackedInline):
+    model = swapper.load_model('django_freeradius', 'RadiusGroupCheck')
+    exclude = ['groupname']
+    extra = 0
+
+
+class RadiusGroupReplyInline(TimeReadonlyAdminMixin, StackedInline):
+    model = swapper.load_model('django_freeradius', 'RadiusGroupReply')
+    exclude = ['groupname']
+    extra = 0
+
+
+class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
+    list_display = ['name', 'description', 'default',
+                    'created', 'modified']
+    search_fields = ['name']
+    inlines = [RadiusGroupCheckInline,
+               RadiusGroupReplyInline]
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.default:
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def delete_selected(self, request, queryset):
+        if self.get_default_queryset(request, queryset).exists():
+            msg = _('Cannot proceed with the delete operation because '
+                    'the batch of items contains the default group, '
+                    'which cannot be deleted')
+            self.message_user(request, msg, messages.ERROR)
+            return False
+        return delete_selected(self, request, queryset)
+
+    actions = [delete_selected]
+
+    def get_default_queryset(self, request, queryset):
+        """ overridable """
+        return queryset.filter(default=True)
+
+
 class AbstractRadiusUserGroupAdmin(TimeStampedEditableAdmin):
+    list_display = ['username', 'groupname',
+                    'priority', 'created', 'modified']
+    autocomplete_fields = ['user', 'group']
+    form = ModeSwitcherForm
+    fields = ['mode',
+              'user',
+              'username',
+              'group',
+              'groupname',
+              'priority',
+              'created',
+              'modified']
+
+
+class RadiusUserGroupInline(StackedInline):
+    model = swapper.load_model('django_freeradius', 'RadiusUserGroup')
+    exclude = ['username', 'groupname', 'created', 'modified']
+    extra = 0
+    ordering = ('priority',)
+
+
+class RadGroupMixin(object):
+    list_display = ['groupname', 'attribute', 'op',
+                    'value', 'created', 'modified']
+    autocomplete_fields = ['group']
+    form = ModeSwitcherForm
+    fields = ['mode',
+              'group',
+              'groupname',
+              'attribute',
+              'op',
+              'value',
+              'created',
+              'modified']
+
+
+class AbstractRadiusGroupCheckAdmin(RadGroupMixin, TimeStampedEditableAdmin):
     pass
 
 
-class AbstractRadiusGroupReplyAdmin(TimeStampedEditableAdmin):
-    pass
-
-
-class AbstractRadiusGroupCheckAdmin(TimeStampedEditableAdmin):
+class AbstractRadiusGroupReplyAdmin(RadGroupMixin, TimeStampedEditableAdmin):
     pass
 
 
@@ -162,7 +258,7 @@ class AbstractRadiusPostAuthAdmin(BasePostAuth):
 
 
 class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
-    form = AbstractRadiusBatchAdminForm
+    form = RadiusBatchForm
 
     class Media:
         js = [static('django-freeradius/js/strategy-switcher.js')]
@@ -215,42 +311,17 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
 AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')
 
 
-class AbstractRadiusProfileAdmin(TimeStampedEditableAdmin):
-    list_display = ['name',
-                    'get_daily_session_limit',
-                    'get_daily_bandwidth_limit',
-                    'get_max_all_time_limit',
-                    'created',
-                    'modified']
-
-    def get_daily_session_limit(self, obj):
-        # returns daily session limit in hours
-        if obj.daily_session_limit:
-            return round(obj.daily_session_limit / float(3600), 2)
-    get_daily_session_limit.short_description = _('daily session limit (hours)')
-
-    def get_daily_bandwidth_limit(self, obj):
-        # returns daily bandwidth limit in megabytes
-        if obj.daily_bandwidth_limit:
-            return int(obj.daily_bandwidth_limit / 1000 ** 2)
-    get_daily_bandwidth_limit.short_description = _('daily bandwidth limit (MB)')
-
-    def get_max_all_time_limit(self, obj):
-        # returns max all time limit in hours
-        if obj.max_all_time_limit:
-            return round(obj.max_all_time_limit / float(3600), 2)
-    get_max_all_time_limit.short_description = _('maximum all time limit (hours)')
-
-
-class AbstractRadiusUserProfileInline(TimeReadonlyAdminMixin, StackedInline):
-    model = swapper.load_model('django_freeradius', 'RadiusUserProfile')
-    extra = 0
-
-
 class AbstractUserAdmin(BaseUserAdmin):
-    inlines = [AbstractRadiusUserProfileInline]
+    search_fields = ['username']
+    readonly_fields = ['date_joined', 'last_login']
 
     def get_inline_instances(self, request, obj=None):
+        """
+        Adds RadiusGroupInline only for existing objects
+        """
+        inlines = super().get_inline_instances(request, obj)
         if obj:
-            return super(AbstractUserAdmin, self).get_inline_instances(request, obj)
-        return []
+            usergroup = RadiusUserGroupInline(self.model,
+                                              self.admin_site)
+            inlines.append(usergroup)
+        return inlines

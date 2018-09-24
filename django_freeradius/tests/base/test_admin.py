@@ -95,7 +95,7 @@ class BaseTestAdmin(object):
 
     def test_radiuscheck_change(self):
         obj = self._create_radius_check(**_RADCHECK_ENTRY)
-        _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
+        _RADCHECK = _RADCHECK_ENTRY.copy()
         _RADCHECK['attribute'] = 'Cleartext-Password'
         self._create_radius_check(**_RADCHECK)
         _RADCHECK['attribute'] = 'LM-Password'
@@ -265,27 +265,16 @@ class BaseTestAdmin(object):
         docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
         self.assertContains(response, docs_link)
 
-    def test_radius_user_profile_inline_user(self):
+    def test_radiususergroup_inline_user(self):
         app_label = User._meta.app_label
         add_url = reverse('admin:{}_user_add'.format(app_label))
         response = self.client.get(add_url)
-        label_id = 'id_radius_user_profile'
+        label_id = 'radiususergroup_set-group'
         self.assertNotContains(response, label_id)
         user = User.objects.first()
         change_url = reverse('admin:{}_user_change'.format(app_label), args=[user.pk])
         response = self.client.get(change_url)
         self.assertContains(response, label_id)
-
-    def test_radius_profile_list(self):
-        options = dict(name='test', default=False, daily_session_limit=55800,
-                       daily_bandwidth_limit=200000000, max_all_time_limit=91800)
-        self._create_radius_profile(**options)
-
-        url = reverse('admin:{0}_radiusprofile_changelist'.format(self.app_name))
-        response = self.client.get(url)
-        self.assertContains(response, '15.5')
-        self.assertContains(response, '25.5')
-        self.assertContains(response, '200')
 
     def _get_csv_post_data(self):
         path = self._get_path('static/test_batch.csv')
@@ -297,3 +286,41 @@ class BaseTestAdmin(object):
         data = {'expiration_date': '2019-03-20', 'strategy': 'prefix',
                 'prefix': 'openwisp', 'number_of_users': 10, 'name': 'test2'}
         return data
+
+    def test_radius_group_delete_default(self):
+        rg = self.radius_group_model.objects
+        default = rg.get(default=True)
+        url_name = 'admin:{0}_radiusgroup_delete'.format(self.app_name)
+        delete_url = reverse(url_name, args=[default.pk])
+        response = self.client.get(delete_url)
+        self.assertEqual(rg.filter(default=True).count(), 1)
+        self.assertEqual(response.status_code, 403)
+
+    def test_radius_group_delete_selected_default(self):
+        url = reverse('admin:{0}_radiusgroup_changelist'.format(self.app_name))
+        rg = self.radius_group_model.objects
+        default = rg.get(default=True)
+        response = self.client.post(url, {
+            'action': 'delete_selected',
+            '_selected_action': str(default.pk),
+            'select_across': '0',
+            'index': '0',
+            'post': 'yes'
+        }, follow=True)
+        self.assertEqual(rg.filter(default=True).count(), 1)
+        self.assertContains(response, 'error')
+        self.assertContains(response, 'Cannot proceed with the delete')
+
+    def test_radius_group_delete_selected_non_default(self):
+        url = reverse('admin:{0}_radiusgroup_changelist'.format(self.app_name))
+        rg = self.radius_group_model.objects
+        non_default = rg.get(default=False)
+        response = self.client.post(url, {
+            'action': 'delete_selected',
+            '_selected_action': str(non_default.pk),
+            'select_across': '0',
+            'index': '0',
+            'post': 'yes'
+        }, follow=True)
+        self.assertNotContains(response, 'error')
+        self.assertEqual(rg.filter(default=False).count(), 0)

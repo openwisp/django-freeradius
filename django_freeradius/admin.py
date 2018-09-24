@@ -3,12 +3,12 @@ from django.contrib.auth import get_user_model
 
 from .base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
-    AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin, AbstractRadiusPostAuthAdmin,
-    AbstractRadiusProfileAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
+    AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
+    AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
 )
 from .models import (
-    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroupCheck, RadiusGroupReply, RadiusPostAuth,
-    RadiusProfile, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
+    RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 
@@ -29,6 +29,11 @@ class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
 
 @admin.register(Nas)
 class NasAdmin(AbstractNasAdmin):
+    pass
+
+
+@admin.register(RadiusGroup)
+class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
     pass
 
 
@@ -54,11 +59,6 @@ class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
 
 @admin.register(RadiusBatch)
 class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
-    pass
-
-
-@admin.register(RadiusProfile)
-class RadiusProfileAdmin(AbstractRadiusProfileAdmin):
     pass
 
 

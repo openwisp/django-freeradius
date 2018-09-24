@@ -65,8 +65,12 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
         'OPTIONS': {
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'openwisp_utils.loaders.DependencyLoader',
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -75,6 +79,13 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openwisp_utils.staticfiles.DependencyFinder',
 ]
 
 LOGGING = {
@@ -100,18 +111,19 @@ LOGGING = {
 }
 
 if os.environ.get('SAMPLE_APP', False):
+    INSTALLED_APPS.remove('django_freeradius')
     INSTALLED_APPS.append('sample_radius')
-    DJANGO_FREERADIUS_RADIUSREPLY_MODEL = 'sample_radius.RadiusReply'
-    DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = 'sample_radius.RadiusGroupReply'
+    EXTENDED_APPS = ['django_freeradius']
     DJANGO_FREERADIUS_RADIUSCHECK_MODEL = 'sample_radius.RadiusCheck'
+    DJANGO_FREERADIUS_RADIUSREPLY_MODEL = 'sample_radius.RadiusReply'
+    DJANGO_FREERADIUS_RADIUSGROUP_MODEL = 'sample_radius.RadiusGroup'
+    DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = 'sample_radius.RadiusGroupReply'
     DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = 'sample_radius.RadiusGroupCheck'
+    DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = 'sample_radius.RadiusUserGroup'
     DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = 'sample_radius.RadiusAccounting'
     DJANGO_FREERADIUS_NAS_MODEL = 'sample_radius.Nas'
-    DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = 'sample_radius.RadiusUserGroup'
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = 'sample_radius.RadiusPostAuth'
     DJANGO_FREERADIUS_RADIUSBATCH_MODEL = 'sample_radius.RadiusBatch'
-    DJANGO_FREERADIUS_RADIUSPROFILE_MODEL = 'sample_radius.RadiusProfile'
-    DJANGO_FREERADIUS_RADIUSUSERPROFILE_MODEL = 'sample_radius.RadiusUserProfile'
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

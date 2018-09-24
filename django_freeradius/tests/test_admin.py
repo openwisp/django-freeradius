@@ -4,8 +4,8 @@ from unittest import skipIf
 from django.test import TestCase
 
 from django_freeradius.models import (
-    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroupCheck, RadiusGroupReply, RadiusPostAuth,
-    RadiusProfile, RadiusReply, RadiusUserGroup,
+    Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
+    RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
 from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin
@@ -24,5 +24,5 @@ class TestAdmin(BaseTestAdmin, TestCase, CreateRadiusObjectsMixin,
     radius_groupreply_model = RadiusGroupReply
     radius_postauth_model = RadiusPostAuth
     radius_reply_model = RadiusReply
+    radius_group_model = RadiusGroup
     radius_usergroup_model = RadiusUserGroup
-    radius_profile_model = RadiusProfile

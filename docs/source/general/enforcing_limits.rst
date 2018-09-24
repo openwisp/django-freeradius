@@ -2,136 +2,45 @@
 Enforcing session limits
 ========================
 
-This feature lets the system administrator enforce session and
-bandwidth limits on the users.
+The default freeradius schema does not include a table where groups are stored,
+but django-freeradius adds a model called ``RadiusGroup`` and alters the default
+freeradius schema to add some optional foreign-keys from other tables like:
 
-Some of the features added here are:
+- ``radgroupcheck``
+- ``radgroupreply``
+- ``radusergroup``
 
-* put daily and all time session limits
-* put daily bandwidth limits
-* default profile for the new users being added
+These foreign keys make it easier to automate many synchronization and integrity
+checks between the ``RadiusGroup`` table and its related tables but they are
+not strictly mandatory from the database point of view:
+their value can be ``NULL`` and their presence and validation is handled at
+application level, this makes it easy to use existing freeradius databases.
 
-Adding from admin inteface
---------------------------
+For each group, checks and replies can be specified directly in the edit page
+of a Radius Group (``admin`` > ``groups`` > ``add group`` or ``change group``).
 
-At the url ``/admin/django_freeradius/radiusprofile/`` it is possible to
-edit the profiles for different types of users. You can map the profiles to the users
-from the user change page i.e., at the url ``/admin/auth/user/<user_id>/change``.
+Default groups
+--------------
 
-You will find two profiles which are created automatically:
+Some groups are created automatically by **django-freeradius** during the initial
+migrations:
 
-- ``Limited User`` is the deafult profile for new users, the default limits
-  are 3 hours and 300 MB daily
-- ``Power User`` is a profile you can use to grant unlimited usage
+- ``users``: this is the deafult group which limits users sessions
+  to 3 hours and 300 MB (daily)
+- ``power-users``: this group does not have any check, therefore users who
+  are members of this group won't be limited in any way
 
-You can customize these profiles or create new ones according to your needs.
+You can customize the checks and the replies of these groups, as well as create
+new groups according to your needs and preferences.
 
-**Note on the default profile**: keep in mind that the profile flagged as
-default will by automatically assigned to new users.
+**Note on the default group**: keep in mind that the group flagged as
+default will by automatically assigned to new users, it cannot be deleted nor
+it can be flagged as non-default: to set another group as default simply check
+that group as the deafult one, save and **django-freeradius** will remove the
+default flag from the old default group.
 
-There are attributes defined in the RadiusProfile model which help us enforce limits on the users.
+Freeradius configuration
+------------------------
 
-``Daily session limit``
------------------------
-
-The daily session time limit (in seconds) to be enforced on the users.
-
-``Daily bandwidth limit``
--------------------------
-
-The daily bandwidth usage limit (in octets) to be enforced on the users.
-
-``Maximum all time session limit``
-----------------------------------
-
-The all time session limit (in seconds) to be enforced on the users.
-
-Configuring the FreeRADIUS rlm_sqlcounter modules
--------------------------------------------------
-
-The sqlcounter modules should be configured in order to get this feature working.
-
-The ``/etc/freeradius/3.0/mods-available/sqlcounter`` should look like the following:
-
-.. code-block:: ini
-
-    # /etc/freeradius/3.0/mods-available/sqlcounter
-    # The dailycounter sqlcounter module which comes by default
-    sqlcounter dailycounter {
-        sql_module_instance = sql
-        dialect = ${modules.sql.dialect}
-
-        counter_name = Daily-Session-Time
-        check_name = Max-Daily-Session
-        reply_name = Session-Timeout
-
-        key = User-Name
-        reset = daily
-
-        $INCLUDE ${modconfdir}/sql/counter/${dialect}/${.:instance}.conf
-    }
-
-    # The noresetcounter sqlcounter module which comes by default
-    sqlcounter noresetcounter {
-        sql_module_instance = sql
-        dialect = ${modules.sql.dialect}
-
-        counter_name = Max-All-Session-Time
-        check_name = Max-All-Session
-        key = User-Name
-        reset = never
-
-        $INCLUDE ${modconfdir}/sql/counter/${dialect}/${.:instance}.conf
-    }
-
-    # Custom defined dailybandwidthcounter for calculating the data transfer daily
-    sqlcounter dailybandwidthcounter {
-        counter_name = Max-Daily-Session-Traffic
-        check_name = Max-Daily-Session-Traffic
-        sql_module_instance = sql
-        key = 'User-Name'
-        reset = daily
-        Reply-Message = "Your daily bandwidth limit has reached"
-        query = "SELECT sum(AcctOutputOctets) + sum(AcctInputOctets) FROM radacct WHERE \
-                 UserName = '%{${key}}' AND \
-                 AcctStartTime::ABSTIME::INT4 + AcctSessionTime > '%%b'"
-    }
-
-Now let's enable the ``sqlcounter`` in a special way, the ``modules`` section
-of ``radiusd.conf`` should look as follows:
-
-.. note::
-  We have to use this special way because of a `bug in freeradius
-  <http://lists.freeradius.org/pipermail/freeradius-users/2015-February/075870.html>`_.
-  This should be solved in a future release of freeradius.
-
-.. code-block:: ini
-
-    # /etc/freeradius/3.0/radiusd.conf
-    modules {
-        # ..
-        $INCLUDE mods-enabled
-        $INCLUDE mods-available/sqlcounter
-        # ..
-    }
-
-Add the sqlcounter modules to the authorize section as follows:
-
-.. code-block:: ini
-
-    # /etc/freeradius/3.0/sites-enabled/default
-    authorize {
-        rest
-        sql
-        dailycounter
-        noresetcounter
-        dailybandwidthcounter
-    }
-
-Now restart freeradius to load new configuration:
-
-.. code-block:: ini
-
-    service freeradius restart
-    # alternatively if you are using systemd
-    systemctl restart freeradius
+Ensure the ``sqlcounter`` module is enabled and configured as described in
+:ref:`configure-sqlcounters`.

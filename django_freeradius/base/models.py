@@ -5,13 +5,12 @@ from hashlib import md5, sha1
 from io import StringIO
 from os import urandom
 
-import swapper
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, ProtectedError
 from django.utils.crypto import get_random_string
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
@@ -124,26 +123,36 @@ class BaseModel(TimeStampedEditableModel):
         abstract = True
 
 
-@python_2_unicode_compatible
-class AbstractRadiusReply(BaseModel):
-    username = models.CharField(verbose_name=_('username'),
-                                max_length=64,
-                                db_index=True)
-    value = models.CharField(verbose_name=_('value'), max_length=253)
-    op = models.CharField(verbose_name=_('operator'),
-                          max_length=2,
-                          choices=RADOP_REPLY_TYPES,
-                          default='=')
-    attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
+_NOT_BLANK_MESSAGE = _('This field cannot be blank.')
 
-    class Meta:
-        db_table = 'radreply'
-        verbose_name = _('reply')
-        verbose_name_plural = _('replies')
-        abstract = True
 
-    def __str__(self):
-        return self.username
+class AutoUsernameMixin(object):
+    def clean(self):
+        """
+        automatically sets username
+        """
+        if self.user:
+            self.username = self.user.username
+        elif not self.username:
+            raise ValidationError({
+                'username': _NOT_BLANK_MESSAGE,
+                'user': _NOT_BLANK_MESSAGE
+            })
+
+
+class AutoGroupnameMixin(object):
+    def clean(self):
+        """
+        automatically sets groupname
+        """
+        super().clean()
+        if self.group:
+            self.groupname = self.group.name
+        elif not self.groupname:
+            raise ValidationError({
+                'groupname': _NOT_BLANK_MESSAGE,
+                'group': _NOT_BLANK_MESSAGE
+            })
 
 
 class AbstractRadiusCheckQueryset(models.query.QuerySet):
@@ -207,10 +216,14 @@ class AbstractRadiusCheckManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusCheck(BaseModel):
+class AbstractRadiusCheck(AutoUsernameMixin, BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
-                                db_index=True)
+                                db_index=True,
+                                # blank values are forbidden with custom validation
+                                # because this field can left blank if the user
+                                # foreign key is filled (it will be auto-filled)
+                                blank=True)
     value = models.CharField(verbose_name=_('value'), max_length=253)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
@@ -222,6 +235,11 @@ class AbstractRadiusCheck(BaseModel):
                                           if i not in
                                           app_settings.DISABLED_SECRET_FORMATS],
                                  default=app_settings.DEFAULT_SECRET_FORMAT)
+    # the foreign key is not part of the standard freeradius schema
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             blank=True,
+                             null=True)
     # additional fields to enable more granular checks
     is_active = models.BooleanField(default=True)
     valid_until = models.DateTimeField(null=True, blank=True)
@@ -234,6 +252,37 @@ class AbstractRadiusCheck(BaseModel):
         db_table = 'radcheck'
         verbose_name = _('check')
         verbose_name_plural = _('checks')
+        abstract = True
+
+    def __str__(self):
+        return self.username
+
+
+@python_2_unicode_compatible
+class AbstractRadiusReply(AutoUsernameMixin, BaseModel):
+    username = models.CharField(verbose_name=_('username'),
+                                max_length=64,
+                                db_index=True,
+                                # blank values are forbidden with custom validation
+                                # because this field can left blank if the user
+                                # foreign key is filled (it will be auto-filled)
+                                blank=True)
+    value = models.CharField(verbose_name=_('value'), max_length=253)
+    op = models.CharField(verbose_name=_('operator'),
+                          max_length=2,
+                          choices=RADOP_REPLY_TYPES,
+                          default='=')
+    attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
+    # the foreign key is not part of the standard freeradius schema
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             blank=True,
+                             null=True)
+
+    class Meta:
+        db_table = 'radreply'
+        verbose_name = _('reply')
+        verbose_name_plural = _('replies')
         abstract = True
 
     def __str__(self):
@@ -416,13 +465,120 @@ class AbstractNas(BaseModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusUserGroup(BaseModel):
+class AbstractRadiusGroup(BaseModel):
+    """
+    This is not part of the standard freeradius schema.
+    It's added to facilitate the management of groups.
+    """
+    id = TimeStampedEditableModel._meta.get_field('id')
+    name = models.CharField(verbose_name=_('group name'),
+                            max_length=255,
+                            unique=True,
+                            db_index=True)
+    description = models.CharField(verbose_name=_('description'),
+                                   max_length=64,
+                                   blank=True,
+                                   null=True)
+    _DEFAULT_HELP_TEXT = (
+        'The default group is automatically assigned to new users; '
+        'changing the default group has only effect on new users '
+        '(existing users will keep being members of their current group)'
+    )
+    default = models.BooleanField(verbose_name=_('is default?'),
+                                  help_text=_(_DEFAULT_HELP_TEXT),
+                                  default=False)
+
+    class Meta:
+        verbose_name = _('group')
+        verbose_name_plural = _('groups')
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if not self.default:
+            self.check_default()
+
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        if self.default:
+            self.set_default()
+        # sync all related records
+        if not self._state.adding:
+            self.radiusgroupcheck_set.update(groupname=self.name)
+            self.radiusgroupreply_set.update(groupname=self.name)
+            self.radiususergroup_set.update(groupname=self.name)
+        return result
+
+    _DEFAULT_VALIDATION_ERROR = _(
+        'There must be at least one default group present in '
+        'the system. To change the default group, simply set '
+        'as deafult the group you want to make the new deafult.'
+    )
+    _DEFAULT_PROTECTED_ERROR = _('The default group cannot be deleted')
+
+    def delete(self, *args, **kwargs):
+        if self.default:
+            raise ProtectedError(self._DEFAULT_PROTECTED_ERROR, self)
+        return super().delete(*args, **kwargs)
+
+    def set_default(self):
+        """
+        ensures there's only 1 default group
+        (logic overridable via custom models)
+        """
+        queryset = self.get_default_queryset()
+        if queryset.exists():
+            queryset.update(default=False)
+
+    def check_default(self):
+        """
+        ensures the default group cannot be undefaulted
+        (logic overridable via custom models)
+        """
+        if not self.get_default_queryset().exists():
+            raise ValidationError(
+                {'default': self._DEFAULT_VALIDATION_ERROR}
+            )
+
+    def get_default_queryset(self):
+        """
+        looks for default groups excluding the current one
+        overridable by openwisp-radius and other 3rd party apps
+        """
+        return self.__class__.objects.exclude(pk=self.pk) \
+                                     .filter(default=True)
+
+
+@python_2_unicode_compatible
+class AbstractRadiusUserGroup(AutoGroupnameMixin, AutoUsernameMixin,
+                              BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
-                                db_index=True)
+                                db_index=True,
+                                # blank values are forbidden with custom validation
+                                # because this field can left blank if the user
+                                # foreign key is filled (it will be auto-filled)
+                                blank=True)
     groupname = models.CharField(verbose_name=_('group name'),
-                                 max_length=64)
+                                 max_length=64,
+                                 # blank values are forbidden with custom validation
+                                 # because this field can left blank if the group
+                                 # foreign key is filled (it will be auto-filled)
+                                 blank=True)
     priority = models.IntegerField(verbose_name=_('priority'), default=1)
+    # the foreign keys are not part of the standard freeradius schema,
+    # these are added here to facilitate the synchronization of the
+    # records which are related in different tables
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             blank=True,
+                             null=True)
+    group = models.ForeignKey('RadiusGroup',
+                              on_delete=models.CASCADE,
+                              blank=True,
+                              null=True)
 
     class Meta:
         db_table = 'radusergroup'
@@ -435,21 +591,30 @@ class AbstractRadiusUserGroup(BaseModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupReply(BaseModel):
+class AbstractRadiusGroupCheck(AutoGroupnameMixin, BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
-                                 db_index=True)
+                                 db_index=True,
+                                 # blank values are forbidden with custom validation
+                                 # because this field can left blank if the group
+                                 # foreign key is filled (it will be auto-filled)
+                                 blank=True)
     attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
-                          choices=RADOP_REPLY_TYPES,
-                          default='=')
+                          choices=RADOP_CHECK_TYPES,
+                          default=':=')
     value = models.CharField(verbose_name=_('value'), max_length=253)
+    # the foreign key is not part of the standard freeradius schema
+    group = models.ForeignKey('RadiusGroup',
+                              on_delete=models.CASCADE,
+                              blank=True,
+                              null=True)
 
     class Meta:
-        db_table = 'radgroupreply'
-        verbose_name = _('group reply')
-        verbose_name_plural = _('group replies')
+        db_table = 'radgroupcheck'
+        verbose_name = _('group check')
+        verbose_name_plural = _('group checks')
         abstract = True
 
     def __str__(self):
@@ -457,21 +622,30 @@ class AbstractRadiusGroupReply(BaseModel):
 
 
 @python_2_unicode_compatible
-class AbstractRadiusGroupCheck(BaseModel):
+class AbstractRadiusGroupReply(AutoGroupnameMixin, BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
-                                 db_index=True)
+                                 db_index=True,
+                                 # blank values are forbidden with custom validation
+                                 # because this field can left blank if the group
+                                 # foreign key is filled (it will be auto-filled)
+                                 blank=True)
     attribute = models.CharField(verbose_name=_('attribute'), max_length=64)
     op = models.CharField(verbose_name=_('operator'),
                           max_length=2,
-                          choices=RADOP_CHECK_TYPES,
-                          default=':=')
+                          choices=RADOP_REPLY_TYPES,
+                          default='=')
     value = models.CharField(verbose_name=_('value'), max_length=253)
+    # the foreign key is not part of the standard freeradius schema
+    group = models.ForeignKey('RadiusGroup',
+                              on_delete=models.CASCADE,
+                              blank=True,
+                              null=True)
 
     class Meta:
-        db_table = 'radgroupcheck'
-        verbose_name = _('group check')
-        verbose_name_plural = _('group checks')
+        db_table = 'radgroupreply'
+        verbose_name = _('group reply')
+        verbose_name_plural = _('group replies')
         abstract = True
 
     def __str__(self):
@@ -643,92 +817,3 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         path = getattr(self, strategy_filemap.get(self.strategy)).path
         if os.path.isfile(path):
             os.remove(path)
-
-
-@python_2_unicode_compatible
-class AbstractRadiusProfile(TimeStampedEditableModel):
-    name = models.CharField(verbose_name=_('name'),
-                            max_length=128,
-                            help_text=_('A unique profile name'),
-                            db_index=True,
-                            unique=True)
-    daily_session_limit = models.BigIntegerField(verbose_name=_('daily session limit'),
-                                                 help_text="Hours",
-                                                 blank=True,
-                                                 null=True)
-    daily_bandwidth_limit = models.BigIntegerField(verbose_name=_('daily bandwidth limit'),
-                                                   help_text="Megabytes (MB)",
-                                                   blank=True,
-                                                   null=True)
-    max_all_time_limit = models.BigIntegerField(verbose_name=('maximum all time session limit'),
-                                                help_text="Hours",
-                                                blank=True,
-                                                null=True)
-    default = models.BooleanField(verbose_name=_('Use this profile as the default profile'),
-                                  default=False)
-
-    class Meta:
-        verbose_name = _('limit profile')
-        verbose_name_plural = _('limit profiles')
-        abstract = True
-
-    def __str__(self):
-        return self.name
-
-    def save(self):
-        if self.default:
-            RadiusProfile = swapper.load_model('django_freeradius', 'RadiusProfile')
-            RadiusProfile.objects.filter(default=True).update(default=False)
-        super(AbstractRadiusProfile, self).save()
-
-    def _create_user_profile(self, **kwargs):
-        RadiusUserProfile = swapper.load_model('django_freeradius', 'RadiusUserProfile')
-        options = dict(profile=self)
-        options.update(kwargs)
-        userprofile = RadiusUserProfile(**options)
-        return userprofile
-
-
-@python_2_unicode_compatible
-class AbstractRadiusUserProfile(TimeStampedEditableModel):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                related_name='radius_user_profile',
-                                on_delete=models.CASCADE)
-    profile = models.ForeignKey('RadiusProfile',
-                                on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'radiususerprofile'
-        verbose_name = _('user profile')
-        verbose_name_plural = _('user profiles')
-        abstract = True
-
-    def __str__(self):
-        return "{}-{}".format(self.user.username, self.profile.name)
-
-    def save(self):
-        radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
-        attribute_map = {'daily_session_limit': 'Max-Daily-Session',
-                         'daily_bandwidth_limit': 'Max-Daily-Session-Traffic',
-                         'max_all_time_limit': 'Max-All-Session'}
-        profile = self.profile
-        username = self.user.username
-        for attr in attribute_map:
-            if getattr(profile, attr):
-                if radcheck.objects.filter(username=username,
-                                           attribute=attribute_map.get(attr)).exists():
-                    check = radcheck.objects.get(username=username,
-                                                 attribute=attribute_map.get(attr))
-                    check.value = getattr(profile, attr)
-                    check.save()
-                else:
-                    options = dict(username=self.user.username,
-                                   attribute=attribute_map.get(attr),
-                                   value=getattr(profile, attr))
-                    check = self._get_instance(**options)
-                    check.save()
-        super(AbstractRadiusUserProfile, self).save()
-
-    def _get_instance(self, **kwargs):
-        radcheck = swapper.load_model('django_freeradius', 'RadiusCheck')
-        return radcheck(**kwargs)

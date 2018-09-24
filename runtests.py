@@ -11,6 +11,8 @@ if __name__ == "__main__":
     from django.core.management import execute_from_command_line
     args = sys.argv
     args.insert(1, "test")
-    args.insert(2, "django_freeradius")
-    args.insert(3, "sample_radius")
+    if not os.environ.get('SAMPLE_APP', False):
+        args.insert(2, "django_freeradius")
+    else:
+        args.insert(2, "sample_radius")
     execute_from_command_line(args)

@@ -4,25 +4,7 @@ import model_utils.fields
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ('django_freeradius', '0001_initial'),
-        ('django_freeradius', '0002_radiusaccounting_acct_update_time'),
-        ('django_freeradius', '0003_auto_20170727_1613'),
-        ('django_freeradius', '0004_auto_20170727_1635'),
-        ('django_freeradius', '0005_radacct_fix_called_calling'),
-        ('django_freeradius', '0006_postauth_improvements'),
-        ('django_freeradius', '0007_nas_improvements'),
-        ('django_freeradius', '0008_auto_20171004_1003'),
-        ('django_freeradius', '0009_radiuscheck_expires'),
-        ('django_freeradius', '0010_auto_20171107_1158'),
-        ('django_freeradius', '0011_radiuscheck_note'),
-        ('django_freeradius', '0012_auto_20171206_1546'),
-        ('django_freeradius', '0013_auto_20171211_1045'),
-        ('django_freeradius', '0014_auto_20171226_1938')
-    ]
     initial = True
-    dependencies = [('django_freeradius', '__first__')]
-
     operations = [
         migrations.CreateModel(
             name='Nas',
