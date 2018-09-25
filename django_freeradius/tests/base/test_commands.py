@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
@@ -7,7 +8,7 @@ from django.utils.timezone import now
 _RADACCT = {'username': 'bob', 'nas_ip_address': '127.0.0.1',
             'start_time': '2017-06-10 10:50:00', 'authentication': 'RADIUS',
             'connection_info_start': 'f', 'connection_info_stop': 'hgh',
-            'input_octets': '1', 'output_octets': '4'}
+            'input_octets': '1', 'output_octets': '4', 'session_id': uuid4().int}
 
 
 class BaseTestCommands(object):

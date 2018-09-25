@@ -119,7 +119,10 @@ class BaseTestAdmin(object):
         self.assertContains(response, 'ok')
 
     def test_radiusbatch_change(self):
-        obj = self._create_radius_batch(expiration_date='1998-01-28')
+        obj = self._create_radius_batch(name='test',
+                                        strategy='prefix',
+                                        prefix='test',
+                                        expiration_date='1998-01-28')
         response = self.client.get(reverse(
                                    'admin:{0}_radiusbatch_change'.format(self.app_name),
                                    args=[obj.pk]))
@@ -230,8 +233,9 @@ class BaseTestAdmin(object):
         self.assertTrue(error_message in str(response.content))
 
     def test_radiusbatch_no_of_users(self):
-        options = dict(strategy='prefix', prefix='openwisp')
-        r = self._create_radius_batch(**options)
+        r = self._create_radius_batch(name='test',
+                                      strategy='prefix',
+                                      prefix='openwisp')
         path = reverse('admin:{0}_radiusbatch_change'.format(self.app_name), args=[r.pk])
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)

@@ -780,7 +780,7 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
 
     def csvfile_upload(self, csvfile, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
         csv_data = csvfile.read()
-        csv_data = csv_data.decode("utf-8") if isinstance(csv_data, bytes) else csv_data
+        csv_data = csv_data.decode('utf-8') if isinstance(csv_data, bytes) else csv_data
         reader = csv.reader(StringIO(csv_data), delimiter=',')
         self.full_clean()
         self.save()

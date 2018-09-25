@@ -194,7 +194,8 @@ class BaseTestRadiusGroup(object):
         self.assertTrue(ug.group.default)
 
     def test_groupcheck_auto_name(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         c = self._create_radius_groupcheck(
             group=g,
             attribute='Max-Daily-Session',
@@ -216,7 +217,8 @@ class BaseTestRadiusGroup(object):
             self.fail('ValidationError not raised')
 
     def test_groupreply_auto_name(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         r = self._create_radius_groupreply(
             group=g,
             attribute='Reply-Message',
@@ -238,7 +240,8 @@ class BaseTestRadiusGroup(object):
             self.fail('ValidationError not raised')
 
     def test_usergroups_auto_fields(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         u = get_user_model().objects.create(username='test',
                                             email='test@test.org',
                                             password='test')
@@ -261,7 +264,8 @@ class BaseTestRadiusGroup(object):
             self.fail('ValidationError not raised')
 
     def test_usergroups_empty_username(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         try:
             self._create_radius_usergroup(group=g, priority=1)
         except ValidationError as e:
@@ -271,7 +275,8 @@ class BaseTestRadiusGroup(object):
             self.fail('ValidationError not raised')
 
     def test_change_group_auto_name(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         u = get_user_model().objects.create(username='test',
                                             email='test@test.org',
                                             password='test')
@@ -302,7 +307,8 @@ class BaseTestRadiusGroup(object):
         self.assertEqual(ug.groupname, g.name)
 
     def test_change_user_username(self):
-        g = self._create_radius_group()
+        g = self._create_radius_group(name='test',
+                                      description='test')
         u = get_user_model().objects.create(username='test',
                                             email='test@test.org',
                                             password='test')
@@ -323,8 +329,9 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(str(radiusbatch), 'test')
 
     def test_delete_method(self):
-        options = dict(strategy='prefix', prefix='test', name='test')
-        radiusbatch = self._create_radius_batch(**options)
+        radiusbatch = self._create_radius_batch(strategy='prefix',
+                                                prefix='test',
+                                                name='test')
         radiusbatch.prefix_add('test', 5)
         User = get_user_model()
         self.assertEqual(User.objects.all().count(), 5)
