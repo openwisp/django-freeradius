@@ -729,17 +729,19 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         return self.name
 
     def clean(self):
-        if self.csvfile and self.prefix or not self.csvfile and not self.prefix:
-            raise ValidationError(
-                _('Only one of the fields csvfile/prefix needs to be non empty'),
-                code='invalid',
-            )
+        if self.strategy == 'csv' and not self.csvfile:
+            raise ValidationError({'csvfile': _('This field cannot be blank.')},
+                                  code='invalid')
+        if self.strategy == 'prefix' and not self.prefix:
+            raise ValidationError({'prefix': _('This field cannot be blank.')},
+                                  code='invalid')
         if self.strategy == 'csv' and self.prefix or self.strategy == 'prefix' and self.csvfile:
+            # this case would happen only when using the internal API
             raise ValidationError(
-                _('Check your strategy and the respective values provided'),
+                _('Mixing fields of different strategies'),
                 code='invalid',
             )
-        if self.strategy == 'csv' and self.csvfile:
+        if self.strategy == 'csv':
             validate_csvfile(self.csvfile.file)
         super(AbstractRadiusBatch, self).clean()
 

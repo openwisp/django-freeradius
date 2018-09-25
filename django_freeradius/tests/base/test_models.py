@@ -340,10 +340,31 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(User.objects.all().count(), 0)
 
     def test_clean_method(self):
-        radiusbatch = self._create_radius_batch()
         with self.assertRaises(ValidationError):
-            radiusbatch.full_clean()
-        options = dict(strategy='csv', prefix='test', name='test')
-        radiusbatch = self._create_radius_batch(**options)
-        with self.assertRaises(ValidationError):
-            radiusbatch.full_clean()
+            self._create_radius_batch()
+        # missing csvfile
+        try:
+            self._create_radius_batch(strategy='csv',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('csvfile', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+        # missing prefix
+        try:
+            self._create_radius_batch(strategy='prefix',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('prefix', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+        # mixing strategies
+        try:
+            self._create_radius_batch(strategy='prefix',
+                                      prefix='prefix',
+                                      csvfile='test',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('Mixing', str(e))
+        else:
+            self.fail('ValidationError not raised')
