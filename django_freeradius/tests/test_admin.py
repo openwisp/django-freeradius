@@ -8,13 +8,13 @@ from django_freeradius.models import (
     RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
-from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin
+from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin, PostParamsMixin
 from .base.test_admin import BaseTestAdmin
 
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
-class TestAdmin(BaseTestAdmin, TestCase, CreateRadiusObjectsMixin,
-                FileMixin, CallCommandMixin):
+class TestAdmin(FileMixin, CallCommandMixin, PostParamsMixin,
+                CreateRadiusObjectsMixin, BaseTestAdmin, TestCase):
     app_name = "django_freeradius"
     nas_model = Nas
     radius_accounting_model = RadiusAccounting

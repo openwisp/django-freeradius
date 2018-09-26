@@ -90,8 +90,8 @@ class CreateRadiusObjectsMixin(object):
         return u
 
 
-class ApiParamsMixin(object):
-    def _get_api_defaults(self, opts, model=None):
+class PostParamsMixin(object):
+    def _get_post_defaults(self, opts, model=None):
         options = {}
         options.update(**opts)
         return options
@@ -103,10 +103,10 @@ class ApiParamsMixin(object):
                   'called_station_id': '00-11-22-33-44-55:hostname',
                   'calling_station_id': '00:26:b9:20:5f:10'}
         params.update(kwargs)
-        return self._get_api_defaults(params)
+        return self._get_post_defaults(params)
 
     def _get_accounting_params(self, **kwargs):
-        return self._get_api_defaults(kwargs)
+        return self._get_post_defaults(kwargs)
 
 
 class FileMixin(object):

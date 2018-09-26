@@ -197,15 +197,15 @@ class BaseTestAdmin(object):
         }
         nas = self._create_nas(**options)
         change_url = reverse('admin:{0}_nas_change'.format(self.app_name), args=[nas.pk])
-        data = options.copy()
-        data['custom_type'] = ''
-        data['type'] = 'Other'
-        response = self.client.post(change_url, data, follow=True)
+        options['custom_type'] = ''
+        options['type'] = 'Other'
+        options = self._get_post_defaults(options)
+        response = self.client.post(change_url, options, follow=True)
         self.assertNotContains(response, 'error')
         nas.refresh_from_db()
         self.assertEqual(nas.type, 'Other')
-        data['custom_type'] = 'my-custom-type'
-        response = self.client.post(change_url, data, follow=True)
+        options['custom_type'] = 'my-custom-type'
+        response = self.client.post(change_url, options, follow=True)
         self.assertNotContains(response, 'error')
         nas.refresh_from_db()
         self.assertEqual(nas.type, 'my-custom-type')

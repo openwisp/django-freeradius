@@ -587,7 +587,7 @@ class BaseTestApi(object):
             text2 = text.encode('utf-8')
             file.write(text2)
         with open('{}/test.csv'.format(settings.MEDIA_ROOT), 'rb') as file:
-            data = self._get_api_defaults({
+            data = self._get_post_defaults({
                 "name": "test",
                 "strategy": "csv",
                 "csvfile": file,
@@ -601,7 +601,7 @@ class BaseTestApi(object):
     def test_batch_prefix_201(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
         self.assertEqual(User.objects.count(), 0)
-        data = self._get_api_defaults({
+        data = self._get_post_defaults({
             "name": "test",
             "strategy": "prefix",
             "prefix": "prefix",
