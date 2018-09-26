@@ -75,7 +75,7 @@ class RadiusBatchForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.fields.get('csvfile'):
+        if 'csvfile' in self.fields:
             docs_link = "https://django-freeradius.readthedocs.io/en/latest/general/importing_users.html"
             help_text = "Refer to the <b><u><a href='{}'>docs</a></u></b> for more \
                 details on importing users from a CSV".format(docs_link)

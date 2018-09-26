@@ -145,7 +145,7 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
         }),
     )
     search_fields = ['name', 'short_name', 'server']
-    list_display = ['name', 'short_name', 'server', 'secret', 'created', 'modified']
+    list_display = ['name', 'short_name', 'type', 'secret', 'created', 'modified']
 
     def save_model(self, request, obj, form, change):
         data = form.cleaned_data
@@ -258,20 +258,37 @@ class AbstractRadiusPostAuthAdmin(BasePostAuth):
 
 
 class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
+    list_display = ['name', 'strategy', 'expiration_date',
+                    'created', 'modified']
+    fields = ['strategy',
+              'name',
+              'csvfile',
+              'prefix',
+              'number_of_users',
+              'users',
+              'pdf',
+              'expiration_date',
+              'created',
+              'modified']
+    list_filter = ['strategy']
+    search_fields = ['name']
     form = RadiusBatchForm
 
     class Media:
         js = [static('django-freeradius/js/strategy-switcher.js')]
+        css = {'all': (static('django-freeradius/css/radiusbatch.css'),)}
 
     def number_of_users(self, obj):
         return obj.users.count()
 
     number_of_users.short_description = _('number of users')
 
-    def get_form(self, request, obj=None, **kwargs):
-        if obj is None:
-            self.exclude = ('pdf', 'users')
-        return super(AbstractRadiusBatchAdmin, self).get_form(request, obj, **kwargs)
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)[:]
+        if not obj:
+            fields.remove('users')
+            fields.remove('pdf')
+        return fields
 
     def save_model(self, request, obj, form, change):
         data = form.cleaned_data
@@ -306,9 +323,6 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
             return ('strategy', 'prefix', 'csvfile', 'number_of_users',
                     'users', 'pdf', 'expiration_date') + readonly_fields
         return readonly_fields
-
-
-AbstractRadiusBatchAdmin.list_display += ('expiration_date', 'created')
 
 
 class AbstractUserAdmin(BaseUserAdmin):

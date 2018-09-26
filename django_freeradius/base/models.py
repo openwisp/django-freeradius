@@ -687,16 +687,16 @@ class AbstractRadiusPostAuth(models.Model):
 
 
 class AbstractRadiusBatch(TimeStampedEditableModel):
-    name = models.CharField(verbose_name=_('name'),
-                            max_length=128,
-                            help_text=_('A unique batch name'),
-                            db_index=True,
-                            unique=True)
     strategy = models.CharField(_('strategy'),
                                 max_length=16,
                                 choices=STRATEGIES,
                                 db_index=True,
                                 help_text=_('Import users from a CSV or generate using a prefix'))
+    name = models.CharField(verbose_name=_('name'),
+                            max_length=128,
+                            help_text=_('A unique batch name'),
+                            db_index=True,
+                            unique=True)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                    blank=True,
                                    related_name='radius_batch',

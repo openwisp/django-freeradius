@@ -2,8 +2,10 @@
     'use strict';
     $(document).ready(function () {
         var strategy = $('#id_strategy'),
-            prefixRows = $('#id_prefix, #id_number_of_users').parents('.form-row'),
-            csvRows = $('#id_csvfile').parents('.form-row'),
+            prefixRows = $('#id_prefix, #id_name, ' +
+                           '#id_expiration_date, #id_number_of_users').parents('.form-row'),
+            csvRows = $('#id_csvfile, #id_name, ' +
+                        '#id_expiration_date').parents('.form-row'),
             prefixField = $('.form-row.field-prefix'),
             pdfField = $('.form-row.field-pdf'),
             csvField = $('.form-row.field-csvfile'),
@@ -18,11 +20,11 @@
         }
 
         function prefix_strategy() {
+            csvRows.hide();
+            csvField.hide();
             prefixRows.show();
             prefixField.show();
             pdfField.show();
-            csvRows.hide();
-            csvField.hide();
         }
 
         if (strategyField !== undefined) {
