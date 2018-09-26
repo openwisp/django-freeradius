@@ -1,5 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
+
+from django_freeradius.migrations import (
+    DEFAULT_SESSION_TIME_LIMIT, DEFAULT_SESSION_TRAFFIC_LIMIT, SESSION_TIME_ATTRIBUTE,
+    SESSION_TRAFFIC_ATTRIBUTE,
+)
 
 
 class BaseTestNas(object):
@@ -19,29 +25,93 @@ class BaseTestRadiusCheck(object):
         radiuscheck = self.radius_check_model(username='entry username')
         self.assertEqual(str(radiuscheck), radiuscheck.username)
 
+    def test_auto_username(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        c = self._create_radius_check(
+            user=u,
+            op=':=',
+            attribute='Max-Daily-Session',
+            value='3600'
+        )
+        self.assertEqual(c.username, u.username)
+
+    def test_empty_username(self):
+        opts = dict(op=':=',
+                    attribute='Max-Daily-Session',
+                    value='3600')
+        try:
+            self._create_radius_check(**opts)
+        except ValidationError as e:
+            self.assertIn('username', e.message_dict)
+            self.assertIn('user', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_change_user_username(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        c = self._create_radius_check(
+            user=u,
+            op=':=',
+            attribute='Max-Daily-Session',
+            value='3600'
+        )
+        u.username = 'changed'
+        u.full_clean()
+        u.save()
+        c.refresh_from_db()
+        # ensure related records have been updated
+        self.assertEqual(c.username, u.username)
+
 
 class BaseTestRadiusReply(object):
     def test_string_representation(self):
         radiusreply = self.radius_reply_model(username='entry username')
         self.assertEqual(str(radiusreply), radiusreply.username)
 
+    def test_auto_username(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        r = self._create_radius_reply(
+            user=u,
+            attribute='Reply-Message',
+            op=':=',
+            value='Login failed'
+        )
+        self.assertEqual(r.username, u.username)
 
-class BaseTestRadiusGroupReply(object):
-    def test_string_representation(self):
-        radiusgroupreply = self.radius_groupreply_model(groupname='entry groupname')
-        self.assertEqual(str(radiusgroupreply), radiusgroupreply.groupname)
+    def test_empty_username(self):
+        opts = dict(attribute='Reply-Message',
+                    op=':=',
+                    value='Login failed')
+        try:
+            self._create_radius_reply(**opts)
+        except ValidationError as e:
+            self.assertIn('username', e.message_dict)
+            self.assertIn('user', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
 
-
-class BaseTestRadiusGroupCheck(object):
-    def test_string_representation(self):
-        radiusgroupcheck = self.radius_groupcheck_model(groupname='entry groupname')
-        self.assertEqual(str(radiusgroupcheck), radiusgroupcheck.groupname)
-
-
-class BaseTestRadiusUserGroup(object):
-    def test_string_representation(self):
-        radiususergroup = self.radius_usergroup_model(username='entry username')
-        self.assertEqual(str(radiususergroup), radiususergroup.username)
+    def test_change_user_username(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        r = self._create_radius_reply(
+            user=u,
+            attribute='Reply-Message',
+            op=':=',
+            value='Login failed'
+        )
+        u.username = 'changed'
+        u.full_clean()
+        u.save()
+        r.refresh_from_db()
+        # ensure related records have been updated
+        self.assertEqual(r.username, u.username)
 
 
 class BaseTestRadiusPostAuth(object):
@@ -51,9 +121,206 @@ class BaseTestRadiusPostAuth(object):
 
 
 class BaseTestRadiusGroup(object):
-    def test_string_representation(self):
-        radiusgroup = self.radius_group_model(groupname='entry groupname')
-        self.assertEqual(str(radiusgroup), radiusgroup.groupname)
+    def test_group_str(self):
+        g = self.radius_group_model(name='entry groupname')
+        self.assertEqual(str(g), g.name)
+
+    def test_group_reply_str(self):
+        r = self.radius_groupreply_model(groupname='entry groupname')
+        self.assertEqual(str(r), r.groupname)
+
+    def test_group_check_str(self):
+        c = self.radius_groupcheck_model(groupname='entry groupname')
+        self.assertEqual(str(c), c.groupname)
+
+    def test_user_group_str(self):
+        ug = self.radius_usergroup_model(username='entry username')
+        self.assertEqual(str(ug), ug.username)
+
+    def test_default_groups(self):
+        queryset = self.radius_group_model.objects.all()
+        self.assertEqual(queryset.count(), 2)
+        self.assertEqual(queryset.filter(name='users').count(), 1)
+        self.assertEqual(queryset.filter(name='power-users').count(), 1)
+        self.assertEqual(queryset.filter(default=True).count(), 1)
+        users = queryset.get(name='users')
+        self.assertTrue(users.default)
+        self.assertEqual(users.radiusgroupcheck_set.count(), 2)
+        check = users.radiusgroupcheck_set.get(attribute=SESSION_TIME_ATTRIBUTE)
+        self.assertEqual(check.value, DEFAULT_SESSION_TIME_LIMIT)
+        check = users.radiusgroupcheck_set.get(attribute=SESSION_TRAFFIC_ATTRIBUTE)
+        self.assertEqual(check.value, DEFAULT_SESSION_TRAFFIC_LIMIT)
+        power_users = queryset.get(name='power-users')
+        self.assertEqual(power_users.radiusgroupcheck_set.count(), 0)
+
+    def test_change_default_group(self):
+        new_default = self.radius_group_model(name='new',
+                                              description='test',
+                                              default=True)
+        new_default.full_clean()
+        new_default.save()
+        queryset = self.radius_group_model.objects.filter(default=True)
+        self.assertEqual(queryset.count(), 1)
+        self.assertEqual(queryset.filter(name='new').count(), 1)
+
+    def test_delete_default_group(self):
+        group = self.radius_group_model.objects.get(default=1)
+        try:
+            group.delete()
+        except ProtectedError:
+            pass
+        else:
+            self.fail('ProtectedError not raised')
+
+    def test_undefault_group(self):
+        group = self.radius_group_model.objects.get(default=1)
+        group.default = False
+        try:
+            group.full_clean()
+        except ValidationError as e:
+            self.assertIn('default', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_new_user_default_group(self):
+        u = get_user_model()(username='test',
+                             email='test@test.org',
+                             password='test')
+        u.full_clean()
+        u.save()
+        usergroup_set = u.radiususergroup_set.all()
+        self.assertEqual(usergroup_set.count(), 1)
+        ug = usergroup_set.first()
+        self.assertTrue(ug.group.default)
+
+    def test_groupcheck_auto_name(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        c = self._create_radius_groupcheck(
+            group=g,
+            attribute='Max-Daily-Session',
+            op=':=',
+            value='3600'
+        )
+        self.assertEqual(c.groupname, g.name)
+
+    def test_groupcheck_empty_groupname(self):
+        opts = dict(attribute='Max-Daily-Session',
+                    op=':=',
+                    value='3600')
+        try:
+            self._create_radius_groupcheck(**opts)
+        except ValidationError as e:
+            self.assertIn('groupname', e.message_dict)
+            self.assertIn('group', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_groupreply_auto_name(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        r = self._create_radius_groupreply(
+            group=g,
+            attribute='Reply-Message',
+            op=':=',
+            value='Login failed'
+        )
+        self.assertEqual(r.groupname, g.name)
+
+    def test_groupreply_empty_groupname(self):
+        opts = dict(attribute='Reply-Message',
+                    op=':=',
+                    value='Login failed')
+        try:
+            self._create_radius_groupreply(**opts)
+        except ValidationError as e:
+            self.assertIn('groupname', e.message_dict)
+            self.assertIn('group', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_usergroups_auto_fields(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        ug = self._create_radius_usergroup(user=u,
+                                           group=g,
+                                           priority=1)
+        self.assertEqual(ug.groupname, g.name)
+        self.assertEqual(ug.username, u.username)
+
+    def test_usergroups_empty_groupname(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        try:
+            self._create_radius_usergroup(user=u, priority=1)
+        except ValidationError as e:
+            self.assertIn('groupname', e.message_dict)
+            self.assertIn('group', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_usergroups_empty_username(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        try:
+            self._create_radius_usergroup(group=g, priority=1)
+        except ValidationError as e:
+            self.assertIn('username', e.message_dict)
+            self.assertIn('user', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_change_group_auto_name(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        c = self._create_radius_groupcheck(
+            group=g,
+            attribute='Max-Daily-Session',
+            op=':=',
+            value='3600'
+        )
+        r = self._create_radius_groupreply(
+            group=g,
+            attribute='Reply-Message',
+            op=':=',
+            value='Login failed'
+        )
+        ug = self._create_radius_usergroup(user=u,
+                                           group=g,
+                                           priority=1)
+        g.name = 'changed'
+        g.full_clean()
+        g.save()
+        c.refresh_from_db()
+        r.refresh_from_db()
+        ug.refresh_from_db()
+        # ensure related records have been updated
+        self.assertEqual(c.groupname, g.name)
+        self.assertEqual(r.groupname, g.name)
+        self.assertEqual(ug.groupname, g.name)
+
+    def test_change_user_username(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        ug = self._create_radius_usergroup(user=u,
+                                           group=g,
+                                           priority=1)
+        u.username = 'changed'
+        u.full_clean()
+        u.save()
+        ug.refresh_from_db()
+        # ensure related records have been updated
+        self.assertEqual(ug.username, u.username)
 
 
 class BaseTestRadiusBatch(object):
@@ -62,8 +329,9 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(str(radiusbatch), 'test')
 
     def test_delete_method(self):
-        options = dict(strategy='prefix', prefix='test', name='test')
-        radiusbatch = self._create_radius_batch(**options)
+        radiusbatch = self._create_radius_batch(strategy='prefix',
+                                                prefix='test',
+                                                name='test')
         radiusbatch.prefix_add('test', 5)
         User = get_user_model()
         self.assertEqual(User.objects.all().count(), 5)
@@ -72,51 +340,31 @@ class BaseTestRadiusBatch(object):
         self.assertEqual(User.objects.all().count(), 0)
 
     def test_clean_method(self):
-        radiusbatch = self._create_radius_batch()
         with self.assertRaises(ValidationError):
-            radiusbatch.full_clean()
-        options = dict(strategy='csv', prefix='test', name='test')
-        radiusbatch = self._create_radius_batch(**options)
-        with self.assertRaises(ValidationError):
-            radiusbatch.full_clean()
-
-
-class BaseTestRadiusProfile(object):
-    def test_string_representation(self):
-        radiusprofile = self.radius_profile_model(name='test')
-        self.assertEqual(str(radiusprofile), 'test')
-
-    def test_save_method(self):
-        RadiusProfile = self.radius_profile_model
-        options = dict(name='test', default=True, daily_session_limit=10)
-        self._create_radius_profile(**options)
-        self.assertEqual(RadiusProfile.objects.all().count(), 3)
-        self.assertEqual(RadiusProfile.objects.filter(default=True).count(), 1)
-        options.update(dict(name='test1', daily_session_limit=20))
-        self._create_radius_profile(**options)
-        self.assertEqual(RadiusProfile.objects.all().count(), 4)
-        self.assertEqual(RadiusProfile.objects.filter(default=True).count(), 1)
-
-
-class BaseTestRadiusUserProfile(object):
-    def test_string_representation(self):
-        self._create_radius_profile(**dict(name='test'))
-        user = get_user_model().objects.create(username="test")
-        radiususerprofile = self.radius_userprofile_model.objects.get(user=user)
-        self.assertEqual(str(radiususerprofile), 'test-test')
-
-    def test_save_method(self):
-        RadiusCheck = self.radius_check_model
-        RadiusUserProfile = self.radius_userprofile_model
-        options = dict(name='test', default=True, daily_session_limit=10)
-        radiusprofile = self._create_radius_profile(**options)
-        get_user_model().objects.create(username="test")
-        self.assertEqual(RadiusUserProfile.objects.all().count(), 1)
-        self.assertEqual(RadiusCheck.objects.all().count(), 1)
-        radiususerprofile = RadiusUserProfile.objects.first()
-        radiusprofile.daily_session_limit = 20
-        radiusprofile.daily_bandwidth_limit = 10
-        radiusprofile.save()
-        radiususerprofile.profile = radiusprofile
-        radiususerprofile.save()
-        self.assertEqual(RadiusCheck.objects.all().count(), 2)
+            self._create_radius_batch()
+        # missing csvfile
+        try:
+            self._create_radius_batch(strategy='csv',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('csvfile', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+        # missing prefix
+        try:
+            self._create_radius_batch(strategy='prefix',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('prefix', e.message_dict)
+        else:
+            self.fail('ValidationError not raised')
+        # mixing strategies
+        try:
+            self._create_radius_batch(strategy='prefix',
+                                      prefix='prefix',
+                                      csvfile='test',
+                                      name='test')
+        except ValidationError as e:
+            self.assertIn('Mixing', str(e))
+        else:
+            self.fail('ValidationError not raised')

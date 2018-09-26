@@ -85,10 +85,10 @@ class BaseTestApi(object):
         response = self.client.post(reverse('freeradius:postauth'),
                                     params,
                                     HTTP_AUTHORIZATION=self.auth_header)
-        self.assertEqual(self.radius_postauth_model.objects.filter(username='molly',
-                                                                   password='barba').count(), 1)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
+        self.assertEqual(self.radius_postauth_model.objects.filter(username='molly',
+                                                                   password='barba').count(), 1)
 
     def test_postauth_reject_201_empty_fields(self):
         params = {'reply': 'Access-Reject',
@@ -189,7 +189,7 @@ class BaseTestApi(object):
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -206,7 +206,7 @@ class BaseTestApi(object):
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -245,7 +245,7 @@ class BaseTestApi(object):
         self.assertEqual(ra.session_time, 0)
         self.assertEqual(ra.input_octets, 0)
         self.assertEqual(ra.output_octets, 0)
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -258,7 +258,7 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(self.radius_accounting_model.objects.first(), data)
 
     @freeze_time(START_DATE)
@@ -274,7 +274,7 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -289,7 +289,7 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra = self.radius_accounting_model.objects.first()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -310,7 +310,7 @@ class BaseTestApi(object):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time, start_time)
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -327,7 +327,7 @@ class BaseTestApi(object):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time.timetuple(), now().timetuple())
-        data = self._get_extra_fields(**data)
+        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -587,12 +587,11 @@ class BaseTestApi(object):
             text2 = text.encode('utf-8')
             file.write(text2)
         with open('{}/test.csv'.format(settings.MEDIA_ROOT), 'rb') as file:
-            data = {
+            data = self._get_post_defaults({
                 "name": "test",
                 "strategy": "csv",
                 "csvfile": file,
-            }
-            data = self._get_extra_params(**data)
+            })
             response = self.client.post(reverse('freeradius:batch'), data,
                                         HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 201)
@@ -602,13 +601,12 @@ class BaseTestApi(object):
     def test_batch_prefix_201(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
         self.assertEqual(User.objects.count(), 0)
-        data = {
+        data = self._get_post_defaults({
             "name": "test",
             "strategy": "prefix",
             "prefix": "prefix",
             "number_of_users": 1,
-        }
-        data = self._get_extra_params(**data)
+        })
         response = self.client.post(reverse('freeradius:batch'), data,
                                     HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 201)

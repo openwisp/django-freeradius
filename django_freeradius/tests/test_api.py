@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from django_freeradius import settings as app_settings
 
-from . import ApiParamsMixin, CreateRadiusObjectsMixin
+from . import CreateRadiusObjectsMixin, PostParamsMixin
 from .base.test_api import BaseTestApi, BaseTestApiReject
 
 RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
@@ -15,7 +15,7 @@ RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
 RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
 
 
-class ApiTestCase(ApiParamsMixin, CreateRadiusObjectsMixin, TestCase):
+class ApiTestCase(PostParamsMixin, CreateRadiusObjectsMixin, TestCase):
     pass
 
 
