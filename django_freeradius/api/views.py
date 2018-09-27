@@ -173,7 +173,7 @@ class BatchView(generics.CreateAPIView):
     serializer_class = RadiusBatchSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = RadiusBatchSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
             expiration_date = serializer.data.get('expiration_data')

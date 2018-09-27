@@ -189,7 +189,6 @@ class BaseTestApi(object):
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -206,7 +205,6 @@ class BaseTestApi(object):
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -245,7 +243,6 @@ class BaseTestApi(object):
         self.assertEqual(ra.session_time, 0)
         self.assertEqual(ra.input_octets, 0)
         self.assertEqual(ra.output_octets, 0)
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -258,7 +255,6 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, None)
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
-        data = self._get_defaults(data)
         self.assertAcctData(self.radius_accounting_model.objects.first(), data)
 
     @freeze_time(START_DATE)
@@ -274,7 +270,6 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra.refresh_from_db()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -289,7 +284,6 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_accounting_model.objects.count(), 1)
         ra = self.radius_accounting_model.objects.first()
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -310,7 +304,6 @@ class BaseTestApi(object):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time, start_time)
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
@@ -327,7 +320,6 @@ class BaseTestApi(object):
         self.assertEqual(ra.update_time.timetuple(), now().timetuple())
         self.assertEqual(ra.stop_time.timetuple(), now().timetuple())
         self.assertEqual(ra.start_time.timetuple(), now().timetuple())
-        data = self._get_defaults(data)
         self.assertAcctData(ra, data)
 
     @freeze_time(START_DATE)
