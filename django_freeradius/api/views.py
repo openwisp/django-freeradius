@@ -38,18 +38,23 @@ class AuthorizeView(APIView):
     authentication_classes = (TokenAuthentication, )
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        try:
-            user = User.objects.get(username=username, is_active=True)
-        except User.DoesNotExist:
-            user = None
-        if user and user.check_password(password):
+        user = self.get_user(request)
+        if user and user.check_password(request.data.get('password')):
             return Response({'control:Auth-Type': 'Accept'}, status=200)
         if app_settings.API_AUTHORIZE_REJECT:
             return Response({'control:Auth-Type': 'Reject'}, status=401)
         else:
             return Response(None, status=200)
+
+    def get_user(self, request):
+        """
+        return active user or ``None``
+        """
+        try:
+            return User.objects.get(username=request.data.get('username'),
+                                    is_active=True)
+        except User.DoesNotExist:
+            return None
 
 
 authorize = AuthorizeView.as_view()
