@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('django_freeradius', '0001_initial_squashed'),
+        ('django_freeradius', '0001_initial_freeradius'),
     ]
 
     operations = [

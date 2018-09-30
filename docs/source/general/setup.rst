@@ -88,6 +88,37 @@ Then run:
 
     ./manage.py migrate
 
+Migrating an existing freeradius database
+-----------------------------------------
+
+If you already have a freeradius 3 database with the default schema, you should
+be able to use it with django-freeradius (and openwisp-radius) easily:
+
+1. first of all, back up your existing database;
+2. configure django to connect to your existing database;
+3. fake the first migration (which only replicates the default freeradius schema)
+   and then launch the rest of migrations normally, see the examples below to
+   see how to do this.
+
+django-freeradius
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: shell
+
+    ./manage.py migrate --fake django_freeradius 0001_initial_freeradius
+    ./manage.py migrate
+
+
+openwisp-radius
+~~~~~~~~~~~~~~~
+
+In case you are using `openwisp-radius <https://github.com/openwisp/openwisp-radius>`_:
+
+.. code-block:: shell
+
+    ./manage.py migrate --fake openwisp_radius 0001_initial_freeradius
+    ./manage.py migrate
+
 Installing for development
 --------------------------
 
