@@ -9,7 +9,9 @@ python:
 
 services:
   - mysql
-  - postgresql
+
+addons:
+  postgresql: "9.4"
 
 branches:
   only:
