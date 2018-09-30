@@ -8,5 +8,6 @@ psycopg2
 sphinx
 sphinx_rtd_theme
 freezegun
-openwisp-utils>=0.2,<0.3
 django-extensions
+django-rest-auth>=0.9.3,<0.12.0
+django-allauth>=0.36.0,<0.38.0

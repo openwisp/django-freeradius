@@ -28,11 +28,12 @@ Django-freeradius is part of the `OpenWISP project <http://openwisp.org>`_.
    /general/settings
    /general/freeradius
    /general/management_commands
-   /general/abstract_models
    /general/importing_users
    /general/generating_users
    /general/enforcing_limits
+   /general/registration
    /general/api
+   /general/abstract_models
    /general/contributing
    /general/goals
 
