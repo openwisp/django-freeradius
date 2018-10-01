@@ -93,12 +93,9 @@ postauth = PostAuthView.as_view()
 class AccountingFilter(filters.FilterSet):
     start_time = filters.DateTimeFilter(field_name='start_time', lookup_expr='gte')
     stop_time = filters.DateTimeFilter(field_name='stop_time', lookup_expr='gte')
-    is_open = filters.BooleanFilter(method='filter_open')
-
-    def filter_open(self, queryset, name,  value):
-        if value:
-            return queryset.filter(stop_time__isnull=True)
-        return queryset.filter(stop_time__isnull=False)
+    is_open = filters.BooleanFilter(field_name='stop_time',
+                                    lookup_expr='isnull',
+                                    label='Is Open')
 
     class Meta:
         model = RadiusAccounting
