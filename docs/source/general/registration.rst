@@ -12,9 +12,9 @@ registration and password reset directly from your captive page.
 Setup
 -----
 
-Install ``django-rest-auth``::
+Install ``django-rest-auth`` and ``django-allauth``::
 
-    pip install django-rest-auth
+    pip install django-rest-auth django-allauth
 
 Add the following to your ``settings.py``:
 
