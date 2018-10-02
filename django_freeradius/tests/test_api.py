@@ -5,9 +5,8 @@ import swapper
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from django_freeradius import settings as app_settings
-
 from . import CreateRadiusObjectsMixin, PostParamsMixin
+from .. import settings as app_settings
 from .base.test_api import BaseTestApi, BaseTestApiReject
 
 RadiusPostAuth = swapper.load_model('django_freeradius', 'RadiusPostAuth')

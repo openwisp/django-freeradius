@@ -11,14 +11,16 @@ from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_freeradius import settings as app_settings
-
+from .. import settings as app_settings
 from .serializers import RadiusAccountingSerializer, RadiusBatchSerializer, RadiusPostAuthSerializer
 
-RadiusPostAuth = swapper.load_model("django_freeradius", "RadiusPostAuth")
-RadiusAccounting = swapper.load_model("django_freeradius", "RadiusAccounting")
+RadiusPostAuth = swapper.load_model('django_freeradius', 'RadiusPostAuth')
+RadiusAccounting = swapper.load_model('django_freeradius', 'RadiusAccounting')
 User = get_user_model()
-RadiusBatch = swapper.load_model("django_freeradius", "RadiusBatch")
+RadiusBatch = swapper.load_model('django_freeradius', 'RadiusBatch')
+
+if app_settings.SOCIAL_LOGIN_ENABLED:
+    from rest_framework.authtoken.models import Token
 
 
 class TokenAuthentication(BaseAuthentication):
@@ -67,7 +69,29 @@ class AuthorizeView(APIView):
         returns ``True`` if the user password is valid
         can be overridden to implement more complex checks
         """
+        if app_settings.SOCIAL_LOGIN_ENABLED:
+            result = self.check_user_token(request, user)
+            if result:
+                return True
         return user.check_password(request.data.get('password'))
+
+    if app_settings.SOCIAL_LOGIN_ENABLED:
+        def check_user_token(self, request, user):
+            """
+            if user has no password set and has at least 1 social account
+            this is probably a social login, the password field is the
+            user's personal auth token
+            """
+            if not user.has_usable_password() and user.socialaccount_set.exists():
+                try:
+                    Token.objects.get(
+                        user=user,
+                        key=request.data.get('password')
+                    )
+                    return True
+                except Token.DoesNotExist:
+                    pass
+            return False
 
 
 authorize = AuthorizeView.as_view()

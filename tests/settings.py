@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_auth.registration',
+    'allauth.socialaccount.providers.facebook',
 ]
 
 SITE_ID = 1
@@ -119,6 +120,25 @@ LOGGING = {
         }
     }
 }
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+        ],
+        'VERIFIED_EMAIL': True,
+    }
+}
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
 
 if os.environ.get('SAMPLE_APP', False):
     INSTALLED_APPS.remove('django_freeradius')

@@ -15,7 +15,7 @@ urlpatterns = [
     # django-rest-auth is optional
     url(r'^api/v1/rest-auth/', include('rest_auth.urls')),
     url(r'^api/v1/registration/', include('rest_auth.registration.urls')),
-
+    url(r'^accounts/', include('allauth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += staticfiles_urlpatterns()
