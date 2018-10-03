@@ -768,9 +768,8 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
                     user.password = password
                 user.full_clean()
                 users_list.append(user)
-        for u in users_list:
-            u.save()
-            self.users.add(u)
+        for user in users_list:
+            self.save_user(user)
         for element in generated_passwords:
             username, password, user_email = element
             send_mail(
@@ -791,14 +790,18 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
     def prefix_add(self, prefix, n, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
         self.save()
         users_list, user_password = prefix_generate_users(prefix, n, password_length)
-        for u in users_list:
-            u.save()
-            self.users.add(u)
+        for user in users_list:
+            user.full_clean()
+            self.save_user(user)
         f = generate_pdf(prefix, {'users': user_password})
         f.name = f.name.split('/')[-1]
         self.pdf = f
         self.full_clean()
         self.save()
+
+    def save_user(self, user):
+        user.save()
+        self.users.add(user)
 
     def delete(self):
         self.users.all().delete()
