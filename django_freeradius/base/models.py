@@ -755,7 +755,10 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
                 if not username and email:
                     username = email.split('@')[0]
                 username = find_available_username(username, users_list)
-                user = User(username=username, email=email, first_name=first_name, last_name=last_name)
+                user = User(username=username,
+                            email=email,
+                            first_name=first_name,
+                            last_name=last_name)
                 cleartext_delimiter = 'cleartext$'
                 if not password:
                     password = get_random_string(length=password_length)
@@ -793,9 +796,9 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         for user in users_list:
             user.full_clean()
             self.save_user(user)
-        f = generate_pdf(prefix, {'users': user_password})
-        f.name = f.name.split('/')[-1]
-        self.pdf = f
+        pdf_file = generate_pdf(prefix, {'users': user_password})
+        pdf_file.name = pdf_file.name.split('/')[-1]
+        self.pdf = pdf_file
         self.full_clean()
         self.save()
 
@@ -805,7 +808,7 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
 
     def delete(self):
         self.users.all().delete()
-        super(AbstractRadiusBatch, self).delete()
+        super().delete()
         self._remove_files()
 
     def expire(self):
