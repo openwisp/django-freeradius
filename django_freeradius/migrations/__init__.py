@@ -48,7 +48,7 @@ def add_default_group_to_existing_users(apps, schema_editor):
     User = get_model(apps, settings.AUTH_USER_MODEL)
     RadiusUserGroup = get_swapped_model(apps, 'django_freeradius', 'RadiusUserGroup')
     RadiusGroup = get_swapped_model(apps, 'django_freeradius', 'RadiusGroup')
-    default_group = RadiusGroup.objects.filter(name='default')
+    default_group = RadiusGroup.objects.filter(default=True)
     if default_group.exists():
         default_group = default_group.first()
         for user in User.objects.all():
