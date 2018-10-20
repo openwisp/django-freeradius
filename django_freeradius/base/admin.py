@@ -214,8 +214,11 @@ class AbstractRadiusUserGroupAdmin(TimeStampedEditableAdmin):
 class RadiusUserGroupInline(StackedInline):
     model = swapper.load_model('django_freeradius', 'RadiusUserGroup')
     exclude = ['username', 'groupname', 'created', 'modified']
-    extra = 0
     ordering = ('priority',)
+    autocomplete_fields = ('group', )
+    verbose_name = _('radius user group')
+    verbose_name_plural = _('radius user groups')
+    extra = 0
 
 
 class RadGroupMixin(object):
