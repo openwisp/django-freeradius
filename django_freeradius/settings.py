@@ -4,6 +4,9 @@ from django.conf import settings
 
 EDITABLE_ACCOUNTING = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_ACCOUNTING', False)
 EDITABLE_POSTAUTH = getattr(settings, 'DJANGO_FREERADIUS_EDITABLE_POSTAUTH', False)
+GROUPCHECK_ADMIN = getattr(settings, 'DJANGO_FREERADIUS_GROUPCHECK_ADMIN', False)
+GROUPREPLY_ADMIN = getattr(settings, 'DJANGO_FREERADIUS_GROUPREPLY_ADMIN', False)
+USERGROUP_ADMIN = getattr(settings, 'DJANGO_FREERADIUS_USERGROUP_ADMIN', False)
 DEFAULT_SECRET_FORMAT = getattr(settings,
                                 'DJANGO_FREERADIUS_DEFAULT_SECRET_FORMAT',
                                 'NT-Password')

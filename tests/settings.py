@@ -1,8 +1,10 @@
 import os
+import sys
 
 import environ
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TESTING = sys.argv[1] == 'test'
 
 root = environ.Path(__file__) - 2
 env = environ.Env(DEBUG=(bool, False))
@@ -154,6 +156,11 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_NAS_MODEL = 'sample_radius.Nas'
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = 'sample_radius.RadiusPostAuth'
     DJANGO_FREERADIUS_RADIUSBATCH_MODEL = 'sample_radius.RadiusBatch'
+
+if TESTING:
+    DJANGO_FREERADIUS_GROUPCHECK_ADMIN = True
+    DJANGO_FREERADIUS_GROUPREPLY_ADMIN = True
+    DJANGO_FREERADIUS_USERGROUP_ADMIN = True
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:

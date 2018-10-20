@@ -15,6 +15,51 @@ Whether ``radacct`` entries are editable from the django admin or not.
 
 Whether ``postauth`` logs are editable from the django admin or not.
 
+``DJANGO_FREERADIUS_GROUPCHECK_ADMIN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``False``
+
+Direct editing of group checks items is disabled by default because
+these can be edited through inline items in the Radius Group
+admin (Freeradius > Groups).
+
+*This is done with the aim of simplifying the admin interface and avoid
+overwhelming users with too many options*.
+
+If for some reason you need to enable direct editing of group checks
+you can do so by setting this to ``True``.
+
+``DJANGO_FREERADIUS_GROUPREPLY_ADMIN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``False``
+
+Direct editing of group reply items is disabled by default because
+these can be edited through inline items in the Radius Group
+admin (Freeradius > Groups).
+
+*This is done with the aim of simplifying the admin interface and avoid
+overwhelming users with too many options*.
+
+If for some reason you need to enable direct editing of group replies
+you can do so by setting this to ``True``.
+
+``DJANGO_FREERADIUS_USERGROUP_ADMIN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``False``
+
+Direct editing of user group items (``radusergroup``) is disabled by default
+because these can be edited through inline items in the User
+admin (Users and Organizations > Users).
+
+*This is done with the aim of simplifying the admin interface and avoid
+overwhelming users with too many options*.
+
+If for some reason you need to enable direct editing of user group items
+you can do so by setting this to ``True``.
+
 ``DJANGO_FREERADIUS_DEFAULT_SECRET_FORMAT``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

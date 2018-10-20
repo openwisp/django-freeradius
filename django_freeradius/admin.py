@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
+from . import settings as app_settings
 from .base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
     AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
@@ -37,19 +38,22 @@ class RadiusGroupAdmin(AbstractRadiusGroupAdmin):
     pass
 
 
-@admin.register(RadiusUserGroup)
-class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
-    pass
+if app_settings.USERGROUP_ADMIN:
+    @admin.register(RadiusUserGroup)
+    class RadiusUserGroupAdmin(AbstractRadiusUserGroupAdmin):
+        pass
 
 
-@admin.register(RadiusGroupReply)
-class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
-    pass
+if app_settings.GROUPREPLY_ADMIN:
+    @admin.register(RadiusGroupReply)
+    class RadiusGroupReplyAdmin(AbstractRadiusGroupReplyAdmin):
+        pass
 
 
-@admin.register(RadiusGroupCheck)
-class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
-    pass
+if app_settings.GROUPCHECK_ADMIN:
+    @admin.register(RadiusGroupCheck)
+    class RadiusGroupCheckAdmin(AbstractRadiusGroupCheckAdmin):
+        pass
 
 
 @admin.register(RadiusPostAuth)
