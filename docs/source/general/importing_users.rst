@@ -89,3 +89,5 @@ The text could be anything but should have the format string operators ``{}`` fo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is the sender email which is also to be configured in the SMTP settings.
+The default sender email is a common setting from the `Django core settings  <https://docs.djangoproject.com/en/2.1/ref/settings/#default-from-email>`_ under ``DEFAULT_FROM_EMAIL``.
+Currently, ``DEFAULT_FROM_EMAIL`` is set to to ``webmaster@localhost``.
