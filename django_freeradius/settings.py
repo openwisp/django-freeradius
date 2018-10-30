@@ -25,10 +25,8 @@ BATCH_MAIL_MESSAGE = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_MESSAGE', '
 BATCH_MAIL_SENDER = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_SENDER', 'testing@localhost')
 BATCH_PDF_TEMPLATE = getattr(settings,
                              'DJANGO_FREERADIUS_BATCH_PDF_TEMPLATE',
-                             os.path.join(
-                                os.path.dirname(__file__),
-                                'templates/django_freeradius/prefix_pdf.html')
-                             )
+                             os.path.join(os.path.dirname(__file__),
+                                          'templates/django_freeradius/prefix_pdf.html'))
 API_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_API_TOKEN', None)
 API_AUTHORIZE_REJECT = getattr(settings, 'DJANGO_FREERADIUS_API_AUTHORIZE_REJECT', False)
 SOCIAL_LOGIN_ENABLED = {'allauth.socialaccount',

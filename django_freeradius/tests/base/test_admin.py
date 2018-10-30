@@ -168,24 +168,24 @@ class BaseTestAdmin(object):
     def test_radiuscheck_filter_duplicates_username(self):
         self._create_radius_check(**_RADCHECK_ENTRY)
         self._create_radius_check(**_RADCHECK_ENTRY)
-        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name))+'?duplicates=username'
+        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name)) + '?duplicates=username'
         resp = self.client.get(url, follow=True)
         self.assertEqual(resp.status_code, 200)
 
     def test_radiuscheck_filter_duplicates_value(self):
         self._create_radius_check(**_RADCHECK_ENTRY)
         self._create_radius_check(**_RADCHECK_ENTRY)
-        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name))+'?duplicates=value'
+        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name)) + '?duplicates=value'
         resp = self.client.get(url, follow=True)
         self.assertEqual(resp.status_code, 200)
 
     def test_radiuscheck_filter_expired(self):
-        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name))+'?expired=expired'
+        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name)) + '?expired=expired'
         resp = self.client.get(url, follow=True)
         self.assertEqual(resp.status_code, 200)
 
     def test_radiuscheck_filter_not_expired(self):
-        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name))+'?expired=not_expired'
+        url = reverse('admin:{0}_radiuscheck_changelist'.format(self.app_name)) + '?expired=not_expired'
         resp = self.client.get(url, follow=True)
         self.assertEqual(resp.status_code, 200)
 

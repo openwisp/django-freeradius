@@ -71,7 +71,7 @@ class BaseTestCommands(object):
         path = self._get_path('static/test_batch.csv')
         options = dict(file=path, expiration='28-01-1970', name='test')
         self._call_command('batch_add_users', **options)
-        expiration_date = now() - timedelta(days=30*15)
+        expiration_date = now() - timedelta(days=30 * 15)
         options['expiration'] = expiration_date.strftime('%d-%m-%Y')
         options['name'] = 'test1'
         self._call_command('batch_add_users', **options)
