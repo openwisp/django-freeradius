@@ -298,7 +298,7 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
         strategy = data.get('strategy')
         if not change:
             if strategy == "csv":
-                if data.get('csvfile', False) and not change:
+                if data.get('csvfile', False):
                     csvfile = data.get('csvfile')
                     obj.csvfile_upload(csvfile)
             elif strategy == "prefix":
