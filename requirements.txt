@@ -5,4 +5,4 @@ djangorestframework>=3.8.2,<3.9
 passlib>=1.7.1,<1.8.0
 django-filter>=2.0.0,<2.1.0
 djangorestframework-link-header-pagination>=0.1.1,<0.2.0
-xhtml2pdf>=0.2.3, <0.3.0
+xhtml2pdf>=0.2.3,<0.3.0
