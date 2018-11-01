@@ -10,4 +10,4 @@ sphinx_rtd_theme
 freezegun
 django-extensions
 django-rest-auth>=0.9.3,<0.12.0
-django-allauth>=0.36.0,<0.38.0
+django-allauth>=0.36.0,<0.39.0
