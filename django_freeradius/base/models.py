@@ -12,7 +12,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Count, ProtectedError
 from django.utils.crypto import get_random_string
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
@@ -215,7 +214,6 @@ class AbstractRadiusCheckManager(models.Manager):
         return super(AbstractRadiusCheckManager, self).create(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class AbstractRadiusCheck(AutoUsernameMixin, BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
@@ -258,7 +256,6 @@ class AbstractRadiusCheck(AutoUsernameMixin, BaseModel):
         return self.username
 
 
-@python_2_unicode_compatible
 class AbstractRadiusReply(AutoUsernameMixin, BaseModel):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64,
@@ -289,7 +286,6 @@ class AbstractRadiusReply(AutoUsernameMixin, BaseModel):
         return self.username
 
 
-@python_2_unicode_compatible
 class AbstractRadiusAccounting(models.Model):
     id = models.BigAutoField(primary_key=True, db_column='radacctid')
     session_id = models.CharField(verbose_name=_('session ID'),
@@ -422,7 +418,6 @@ class AbstractRadiusAccounting(models.Model):
         return self.unique_id
 
 
-@python_2_unicode_compatible
 class AbstractNas(BaseModel):
     name = models.CharField(verbose_name=_('name'),
                             max_length=128,
@@ -464,7 +459,6 @@ class AbstractNas(BaseModel):
         return self.name
 
 
-@python_2_unicode_compatible
 class AbstractRadiusGroup(BaseModel):
     """
     This is not part of the standard freeradius schema.
@@ -551,7 +545,6 @@ class AbstractRadiusGroup(BaseModel):
                                      .filter(default=True)
 
 
-@python_2_unicode_compatible
 class AbstractRadiusUserGroup(AutoGroupnameMixin, AutoUsernameMixin,
                               BaseModel):
     username = models.CharField(verbose_name=_('username'),
@@ -590,7 +583,6 @@ class AbstractRadiusUserGroup(AutoGroupnameMixin, AutoUsernameMixin,
         return str(self.username)
 
 
-@python_2_unicode_compatible
 class AbstractRadiusGroupCheck(AutoGroupnameMixin, BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
@@ -621,7 +613,6 @@ class AbstractRadiusGroupCheck(AutoGroupnameMixin, BaseModel):
         return str(self.groupname)
 
 
-@python_2_unicode_compatible
 class AbstractRadiusGroupReply(AutoGroupnameMixin, BaseModel):
     groupname = models.CharField(verbose_name=_('group name'),
                                  max_length=64,
@@ -652,7 +643,6 @@ class AbstractRadiusGroupReply(AutoGroupnameMixin, BaseModel):
         return str(self.groupname)
 
 
-@python_2_unicode_compatible
 class AbstractRadiusPostAuth(models.Model):
     username = models.CharField(verbose_name=_('username'),
                                 max_length=64)

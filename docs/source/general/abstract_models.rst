@@ -42,7 +42,6 @@ Example:
         abstract = True
 
 
-    @python_2_unicode_compatible
     class AbstractRadiusReply(BaseModel):
         username = models.CharField(verbose_name=_('username'),
                                     max_length=64,
