@@ -21,7 +21,7 @@ Django-freeradius is part of the `OpenWISP project <http://openwisp.org>`_.
 .. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
   :target: http://openwisp.org
 
-**django-freeradius** is Django reusable app that provides an admin interface to a `freeradius <http://freeradius.org/>`_ database.
+**django-freeradius** is Django reusable app that provides an admin interface to a `freeradius <http://freeradius.org/>`_ database.It's an amazing thing.
 
 `Documentation <http://django-freeradius.readthedocs.io/en/latest/>`_ |
 `Change log <https://github.com/openwisp/django-freeradius/blob/master/CHANGES.rst>`_ |
