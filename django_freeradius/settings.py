@@ -22,7 +22,7 @@ BATCH_DEFAULT_PASSWORD_LENGTH = getattr(settings, 'DJANGO_FREERADIUS_BATCH_DEFAU
 BATCH_DELETE_EXPIRED = getattr(settings, 'DJANGO_FREERADIUS_BATCH_DELETE_EXPIRED', 18)
 BATCH_MAIL_SUBJECT = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_SUBJECT', 'Credentials')
 BATCH_MAIL_MESSAGE = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_MESSAGE', 'username: {}, password: {}')
-BATCH_MAIL_SENDER = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_SENDER', 'testing@localhost')
+BATCH_MAIL_SENDER = getattr(settings, 'DJANGO_FREERADIUS_BATCH_MAIL_SENDER', settings.DEFAULT_FROM_EMAIL)
 BATCH_PDF_TEMPLATE = getattr(settings,
                              'DJANGO_FREERADIUS_BATCH_PDF_TEMPLATE',
                              os.path.join(os.path.dirname(__file__),
