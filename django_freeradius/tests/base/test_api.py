@@ -15,6 +15,15 @@ User = get_user_model()
 
 
 class BaseTestApi(object):
+    def test_valid_token(self):
+        options = dict(username='molly', password='barbar')
+        self._create_user(**options)
+        auth_header = self.auth_header.replace(' ', '')  # removes spaces in token
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'molly', 'password': 'barbar'},
+                                    HTTP_AUTHORIZATION=auth_header)
+        self.assertEqual(response.status_code, 400)
+
     def test_disabled_user_login(self):
         options = dict(username='barbar', password='molly', is_active=False)
         self._create_user(**options)
