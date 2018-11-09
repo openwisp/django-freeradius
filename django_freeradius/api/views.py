@@ -69,32 +69,28 @@ class AuthorizeView(APIView):
 
     def authenticate_user(self, request, user):
         """
-        returns ``True`` if the user password is valid
+        returns ``True`` if the password value supplied is
+        a valid user password or a valid user token
         can be overridden to implement more complex checks
         """
-        if app_settings.SOCIAL_LOGIN_ENABLED:
-            result = self.check_user_token(request, user)
-            if result:
-                return True
-        return user.check_password(request.data.get('password'))
+        return user.check_password(request.data.get('password')) or \
+               self.check_user_token(request, user)  # noqa
 
-    if app_settings.SOCIAL_LOGIN_ENABLED:
-        def check_user_token(self, request, user):
-            """
-            if user has no password set and has at least 1 social account
-            this is probably a social login, the password field is the
-            user's personal auth token
-            """
-            if not user.has_usable_password() and user.socialaccount_set.exists():
-                try:
-                    Token.objects.get(
-                        user=user,
-                        key=request.data.get('password')
-                    )
-                    return True
-                except Token.DoesNotExist:
-                    pass
-            return False
+    def check_user_token(self, request, user):
+        """
+        if user has no password set and has at least 1 social account
+        this is probably a social login, the password field is the
+        user's personal auth token
+        """
+        try:
+            token = Token.objects.get(
+                user=user,
+                key=request.data.get('password')
+            )
+        except Token.DoesNotExist:
+            token = None
+        finally:
+            return token is not None
 
 
 authorize = AuthorizeView.as_view()
