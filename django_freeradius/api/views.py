@@ -7,7 +7,7 @@ from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.exceptions import AuthenticationFailed, ParseError, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,7 +28,10 @@ class TokenAuthentication(BaseAuthentication):
         if request.META.get('HTTP_AUTHORIZATION', False):
             headers = request.META.get('HTTP_AUTHORIZATION').split(',')
             for header in headers:
-                token = header.split(' ')[1]
+                try:
+                    token = header.split(' ')[1]
+                except IndexError:
+                    raise ParseError('Invalid token')
                 if token == app_settings.API_TOKEN:
                     return (AnonymousUser(), None)
         if request.GET.get('token') == app_settings.API_TOKEN:
