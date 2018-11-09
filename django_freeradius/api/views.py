@@ -89,6 +89,9 @@ class AuthorizeView(APIView):
             )
         except Token.DoesNotExist:
             token = None
+        else:
+            if app_settings.DISPOSABLE_USER_TOKEN:
+                token.delete()
         finally:
             return token is not None
 

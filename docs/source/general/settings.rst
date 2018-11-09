@@ -123,6 +123,17 @@ The value should be the absolute path to the template of the pdf.
 
 See `API Token <api.html#api-token>`_.
 
+``DJANGO_FREERADIUS_DISPOSABLE_USER_TOKEN``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``True``
+
+User tokens can be used for authorizing users as well.
+
+When this setting is ``True`` user tokens are deleted right after a successful
+authorization is performed. This reduces the possibility of attackers reusing
+the access tokens and posing as other users if they manage to intercept it somehow.
+
 ``DJANGO_FREERADIUS_API_AUTHORIZE_REJECT``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

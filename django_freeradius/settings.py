@@ -31,3 +31,4 @@ API_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_API_TOKEN', None)
 API_AUTHORIZE_REJECT = getattr(settings, 'DJANGO_FREERADIUS_API_AUTHORIZE_REJECT', False)
 SOCIAL_LOGIN_ENABLED = {'allauth.socialaccount',
                         'rest_framework.authtoken'}.issubset(settings.INSTALLED_APPS)
+DISPOSABLE_USER_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_DISPOSABLE_USER_TOKEN', True)
