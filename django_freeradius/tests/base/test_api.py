@@ -15,7 +15,7 @@ User = get_user_model()
 
 
 class BaseTestApi(object):
-    def test_valid_token(self):
+    def test_invalid_token(self):
         options = dict(username='molly', password='barbar')
         self._create_user(**options)
         auth_header = self.auth_header.replace(' ', '')  # removes spaces in token
