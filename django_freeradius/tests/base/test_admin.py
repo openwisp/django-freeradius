@@ -154,7 +154,6 @@ class BaseTestAdmin(object):
 
     def test_radiuscheck_admin_save_model(self):
         obj = self._create_radius_check(**_RADCHECK_ENTRY)
-        self.assertEqual(obj.value, _RADCHECK_ENTRY['value'])
         change_url = reverse('admin:{0}_radiuscheck_change'.format(self.app_name), args=[obj.pk])
         # test admin save_model method
         data = _RADCHECK_ENTRY_PW_UPDATE.copy()
