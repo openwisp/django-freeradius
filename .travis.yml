@@ -29,6 +29,7 @@ before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runisort
+  - ./runcheckmigration
   - npm install -g jslint
   - jslint ./django_freeradius/static/django-freeradius/js/*.js
   - ./runsphinx-build
