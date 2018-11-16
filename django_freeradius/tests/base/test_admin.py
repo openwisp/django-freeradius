@@ -28,6 +28,7 @@ class BaseTestAdmin(object):
         obj = self._create_nas(**options)
         response = self.client.get(reverse('admin:{0}_nas_change'.format(self.app_name), args=[obj.pk]))
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusreply_change(self):
         options = dict(username='bob', attribute='Cleartext-Password',
@@ -37,6 +38,7 @@ class BaseTestAdmin(object):
                                            args=[obj.pk]))
 
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusgroupreply_change(self):
         options = dict(groupname='students', attribute='Cleartext-Password',
@@ -46,6 +48,7 @@ class BaseTestAdmin(object):
                                    args=[obj.pk]))
 
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusgroupcheck_change(self):
         options = dict(groupname='students', attribute='Cleartext-Password',
@@ -55,6 +58,7 @@ class BaseTestAdmin(object):
                                    'admin:{0}_radiusgroupcheck_change'.format(self.app_name),
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiususergroup_change(self):
         options = dict(username='bob', groupname='students', priority='1')
@@ -63,6 +67,7 @@ class BaseTestAdmin(object):
                                    'admin:{0}_radiususergroup_change'.format(self.app_name),
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusaccounting_change(self):
         options = dict(unique_id='2', username='bob', nas_ip_address='127.0.0.1',
@@ -76,22 +81,23 @@ class BaseTestAdmin(object):
                                    'admin:{0}_radiusaccounting_change'.format(self.app_name),
                                    args=[obj.pk]))
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusaccounting_changelist(self):
         original_value = settings.EDITABLE_ACCOUNTING
         settings.EDITABLE_ACCOUNTING = False
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusaccounting_changelist'.format(self.app_name)))
+        url = reverse('admin:{0}_radiusaccounting_changelist'.format(self.app_name))
+        response = self.client.get(url)
         self.assertNotContains(response, 'Add accounting')
         settings.EDITABLE_ACCOUNTING = original_value
 
     def test_postauth_change(self):
         options = dict(username='gino', password='ciao', reply='ghdhd', date='2017-09-02')
         obj = self._create_radius_postauth(**options)
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiuspostauth_change'.format(self.app_name),
-                                   args=[obj.pk]))
+        url = reverse('admin:{0}_radiuspostauth_change'.format(self.app_name), args=[obj.pk])
+        response = self.client.get(url)
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiuscheck_change(self):
         obj = self._create_radius_check(**_RADCHECK_ENTRY)
@@ -112,21 +118,22 @@ class BaseTestAdmin(object):
         self._create_radius_check(**_RADCHECK)
         _RADCHECK['attribute'] = 'Crypt-Password'
         self._create_radius_check(**_RADCHECK)
-        response = self.client.post(reverse(
-                                    'admin:{0}_radiuscheck_change'.format(self.app_name),
-                                    args=[obj.pk]),
-                                    _RADCHECK_ENTRY_PW_UPDATE, follow=True)
+        data = _RADCHECK_ENTRY_PW_UPDATE.copy()
+        data['mode'] = 'custom'
+        url = reverse('admin:{0}_radiuscheck_change'.format(self.app_name), args=[obj.pk])
+        response = self.client.post(url, data, follow=True)
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiusbatch_change(self):
         obj = self._create_radius_batch(name='test',
                                         strategy='prefix',
                                         prefix='test',
                                         expiration_date='1998-01-28')
-        response = self.client.get(reverse(
-                                   'admin:{0}_radiusbatch_change'.format(self.app_name),
-                                   args=[obj.pk]))
+        url = reverse('admin:{0}_radiusbatch_change'.format(self.app_name), args=[obj.pk])
+        response = self.client.get(url)
         self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
 
     def test_radiuscheck_create_weak_passwd(self):
         _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
@@ -134,26 +141,36 @@ class BaseTestAdmin(object):
         resp = self.client.post(reverse('admin:{0}_radiuscheck_add'.format(self.app_name)),
                                 _RADCHECK, follow=True)
         self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'errors')
 
     def test_radiuscheck_create_disabled_hash(self):
-        _RADCHECK = _RADCHECK_ENTRY_PW_UPDATE.copy()
-        _RADCHECK['attribute'] = 'Cleartext-Password'
-        response = self.client.post(reverse('admin:{0}_radiuscheck_add'.format(self.app_name)),
-                                    _RADCHECK, follow=True)
+        data = _RADCHECK_ENTRY_PW_UPDATE.copy()
+        data['attribute'] = 'Cleartext-Password'
+        data['mode'] = 'custom'
+        url = reverse('admin:{0}_radiuscheck_add'.format(self.app_name))
+        response = self.client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'errors')
 
     def test_radiuscheck_admin_save_model(self):
         obj = self._create_radius_check(**_RADCHECK_ENTRY)
+        self.assertEqual(obj.value, _RADCHECK_ENTRY['value'])
         change_url = reverse('admin:{0}_radiuscheck_change'.format(self.app_name), args=[obj.pk])
         # test admin save_model method
-        data = _RADCHECK_ENTRY_PW_UPDATE
+        data = _RADCHECK_ENTRY_PW_UPDATE.copy()
         data['op'] = ':='
+        data['mode'] = 'custom'
         response = self.client.post(change_url, data, follow=True)
+        self.assertNotContains(response, 'errors')
+        obj.refresh_from_db()
+        self.assertNotEqual(obj.value, _RADCHECK_ENTRY['value'])
+        self.assertNotEqual(obj.value, data['new_value'])  # hashed
         # test also invalid password
-        data = _RADCHECK_ENTRY_PW_UPDATE
         data['new_value'] = 'cionfrazZ'
         response = self.client.post(change_url, data, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'errors')
+        self.assertContains(response, 'The secret must contain')
 
     def test_radiuscheck_enable_disable_action(self):
         self._create_radius_check(**_RADCHECK_ENTRY)

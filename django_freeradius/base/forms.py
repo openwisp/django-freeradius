@@ -26,9 +26,9 @@ class ModeSwitcherForm(forms.ModelForm):
 
 
 class RadiusCheckForm(ModeSwitcherForm):
-    _secret_help_text = _('The secret must contains lowercase'
-                          ' and uppercase characters, '
-                          ' number and at least one of these symbols:'
+    _secret_help_text = _('The secret must contain at least one lowercase '
+                          'and uppercase characters, '
+                          'one number and one of these symbols: '
                           '! % - _ + = [ ] { } : , . ? < > ( ) ; ')
     # custom field not backed by database
     new_value = forms.CharField(label=_('Value'), required=False,
