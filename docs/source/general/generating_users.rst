@@ -2,7 +2,7 @@
 Generating users
 ================
 
-Many a times a network admin might need to generate temporary users for a events etc. This feature can be used for generating users by specifying a prefix and the number of users to be generated. There are many features included in it such as:
+Many a times, a network admin might need to generate temporary users for events etc. This feature can be used for generating users by specifying a prefix and the number of users to be generated. There are many features included in it such as:
 
 * Generating users in batches: all of the users of a particular prefix would be stored in batches and can be retrieved/ deleted easily using the batch functions.
 * Set an expiration date: Expiration date can be set for a batch after which the users would not able to authenticate to the RADIUS Server.
