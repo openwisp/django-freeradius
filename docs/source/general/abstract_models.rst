@@ -2,9 +2,9 @@
 Abstract Models
 ===============
 
-Firstly, need to add basic models TimeStampedEditableModel is an abstract base class model, that provides self-updating
-created and modified fields. Write  base class and put abstract=True in the Meta class. This model will then not be used to
-create any database table. Instead, when it is used as a base class for other models, it's fields will be added to those
+Firstly, we need to add basic models. TimeStampedEditableModel is an abstract base class model that provides self-updating
+created and modified fields. If we write the base class and put abstract=True in the Meta class, this model will then not be used to
+create any database table. Instead, when it is used as a base class for other models, its fields will be added to those
 of the child class.
 
 Example of TimeStampedEditableModel code:
@@ -98,7 +98,7 @@ Install swapper:
    pip install swapper
 
 
-In your reusable models use import swapper  and  add to Meta class  swappable = swapper.swappable_setting('reusable_app', 'model'):
+In your reusable models, use ``import swapper``  and  add to Meta class  ``swappable = swapper.swappable_setting('reusable_app', 'model')``:
 
 .. code-block:: python
 
