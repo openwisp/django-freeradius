@@ -196,6 +196,11 @@ class BaseTestRadiusGroup(object):
         else:
             self.fail('ValidationError not raised')
 
+    def test_no_default_failure_after_erasing(self):
+        # this is a corner case but a very annoying one
+        self.radius_group_model.objects.all().delete()  # won't trigger ValidationError
+        self._create_radius_group(name='test')
+
     def test_new_user_default_group(self):
         u = get_user_model()(username='test',
                              email='test@test.org',

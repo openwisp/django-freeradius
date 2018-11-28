@@ -490,9 +490,12 @@ class AbstractRadiusGroup(BaseModel):
     def __str__(self):
         return self.name
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_default = self.default
+
     def clean(self):
-        if not self.default:
-            self.check_default()
+        self.check_default()
 
     def save(self, *args, **kwargs):
         result = super().save(*args, **kwargs)
@@ -531,7 +534,7 @@ class AbstractRadiusGroup(BaseModel):
         ensures the default group cannot be undefaulted
         (logic overridable via custom models)
         """
-        if not self.get_default_queryset().exists():
+        if not self.default and self._initial_default:
             raise ValidationError(
                 {'default': self._DEFAULT_VALIDATION_ERROR}
             )
