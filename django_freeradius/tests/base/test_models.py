@@ -187,7 +187,7 @@ class BaseTestRadiusGroup(object):
             self.fail('ProtectedError not raised')
 
     def test_undefault_group(self):
-        group = self.radius_group_model.objects.get(default=1)
+        group = self.radius_group_model.objects.get(default=True)
         group.default = False
         try:
             group.full_clean()
