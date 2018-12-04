@@ -66,6 +66,20 @@ class BaseTestRadiusCheck(object):
         # ensure related records have been updated
         self.assertEqual(c.username, u.username)
 
+    def test_auto_value(self):
+        obj = self._create_radius_check(username='Monica',
+                                        value='Cam0_liX',
+                                        attribute='NT-Password',
+                                        op=':=')
+        self.assertEqual(obj.value, '891fc570507eef023cbfec043dd5f2b1')
+
+    def test_create_radius_check_model(self):
+        obj = self.radius_check_model.objects.create(username='Monica',
+                                                     new_value='Cam0_liX',
+                                                     attribute='NT-Password',
+                                                     op=':=')
+        self.assertEqual(obj.value, '891fc570507eef023cbfec043dd5f2b1')
+
 
 class BaseTestRadiusReply(object):
     def test_string_representation(self):
@@ -173,7 +187,7 @@ class BaseTestRadiusGroup(object):
             self.fail('ProtectedError not raised')
 
     def test_undefault_group(self):
-        group = self.radius_group_model.objects.get(default=1)
+        group = self.radius_group_model.objects.get(default=True)
         group.default = False
         try:
             group.full_clean()
@@ -181,6 +195,11 @@ class BaseTestRadiusGroup(object):
             self.assertIn('default', e.message_dict)
         else:
             self.fail('ValidationError not raised')
+
+    def test_no_default_failure_after_erasing(self):
+        # this is a corner case but a very annoying one
+        self.radius_group_model.objects.all().delete()  # won't trigger ValidationError
+        self._create_radius_group(name='test')
 
     def test_new_user_default_group(self):
         u = get_user_model()(username='test',
@@ -321,6 +340,12 @@ class BaseTestRadiusGroup(object):
         ug.refresh_from_db()
         # ensure related records have been updated
         self.assertEqual(ug.username, u.username)
+
+    def test_delete(self):
+        g = self._create_radius_group(name='test',
+                                      description='test')
+        g.delete()
+        self.assertEqual(self.radius_group_model.objects.all().count(), 2)
 
 
 class BaseTestRadiusBatch(object):

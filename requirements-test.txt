@@ -1,7 +1,5 @@
 coverage
 coveralls
-isort
-flake8
 django-environ
 mysqlclient
 psycopg2
@@ -11,3 +9,4 @@ freezegun
 django-extensions
 django-rest-auth>=0.9.3,<0.12.0
 django-allauth>=0.36.0,<0.39.0
+openwisp-utils[qa]>=0.2.1

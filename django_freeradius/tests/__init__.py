@@ -2,6 +2,8 @@ import os
 
 from django.core.management import call_command
 
+from django_freeradius.base.models import _encode_secret
+
 
 class CreateRadiusObjectsMixin(object):
     def _get_defaults(self, opts, model=None):
@@ -10,6 +12,9 @@ class CreateRadiusObjectsMixin(object):
         return options
 
     def _create_radius_check(self, **kwargs):
+        if kwargs.get('value'):
+            kwargs['value'] = _encode_secret(kwargs['attribute'],
+                                             kwargs.get('value'))
         options = self._get_defaults(kwargs)
         rc = self.radius_check_model(**options)
         rc.full_clean()
