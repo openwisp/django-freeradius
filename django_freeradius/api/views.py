@@ -1,3 +1,5 @@
+import logging
+
 import drf_link_header_pagination
 import swapper
 from django.contrib.auth import get_user_model
@@ -168,10 +170,11 @@ class AccountingView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         is_start = request.data['status_type'] == 'Start'
+        data = request.data.copy()  # import because request objects is immutable
         for field in ['session_time', 'input_octets', 'output_octets']:
             if is_start and request.data[field] == '':
-                request.data[field] = 0
-        serializer = self.get_serializer(data=request.data)
+                data[field] = 0
+        serializer = self.get_serializer(data=data)
         serializer.is_valid()
         error_keys = serializer.errors.keys()
         errors = len(error_keys)
@@ -185,6 +188,24 @@ class AccountingView(generics.ListCreateAPIView):
             return self.update(request, *args, **kwargs)
         else:
             raise ValidationError(serializer.errors)
+
+    def perform_create(self, serializer):
+        if app_settings.API_ACCOUNTING_AUTO_GROUP:
+            user_model = get_user_model()
+            username = serializer.validated_data.get('username', '')
+            try:
+                user = user_model.objects.get(username=username)
+            except User.DoesNotExist:
+                logging.info('no corresponding user found '
+                             'for username: {}'.format(username))
+                serializer.save()
+            else:
+                group = user.radiususergroup_set.order_by('priority').first()
+                # user may not have a group defined
+                groupname = group.groupname if group else None
+                serializer.save(groupname=groupname)
+        else:
+            return super().perform_create(serializer)
 
     def update(self, request, *args, **kwargs):
         try:

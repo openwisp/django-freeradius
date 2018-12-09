@@ -167,3 +167,4 @@ try:
     from local_settings import *
 except ImportError:
     pass
+DJANGO_FREERADIUS_API_ACCOUNTING_AUTO_GROUP = True

@@ -180,3 +180,12 @@ The text could be anything but should have the format string operator ``{}`` for
 It is the sender email which is also to be configured in the SMTP settings.
 The default sender email is a common setting from the `Django core settings  <https://docs.djangoproject.com/en/2.1/ref/settings/#default-from-email>`_ under ``DEFAULT_FROM_EMAIL``.
 Currently, ``DEFAULT_FROM_EMAIL`` is set to to ``webmaster@localhost``.
+
+``DJANGO_FREERADIUS_API_ACCOUNTING_AUTO_GROUP``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``True``
+
+When this setting is enabled, every accounting instance saved from the API will have its ``groupname`` attribute automatically filled in.
+The value filled in will be the ``groupname`` of the ``RadiusUserGroup`` of the highest priority among the RadiusUserGroups related to the user with the ``username`` as in the accounting instance.
+In the event there is no user in the database corresponding to the ``username`` in the accounting instance, the failure will be logged with `info` level but the accounting will be saved as usual.
