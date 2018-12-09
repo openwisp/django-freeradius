@@ -33,3 +33,4 @@ SOCIAL_LOGIN_ENABLED = {'allauth.socialaccount',
                         'rest_framework.authtoken'}.issubset(settings.INSTALLED_APPS)
 DISPOSABLE_USER_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_DISPOSABLE_USER_TOKEN', True)
 API_ACCOUNTING_AUTO_GROUP = getattr(settings, 'DJANGO_FREERADIUS_API_ACCOUNTING_AUTO_GROUP', True)
+CUSTOM_TYPES_EXTRA = getattr(settings, 'CUSTOM_TYPES_FOR_NAS', tuple())

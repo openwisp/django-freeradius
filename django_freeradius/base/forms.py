@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import RAD_NAS_TYPES, RADCHECK_PASSWD_TYPE, AbstractNas, AbstractRadiusCheck
+from .models import RAD_NAS_TYPES_ALL, RADCHECK_PASSWD_TYPE, AbstractNas, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 nas_type_field = AbstractNas._meta.get_field('type')
@@ -59,13 +59,10 @@ class NasForm(forms.ModelForm):
     Allows users to easily select a NAS type from
     a predefined list or to define a custom type
     """
-    type = forms.ChoiceField(choices=RAD_NAS_TYPES,
+    type = forms.ChoiceField(choices=RAD_NAS_TYPES_ALL,
                              initial='Other',
                              help_text=_('You can use one of the standard '
                                          'types from the list'))
-    custom_type = forms.CharField(max_length=nas_type_field.max_length,
-                                  required=False,
-                                  help_text=_('or define a custom type'))
 
 
 class RadiusBatchForm(forms.ModelForm):

@@ -90,6 +90,9 @@ RAD_NAS_TYPES = (
 )
 
 
+RAD_NAS_TYPES_ALL = app_settings.CUSTOM_TYPES_EXTRA + RAD_NAS_TYPES
+
+
 RADOP_REPLY_TYPES = (('=', '='),
                      (':=', ':='),
                      ('+=', '+='))

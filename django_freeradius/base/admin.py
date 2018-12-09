@@ -139,8 +139,8 @@ class AbstractNasAdmin(TimeStampedEditableAdmin):
         (None, {
             'fields': (
                 'name', 'short_name',
-                ('type', 'custom_type'),
-                'ports', 'secret', 'server', 'community', 'description'
+                'type', 'ports',
+                'secret', 'server', 'community', 'description'
             )
         }),
     )

@@ -189,3 +189,13 @@ Currently, ``DEFAULT_FROM_EMAIL`` is set to to ``webmaster@localhost``.
 When this setting is enabled, every accounting instance saved from the API will have its ``groupname`` attribute automatically filled in.
 The value filled in will be the ``groupname`` of the ``RadiusUserGroup`` of the highest priority among the RadiusUserGroups related to the user with the ``username`` as in the accounting instance.
 In the event there is no user in the database corresponding to the ``username`` in the accounting instance, the failure will be logged with `info` level but the accounting will be saved as usual.
+
+``CUSTOM_TYPES_FOR_NAS``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default**: ``tuple()``
+
+This setting should have a tuple of tuples, where each tuple should be an option for ``ChoiceField`` for the NAS form.
+This setting should be used to allow custom NAS types to be selected from the admin interfac ewhen creating a new NAS instance.
+For example, you want a cutsom type called ``my_custom_type``, you would add ``CUSTOM_TYPES_FOR_NAS = (('my_custom_type', 'my_custom_type),  )`` to your settings file.
+
