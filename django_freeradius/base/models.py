@@ -40,7 +40,7 @@ RADOP_CHECK_TYPES = (('=', '='),
                      ('=*', '=*'),
                      ('!*', '!*'))
 
-RAD_NAS_TYPES = (
+RAD_NAS_TYPES = app_settings.EXTRA_NAS_TYPES + (
     ('Async', 'Async'),
     ('Sync', 'Sync'),
     ('ISDN Sync', 'ISDN Sync'),
@@ -88,9 +88,6 @@ RAD_NAS_TYPES = (
     ('WIMAX-WVS', 'WIMAX-WVS: WiMAX voice service'),
     ('Other', 'Other'),
 )
-
-
-RAD_NAS_TYPES_ALL = app_settings.CUSTOM_TYPES_EXTRA + RAD_NAS_TYPES
 
 
 RADOP_REPLY_TYPES = (('=', '='),
@@ -432,7 +429,8 @@ class AbstractNas(BaseModel):
                                   db_column='shortname')
     type = models.CharField(verbose_name=_('type'),
                             max_length=30,
-                            default='other')
+                            default='other',
+                            choices=RAD_NAS_TYPES)
     ports = models.PositiveIntegerField(verbose_name=_('ports'),
                                         blank=True,
                                         null=True)

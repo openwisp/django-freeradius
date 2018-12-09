@@ -10,7 +10,7 @@ from openwisp_utils.admin import TimeReadonlyAdminMixin
 from .. import settings as app_settings
 from .admin_actions import disable_action, enable_action
 from .admin_filters import DuplicateListFilter, ExpiredListFilter
-from .forms import ModeSwitcherForm, NasForm, RadiusBatchForm, RadiusCheckForm
+from .forms import ModeSwitcherForm, RadiusBatchForm, RadiusCheckForm
 from .models import _encode_secret
 
 
@@ -134,7 +134,6 @@ class AbstractRadiusAccountingAdmin(BaseAccounting):
 
 
 class AbstractNasAdmin(TimeStampedEditableAdmin):
-    form = NasForm
     fieldsets = (
         (None, {
             'fields': (

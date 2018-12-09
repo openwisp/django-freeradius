@@ -162,9 +162,12 @@ if TESTING:
     DJANGO_FREERADIUS_GROUPREPLY_ADMIN = True
     DJANGO_FREERADIUS_USERGROUP_ADMIN = True
 
+DJANGO_FREERADIUS_EXTRA_NAS_TYPES = (
+    ('cisco', 'Cisco Router'),
+)
+
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
     from local_settings import *
 except ImportError:
     pass
-DJANGO_FREERADIUS_API_ACCOUNTING_AUTO_GROUP = True

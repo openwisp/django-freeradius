@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as app_settings
-from .models import RAD_NAS_TYPES_ALL, RADCHECK_PASSWD_TYPE, AbstractNas, AbstractRadiusCheck
+from .models import RADCHECK_PASSWD_TYPE, AbstractNas, AbstractRadiusCheck
 
 radcheck_value_field = AbstractRadiusCheck._meta.get_field('value')
 nas_type_field = AbstractNas._meta.get_field('type')
@@ -52,17 +52,6 @@ class RadiusCheckForm(ModeSwitcherForm):
     class Media:
         js = ('django-freeradius/js/radcheck.js',)
         css = {'all': ('django-freeradius/css/radcheck.css',)}
-
-
-class NasForm(forms.ModelForm):
-    """
-    Allows users to easily select a NAS type from
-    a predefined list or to define a custom type
-    """
-    type = forms.ChoiceField(choices=RAD_NAS_TYPES_ALL,
-                             initial='Other',
-                             help_text=_('You can use one of the standard '
-                                         'types from the list'))
 
 
 class RadiusBatchForm(forms.ModelForm):

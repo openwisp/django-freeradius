@@ -2,6 +2,8 @@ from django.db import migrations, models
 import django.utils.timezone
 import model_utils.fields
 
+from django_freeradius.base.models import RAD_NAS_TYPES
+
 
 class Migration(migrations.Migration):
     initial = True
@@ -14,7 +16,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('name', models.CharField(db_column='nasname', db_index=True, help_text='NAS Name (or IP address)', max_length=128, verbose_name='name')),
                 ('short_name', models.CharField(db_column='shortname', max_length=32, verbose_name='short name')),
-                ('type', models.CharField(default='other', max_length=30, verbose_name='type')),
+                ('type', models.CharField(default='other', max_length=30, verbose_name='type', choices=RAD_NAS_TYPES)),
                 ('secret', models.CharField(help_text='Shared Secret', max_length=60, verbose_name='secret')),
                 ('ports', models.PositiveIntegerField(blank=True, null=True, verbose_name='ports')),
                 ('community', models.CharField(blank=True, max_length=50, null=True, verbose_name='community')),
