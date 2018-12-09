@@ -220,11 +220,6 @@ class BaseTestAdmin(object):
         self.assertNotContains(response, 'error')
         nas.refresh_from_db()
         self.assertEqual(nas.type, 'Other')
-        options['custom_type'] = 'my-custom-type'
-        response = self.client.post(change_url, options, follow=True)
-        self.assertNotContains(response, 'error')
-        nas.refresh_from_db()
-        self.assertEqual(nas.type, 'my-custom-type')
 
     def test_radius_batch_save_model(self):
         self.assertEqual(self.radius_batch_model.objects.count(), 0)
