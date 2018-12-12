@@ -55,6 +55,19 @@ class TestApi(BaseTestApi, ApiTestCase):
         self.assertEquals(accounting_created.groupname, 'group2')
         user.delete()
 
+    def test_api_batch_user_creation_no_users(self):
+        self.client.enforce_csrf_checks = False
+        response = self.client.post('/api/v1/batch/{}'.format(self.token_querystring), {
+            'strategy': 'prefix',
+            'prefix': 'test',
+            'name': 'test_name',
+            'csvfile': '',
+            'number_of_users': '',
+            'modified': '',
+
+        })
+        self.assertEqual(response.status_code, 400)
+
 
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestApiReject(BaseTestApiReject, ApiTestCase):

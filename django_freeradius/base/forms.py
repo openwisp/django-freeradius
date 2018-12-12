@@ -59,6 +59,14 @@ class RadiusBatchForm(forms.ModelForm):
                                          validators=[MinValueValidator(1)],
                                          help_text=_('Number of users to be generated'))
 
+    def clean(self):
+        data = self.cleaned_data
+        strategy = data.get('strategy')
+        number_of_users = data.get('number_of_users')
+        if strategy == 'prefix' and not number_of_users:
+            self.add_error('number_of_users', 'This field is required')
+        return data
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'csvfile' in self.fields:

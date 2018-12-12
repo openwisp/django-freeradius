@@ -92,6 +92,13 @@ class RadiusBatchSerializer(serializers.ModelSerializer):
                                                write_only=True,
                                                min_value=1)
 
+    def validate(self, data):
+        if data['strategy'] == 'prefix' and not data.get('number_of_users'):
+            raise serializers.ValidationError({
+                'number_of_users': 'The field number_of_users cannot be empty'
+            })
+        return super().validate(data)
+
     class Meta:
         model = RadiusBatch
         fields = '__all__'
