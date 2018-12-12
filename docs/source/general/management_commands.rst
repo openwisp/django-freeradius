@@ -10,7 +10,7 @@ Example usage:
 .. code-block:: shell
 
     cd tests/
-    ./manage.py <commad> <args>
+    ./manage.py <command> <args>
 
 In this page we list the management commands currently available in **django-freeradius**.
 
