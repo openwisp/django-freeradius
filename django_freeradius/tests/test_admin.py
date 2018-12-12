@@ -1,6 +1,7 @@
 import os
 from unittest import skipIf
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from django_freeradius.models import (
@@ -26,3 +27,21 @@ class TestAdmin(FileMixin, CallCommandMixin, PostParamsMixin,
     radius_reply_model = RadiusReply
     radius_group_model = RadiusGroup
     radius_usergroup_model = RadiusUserGroup
+
+    def test_batch_user_creation_form(self):
+        user_model = get_user_model()
+        current_user = user_model.objects.create_superuser(
+            username='test_user',
+            email='test@admin.com',
+            password='qwertyuiop'
+        )
+        self.client.post('/admin/login/', {'username': 'admin', 'password': 'qwertyuiop'})
+        response = self.client.post('/admin/django_freeradius/radiusbatch/add/', {
+            'strategy': 'prefix',
+            'prefix': 'test',
+            'name': 'test_name',
+            'csvfile': '(binary)',
+            'number_of_users': ''
+        })
+        self.assertEqual(response.status_code, 200)
+        current_user.delete()
