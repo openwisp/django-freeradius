@@ -283,13 +283,20 @@ Restart freeradius to load the new configuration:
     # alternatively if you are using systemd
     systemctl restart freeradius
 
-In case of any error, run ``journalctl -xe`` to know the cause. You can also run ``freeradius -X`` to know the 
-detailed cause. One error might be that the django-freeradius server might not be running in the background.
-To set up the django-freeradius server refer `this <https://django-freeradius.readthedocs.io/en/latest/general/setup.html#installing-for-development>`_
-Also make sure that this server runs on the port specified in ``/etc/freeradius/mods-enabled/rest``.
+In case of errors you can run `freeradius in debug mode
+<https://wiki.freeradius.org/guide/radiusd-X>`_ by running
+``freeradius -X`` in order to find out the reason of the failure.
 
-You may also want to take a look at the `Freeradius documentation <http://freeradius.org/doc/>`_
-for further details on how to configure other modules.
+**A common problem, especially during development and testing, is that the
+django-freeradius application may not be running**, in that case you can find
+out how to run the django development server in the
+`Install for development <./setup.html#installing-for-development>`_ section.
+
+Also make sure that this server runs on the port specified in
+``/etc/freeradius/mods-enabled/rest``.
+
+You may also want to take a look at the `Freeradius documentation
+<http://freeradius.org/doc/>`_ for further information that is freeradius specific. 
 
 Reconfigure the development environment using PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
