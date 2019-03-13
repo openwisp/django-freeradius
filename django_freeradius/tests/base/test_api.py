@@ -614,6 +614,13 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)
 
+    def test_get_authorize_view(self):
+        url = '{}{}'.format(reverse('freeradius:authorize'), self.token_querystring)
+        r = self.client.get(url, HTTP_ACCEPT='text/html')
+        self.assertEqual(r.status_code, 405)
+        expected = '<form action="{}'.format(reverse('freeradius:authorize'))
+        self.assertIn(expected, r.content.decode())
+
 
 class BaseTestApiReject(object):
     @classmethod
