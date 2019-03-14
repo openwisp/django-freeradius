@@ -29,8 +29,8 @@ BATCH_PDF_TEMPLATE = getattr(settings,
                                           'templates/django_freeradius/prefix_pdf.html'))
 API_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_API_TOKEN', None)
 API_AUTHORIZE_REJECT = getattr(settings, 'DJANGO_FREERADIUS_API_AUTHORIZE_REJECT', False)
-SOCIAL_LOGIN_ENABLED = {'allauth.socialaccount',
-                        'rest_framework.authtoken'}.issubset(settings.INSTALLED_APPS)
+REST_USER_TOKEN_ENABLED = 'rest_framework.authtoken' in settings.INSTALLED_APPS
+SOCIAL_LOGIN_ENABLED = 'allauth.socialaccount' in settings.INSTALLED_APPS and REST_USER_TOKEN_ENABLED
 DISPOSABLE_USER_TOKEN = getattr(settings, 'DJANGO_FREERADIUS_DISPOSABLE_USER_TOKEN', True)
 API_ACCOUNTING_AUTO_GROUP = getattr(settings, 'DJANGO_FREERADIUS_API_ACCOUNTING_AUTO_GROUP', True)
 EXTRA_NAS_TYPES = getattr(settings, 'DJANGO_FREERADIUS_EXTRA_NAS_TYPES', tuple())

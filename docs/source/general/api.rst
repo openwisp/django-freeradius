@@ -240,3 +240,25 @@ prefix             prefix for the generation of users
 number_of_users    number of users
 expiration_date    date of expiration of the users
 ===============    ==================================
+
+Obtain User Auth Token
+----------------------
+
+.. code-block:: text
+
+    /api/v1/user-token/
+
+Responds only to **POST**, this endpoint is enabled only
+if ``rest_framework.authtoken`` is in ``settings.INSTALLED_APPS``.
+
+Returns the user access token, which can be used to authenticate
+the user via the freeradius authorization mechanism.
+
+Parameters:
+
+===============    ===============================
+Param              Description
+===============    ===============================
+username           string
+password           string
+===============    ===============================

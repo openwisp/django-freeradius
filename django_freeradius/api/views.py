@@ -21,7 +21,7 @@ RadiusAccounting = swapper.load_model('django_freeradius', 'RadiusAccounting')
 User = get_user_model()
 RadiusBatch = swapper.load_model('django_freeradius', 'RadiusBatch')
 
-if app_settings.SOCIAL_LOGIN_ENABLED:
+if app_settings.REST_USER_TOKEN_ENABLED:
     from rest_framework.authtoken.models import Token
 
 
@@ -84,6 +84,8 @@ class AuthorizeView(APIView):
         this is probably a social login, the password field is the
         user's personal auth token
         """
+        if not app_settings.REST_USER_TOKEN_ENABLED:
+            return False
         try:
             token = Token.objects.get(
                 user=user,
@@ -266,3 +268,43 @@ class BatchView(generics.CreateAPIView):
 
 
 batch = BatchView.as_view()
+
+
+if app_settings.REST_USER_TOKEN_ENABLED:
+    from rest_framework.authtoken.serializers import AuthTokenSerializer
+    from rest_framework.authtoken.views import ObtainAuthToken as BaseObtainAuthToken
+    from rest_framework import serializers
+    from django.views.decorators.csrf import csrf_exempt
+
+    class TokenSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Token
+            fields = ('key',)
+
+    class ObtainAuthTokenView(BaseObtainAuthToken):
+        serializer_class = TokenSerializer
+        auth_serializer_class = AuthTokenSerializer
+        authentication_classes = []
+
+        def get_user(self, serializer):
+            """
+            Designed to be overridden by extensions
+            """
+            return serializer.validated_data['user']
+
+        def post(self, request, *args, **kwargs):
+            serializer = self.auth_serializer_class(
+                data=request.data,
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
+            user = self.get_user(serializer, *args, **kwargs)
+            token, created = Token.objects.get_or_create(user=user)
+            context = {'view': self,
+                       'request': request,
+                       'token_login': True}
+            serializer = self.serializer_class(instance=token,
+                                               context=context)
+            return Response(serializer.data)
+
+    obtain_auth_token = csrf_exempt(ObtainAuthTokenView.as_view())

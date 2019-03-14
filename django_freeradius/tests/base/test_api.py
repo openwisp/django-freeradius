@@ -66,6 +66,14 @@ class BaseTestApi(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, None)
 
+    def test_authorize_wrong_password(self):
+        self._create_user(username='tester', password='tester123')
+        response = self.client.post(reverse('freeradius:authorize'),
+                                    {'username': 'tester', 'password': 'wrong'},
+                                    HTTP_AUTHORIZATION=self.auth_header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, None)
+
     def test_postauth_accept_201(self):
         self.assertEqual(self.radius_postauth_model.objects.all().count(), 0)
         params = self._get_postauth_params()
@@ -728,3 +736,30 @@ class BaseTestAutoGroupnameDisabled(object):
                                  .objects.get(username='username1')
         self.assertIsNone(accounting_created.groupname)
         user.delete()
+
+
+if app_settings.REST_USER_TOKEN_ENABLED:
+    from rest_framework.authtoken.models import Token
+
+    class BaseTestApiUserToken(object):
+        def _get_url(self):
+            return reverse('freeradius:user_token')
+
+        def test_user_auth_token_200(self):
+            url = self._get_url()
+            opts = dict(username='tester',
+                        password='tester')
+            self._create_user(**opts)
+            response = self.client.post(url, opts)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['key'],
+                             Token.objects.first().key)
+
+        def test_user_auth_token_400_credentials(self):
+            url = self._get_url()
+            opts = dict(username='tester',
+                        password='tester')
+            r = self.client.post(url, opts)
+            self.assertEqual(r.status_code, 400)
+            self.assertIn('Unable to log in',
+                          r.json()['non_field_errors'][0])

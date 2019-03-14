@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from . import views
+from .. import settings as app_settings
 
 urlpatterns = [
     url(r'^authorize/$', views.authorize, name='authorize'),
@@ -8,3 +9,10 @@ urlpatterns = [
     url(r'^accounting/$', views.accounting, name='accounting'),
     url(r'^batch/$', views.batch, name='batch'),
 ]
+
+if app_settings.REST_USER_TOKEN_ENABLED:
+    urlpatterns.append(
+        url(r'^user-token/$',
+            views.obtain_auth_token,
+            name='user_token')
+    )
