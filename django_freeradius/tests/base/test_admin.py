@@ -341,7 +341,8 @@ class BaseTestAdmin(object):
         self.assertEqual(rg.filter(default=False).count(), 0)
 
     def test_batch_user_creation_form(self):
-        response = self.client.post('/admin/django_freeradius/radiusbatch/add/', {
+        url = reverse('admin:{0}_radiusbatch_add'.format(self.app_name))
+        response = self.client.post(url, {
             'strategy': 'prefix',
             'prefix': 'test',
             'name': 'test_name',
