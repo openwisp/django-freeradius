@@ -614,6 +614,22 @@ class BaseTestApi(object):
         self.assertEqual(self.radius_batch_model.objects.count(), 1)
         self.assertEqual(User.objects.count(), 1)
 
+    def test_api_batch_user_creation_no_users(self):
+        data = {
+            'strategy': 'prefix',
+            'prefix': 'test',
+            'name': 'test_name',
+            'csvfile': '',
+            'number_of_users': '',
+            'modified': '',
+        }
+        response = self.client.post(
+            reverse('freeradius:batch'),
+            data,
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_get_authorize_view(self):
         url = '{}{}'.format(reverse('freeradius:authorize'), self.token_querystring)
         r = self.client.get(url, HTTP_ACCEPT='text/html')
@@ -647,3 +663,68 @@ class BaseTestApiReject(object):
                                     HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data, {'control:Auth-Type': 'Reject'})
+
+
+class BaseTestAutoGroupname(object):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        app_settings.API_ACCOUNTING_AUTO_GROUP = True
+
+    def test_automatic_groupname_account_enabled(self):
+        user = self.user_model.objects.create_superuser(
+            username='username1', email='admin@admin.com', password='qwertyuiop'
+        )
+        usergroup1 = self._create_radius_usergroup(groupname='group1', priority=2, username='testgroup1')
+        usergroup2 = self._create_radius_usergroup(groupname='group2', priority=1, username='testgroup2')
+        user.radiususergroup_set.set([usergroup1, usergroup2])
+        self.client.post('/api/v1/accounting/{}'.format(self.token_querystring), {
+            'status_type': 'Start',
+            'session_time': '',
+            'input_octets': '',
+            'output_octets': '',
+            'nas_ip_address': '127.0.0.1',
+            'session_id': '48484',
+            'unique_id': '1515151',
+            'username': 'username1',
+        })
+        accounting_created = self.radius_accounting_model.objects.get(username='username1')
+        self.assertEqual(accounting_created.groupname, 'group2')
+        user.delete()
+
+
+class BaseTestAutoGroupnameDisabled(object):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        app_settings.API_ACCOUNTING_AUTO_GROUP = False
+
+    def test_account_creation_api_automatic_groupname_disabled(self):
+        user = self.user_model.objects.create_superuser(
+            username='username1',
+            email='admin@admin.com',
+            password='qwertyuiop'
+        )
+        usergroup1 = self._create_radius_usergroup(groupname='group1',
+                                                   priority=2,
+                                                   username='testgroup1')
+        usergroup2 = self._create_radius_usergroup(groupname='group2',
+                                                   priority=1,
+                                                   username='testgroup2')
+        user.radiususergroup_set.set([usergroup1, usergroup2])
+        url = '{}{}'.format(reverse('freeradius:accounting'),
+                            self.token_querystring)
+        self.client.post(url, {
+            'status_type': 'Start',
+            'session_time': '',
+            'input_octets': '',
+            'output_octets': '',
+            'nas_ip_address': '127.0.0.1',
+            'session_id': '48484',
+            'unique_id': '1515151',
+            'username': 'username1',
+        })
+        accounting_created = self.radius_accounting_model \
+                                 .objects.get(username='username1')
+        self.assertIsNone(accounting_created.groupname)
+        user.delete()
