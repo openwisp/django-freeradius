@@ -339,3 +339,14 @@ class BaseTestAdmin(object):
         }, follow=True)
         self.assertNotContains(response, 'error')
         self.assertEqual(rg.filter(default=False).count(), 0)
+
+    def test_batch_user_creation_form(self):
+        response = self.client.post('/admin/django_freeradius/radiusbatch/add/', {
+            'strategy': 'prefix',
+            'prefix': 'test',
+            'name': 'test_name',
+            'csvfile': '',
+            'number_of_users': ''
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'errors field-number_of_users')
