@@ -5,9 +5,11 @@ API Documentation
 django-freeradius provides an API that can be used by freeradius to perform
 the following operations:
 
-- authorize
-- accounting
-- postauth
+- Authorize
+- Accounting
+- Post Auth
+- Batch User Creation
+- Obtain Auth Token
 
 The API also provides other features that can be useful to perform integrations
 with third-party software.
@@ -52,7 +54,7 @@ Accounting
 
 .. code-block:: text
 
-    /api/v1/accounting
+    /api/v1/accounting/
 
 GET
 ~~~
@@ -61,7 +63,7 @@ Returns a list of accounting objects
 
 .. code-block:: text
 
-    GET /api/v1/accounting
+    GET /api/v1/accounting/
 
 .. code-block:: json
 
@@ -172,13 +174,13 @@ Authorize
 
 .. code-block:: text
 
-    /api/v1/authorize
+    /api/v1/authorize/
 
 Responds to only **POST**, used for authorizing a given username and password.
 
 .. code-block:: text
 
-    POST /api/v1/authorize HTTP/1.1 username=testuser&password=testpassword
+    POST /api/v1/authorize/ HTTP/1.1 username=testuser&password=testpassword
 
 ========    ===========================
 Param       Description
@@ -195,7 +197,7 @@ PostAuth
 
 .. code-block:: text
 
-    /api/v1/postauth
+    /api/v1/postauth/
 
 Sets the response data to None in order to instruct
 FreeRADIUS to avoid processing the response body.
@@ -207,8 +209,7 @@ Batch user creation
 
 .. code-block:: text
 
-    /api/v1/batch
-
+    /api/v1/batch/
 
 .. note::
   This API endpoint allows to use the features described in :doc:`importing_users`
@@ -234,7 +235,7 @@ These others are for the prefix method:
 ===============    ==================================
 Param              Description
 ===============    ==================================
-name               Name of the operation
+name               name of the operation
 strategy           prefix
 prefix             prefix for the generation of users
 number_of_users    number of users
@@ -249,7 +250,8 @@ Obtain User Auth Token
     /api/v1/user-token/
 
 Responds only to **POST**, this endpoint is enabled only
-if ``rest_framework.authtoken`` is in ``settings.INSTALLED_APPS``.
+if ``rest_framework.authtoken`` is in ``settings.INSTALLED_APPS``
+(which is optional).
 
 Returns the user access token, which can be used to authenticate
 the user via the freeradius authorization mechanism.
