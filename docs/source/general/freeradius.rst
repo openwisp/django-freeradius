@@ -70,12 +70,13 @@ for the available configuration values.
 Enable the configured modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First of all enable the ``sql`` and ``rest`` modules:
+First of all enable the ``sql``, ``rest`` and ``sqlcounter`` modules:
 
 .. code-block:: shell
 
     ln -s /etc/freeradius/mods-available/sql /etc/freeradius/mods-enabled/sql
     ln -s /etc/freeradius/mods-available/rest /etc/freeradius/mods-enabled/rest
+    ln -s /etc/freeradius/mods-available/sqlcounter /etc/freeradius/mods-enabled/sqlcounter
 
 Configure the SQL module
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -158,11 +159,13 @@ The ``mods-available/sqlcounter`` should look like the following:
                 AND UNIX_TIMESTAMP(acctstarttime) + acctsessiontime > '%%b'"
     }
 
-Now we need enable the ``sqlcounter`` in a special way, the ``modules`` section
-of ``radiusd.conf`` should look as follows:
-
 .. note::
-  We have to use this special way because of a `bug in freeradius
+  If your freeradius installation fails to start with an error similar to:
+
+  ``/etc/raddb/sites-enabled/default[440]: Failed to find "dailycounter" as a module or policy.``
+
+  We need enable the ``sqlcounter`` in a special way. The ``modules`` section
+  of ``radiusd.conf`` should look as shown below.  This is because of a `bug in freeradius
   <http://lists.freeradius.org/pipermail/freeradius-users/2015-February/075870.html>`_.
   This should be solved in a future release of freeradius.
 
@@ -233,33 +236,36 @@ of `DJANGO_FREERADIUS_API_TOKEN <api.html#api-token>`_:
 
     # /etc/freeradius/sites-enabled/default
 
-    api_token_header = "Authorization: Bearer <api_token>"
+    server default {
 
-    authorize {
-        update control { &REST-HTTP-Header += "${...api_token_header}" }
-        rest
-        sql
-        dailycounter
-        noresetcounter
-        dailybandwidthcounter
-    }
+        api_token_header = "Authorization: Bearer <api_token>"
 
-    # this section can be left empty
-    authenticate {}
+        authorize {
+            update control { &REST-HTTP-Header += "${...api_token_header}" }
+            rest
+            sql
+            dailycounter
+            noresetcounter
+            dailybandwidthcounter
+        }
 
-    post-auth {
-        update control { &REST-HTTP-Header += "${...api_token_header}" }
-        rest
+        # this section can be left empty
+        authenticate {}
 
-        Post-Auth-Type REJECT {
-            update control { &REST-HTTP-Header += "${....api_token_header}" }
+        post-auth {
+            update control { &REST-HTTP-Header += "${...api_token_header}" }
+            rest
+
+            Post-Auth-Type REJECT {
+                update control { &REST-HTTP-Header += "${....api_token_header}" }
+                rest
+            }
+        }
+
+        accounting {
+            update control { &REST-HTTP-Header += "${...api_token_header}" }
             rest
         }
-    }
-
-    accounting {
-        update control { &REST-HTTP-Header += "${...api_token_header}" }
-        rest
     }
 
 Please also ensure that ``acct_unique`` is present in tge ``pre-accounting`` section:
