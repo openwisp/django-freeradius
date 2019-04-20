@@ -8,16 +8,18 @@ the following operations:
 - Authorize
 - Accounting
 - Post Auth
-- Batch User Creation
-- Obtain Auth Token
 
 The API also provides other features that can be useful to perform integrations
-with third-party software.
+with third-party software:
+
+- Batch User Creation
+- Login (Obtain User Auth Token)
 
 API Token
 ---------
 
-Only requests containing the right API token will able to talk to the API.
+Only requests containing the right API token will able to talk to the API
+endpoints.
 
 Remember to set API token of your instance by setting
 ``DJANGO_FREERADIUS_API_TOKEN`` in your django ``settings.py``.
@@ -242,12 +244,16 @@ number_of_users    number of users
 expiration_date    date of expiration of the users
 ===============    ==================================
 
-Obtain User Auth Token
-----------------------
+Login (Obtain User Auth Token)
+------------------------------
 
 .. code-block:: text
 
-    /api/v1/user-token/
+    /api/v1/account/token/
+
+.. note::
+  This endpoint does not require the sending of the `API Token <#api-token>`_
+  described in the beginning of this document.
 
 Responds only to **POST**, this endpoint is enabled only
 if ``rest_framework.authtoken`` is in ``settings.INSTALLED_APPS``

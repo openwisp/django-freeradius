@@ -49,7 +49,7 @@ class BaseTestSocial(object):
                                                     token.key)
         self.assertIn(querystring, r.url)
 
-    def test_authorize_user_token_200(self):
+    def test_authorize_using_user_token_200(self):
         self.test_redirect_cp_301()
         token = Token.objects.filter(user__username='socialuser').first()
         self.assertIsNotNone(token)
@@ -59,7 +59,7 @@ class BaseTestSocial(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
 
-    def test_authorize_user_token_403(self):
+    def test_authorize_using_user_token_403(self):
         self.test_redirect_cp_301()
         token = Token.objects.filter(user__username='socialuser').first()
         self.assertIsNotNone(token)

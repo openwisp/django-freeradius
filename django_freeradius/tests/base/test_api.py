@@ -747,7 +747,7 @@ if app_settings.REST_USER_TOKEN_ENABLED:
 
     class BaseTestApiUserToken(object):
         def _get_url(self):
-            return reverse('freeradius:user_token')
+            return reverse('freeradius:user_auth_token')
 
         def test_user_auth_token_200(self):
             url = self._get_url()
