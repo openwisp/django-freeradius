@@ -122,7 +122,7 @@ postauth = PostAuthView.as_view()
 
 class AccountingFilter(filters.FilterSet):
     start_time = filters.DateTimeFilter(field_name='start_time', lookup_expr='gte')
-    stop_time = filters.DateTimeFilter(field_name='stop_time', lookup_expr='gte')
+    stop_time = filters.DateTimeFilter(field_name='stop_time', lookup_expr='lte')
     is_open = filters.BooleanFilter(field_name='stop_time',
                                     lookup_expr='isnull',
                                     label='Is Open')

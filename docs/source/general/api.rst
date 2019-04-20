@@ -158,16 +158,16 @@ Filters
 
 The JSON objects returned using the GET endpoint can be filtered/queried using specific parameters.
 
-==================  ====================
+==================  ====================================
 Filter Parameters   Description
-==================  ====================
+==================  ====================================
 username            Username
 called_station_id   Called Station ID
 calling_station_id  Calling Station ID
-start_time          Start time
-stop_time           Stop time
+start_time          Start time (greater or equal to)
+stop_time           Stop time (less or equal to)
 is_open             If stop_time is null
-==================  ====================
+==================  ====================================
 
 Authorize
 ---------

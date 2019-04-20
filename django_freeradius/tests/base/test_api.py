@@ -1,5 +1,6 @@
 import json
 
+from dateutil import parser
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -9,7 +10,7 @@ from rest_framework import status
 
 from django_freeradius import settings as app_settings
 
-START_DATE = '2017-08-08 15:16:10+0200'
+START_DATE = '2019-04-20T22:14:09+01:00'
 
 User = get_user_model()
 
@@ -471,30 +472,33 @@ class BaseTestApi(object):
         data2 = self.acct_post_data
         data2.update(dict(start_time='2018-03-02T00:43:24.020460+01:00',
                           unique_id='85144d60'))
-        self._create_radius_accounting(**data2)
-        response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-02'),
+        ra = self._create_radius_accounting(**data2)
+        response = self.client.get('{0}?start_time={1}'.format(self._acct_url, '2018-03-01'),
                                    HTTP_AUTHORIZATION=self.auth_header)
-        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(len(response.json()), 2)
         self.assertEqual(response.status_code, 200)
-        item = response.data[0]
-        self.assertEqual(item['start_time'], '2018-03-02T00:43:24.020460+01:00')
+        item = response.data[-1]
+        self.assertEqual(parser.parse(item['start_time']), ra.start_time)
 
     @freeze_time(START_DATE)
     def test_accounting_filter_stop_time(self):
         data1 = self.acct_post_data
-        data1.update(dict(stop_time=START_DATE,
+        data1.update(dict(start_time=START_DATE,
+                          stop_time=START_DATE.replace('04-20', '04-21'),
                           unique_id='99144d60'))
         self._create_radius_accounting(**data1)
         data2 = self.acct_post_data
-        data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
+        stop_time = '2018-03-02T11:43:24.020460+01:00'
+        data2.update(dict(start_time='2018-03-02T10:43:24.020460+01:00',
+                          stop_time=stop_time,
                           unique_id='85144d60'))
-        self._create_radius_accounting(**data2)
-        response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02'),
+        ra = self._create_radius_accounting(**data2)
+        response = self.client.get('{0}?stop_time={1}'.format(self._acct_url, '2018-03-02 21:43:25'),
                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
-        self.assertEqual(item['stop_time'], '2018-03-02T00:43:24.020460+01:00')
+        self.assertEqual(parser.parse(item['stop_time']), ra.stop_time)
 
     def test_accounting_filter_is_open(self):
         data1 = self.acct_post_data
@@ -504,7 +508,7 @@ class BaseTestApi(object):
         data2 = self.acct_post_data
         data2.update(dict(stop_time='2018-03-02T00:43:24.020460+01:00',
                           unique_id='85144d60'))
-        self._create_radius_accounting(**data2)
+        ra = self._create_radius_accounting(**data2)
         response = self.client.get('{0}?is_open=true'.format(self._acct_url),
                                    HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(len(response.json()), 1)
@@ -516,7 +520,7 @@ class BaseTestApi(object):
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.status_code, 200)
         item = response.data[0]
-        self.assertEqual(item['stop_time'], '2018-03-02T00:43:24.020460+01:00')
+        self.assertEqual(parser.parse(item['stop_time']), ra.stop_time)
 
     @freeze_time(START_DATE)
     def test_coova_accounting_on_200(self):
