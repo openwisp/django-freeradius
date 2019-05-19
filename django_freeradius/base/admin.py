@@ -43,7 +43,7 @@ class AbstractRadiusCheckAdmin(TimeStampedEditableAdmin):
               'created',
               'modified']
     autocomplete_fields = ['user']
-    actions = [disable_action, enable_action, delete_selected]
+    actions = TimeStampedEditableAdmin.actions + [disable_action, enable_action]
 
     def save_model(self, request, obj, form, change):
         if form.data.get('new_value'):
@@ -141,7 +141,7 @@ class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
             return False
         return super().has_delete_permission(request, obj)
 
-    def delete_selected(self, request, queryset):
+    def delete_selected_batch(self, request, queryset):
         if self.get_default_queryset(request, queryset).exists():
             msg = _('Cannot proceed with the delete operation because '
                     'the batch of items contains the default group, '
@@ -150,7 +150,7 @@ class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
             return False
         return delete_selected(self, request, queryset)
 
-    actions = [delete_selected]
+    actions = ['delete_selected_batch']
 
     def get_default_queryset(self, request, queryset):
         """ overridable """
@@ -239,7 +239,7 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
     form = RadiusBatchForm
 
     class Media:
-        js = [static('django-freeradius/js/strategy-switcher.js')]
+        js = ['admin/js/jquery.init.js', static('django-freeradius/js/strategy-switcher.js')]
         css = {'all': (static('django-freeradius/css/radiusbatch.css'),)}
 
     def number_of_users(self, obj):
@@ -273,13 +273,13 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
         obj.users.all().delete()
         super(AbstractRadiusBatchAdmin, self).delete_model(request, obj)
 
-    actions = ['delete_selected']
+    actions = ['delete_selected_batches']
 
-    def delete_selected(self, request, queryset):
+    def delete_selected_batches(self, request, queryset):
         for obj in queryset:
             obj.delete()
 
-    delete_selected.short_description = _('Delete selected batches')
+    delete_selected_batches.short_description = _('Delete selected batches')
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super(AbstractRadiusBatchAdmin, self).get_readonly_fields(request, obj)

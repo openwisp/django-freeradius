@@ -21,7 +21,7 @@ class ModeSwitcherForm(forms.ModelForm):
     mode = forms.ChoiceField(choices=MODE_CHOICES)
 
     class Media:
-        js = ('django-freeradius/js/mode-switcher.js',)
+        js = ['admin/js/jquery.init.js', 'django-freeradius/js/mode-switcher.js']
         css = {'all': ('django-freeradius/css/mode-switcher.css',)}
 
 
@@ -50,7 +50,7 @@ class RadiusCheckForm(ModeSwitcherForm):
         return self.cleaned_data['new_value']
 
     class Media:
-        js = ('django-freeradius/js/radcheck.js',)
+        js = ['admin/js/jquery.init.js', 'django-freeradius/js/radcheck.js']
         css = {'all': ('django-freeradius/css/radcheck.css',)}
 
 

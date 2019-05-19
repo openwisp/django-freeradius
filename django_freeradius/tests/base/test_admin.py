@@ -45,7 +45,7 @@ class BaseTestAdmin(object):
                        op=':=', value='PPP')
         obj = self._create_radius_groupreply(**options)
         response = self.client.get(reverse('admin:{0}_radiusgroupreply_change'.format(self.app_name),
-                                   args=[obj.pk]))
+                                           args=[obj.pk]))
 
         self.assertContains(response, 'ok')
         self.assertNotContains(response, 'errors')
@@ -269,7 +269,10 @@ class BaseTestAdmin(object):
         self.assertEqual(User.objects.count() - n, 20)
         changelist_path = reverse('admin:{0}_radiusbatch_changelist'.format(self.app_name))
         p_keys = [x.pk for x in self.radius_batch_model.objects.all()]
-        data = {'action': 'delete_selected', '_selected_action': p_keys}
+        data = {
+            'action': 'delete_selected_batches',
+            '_selected_action': p_keys
+        }
         response = self.client.post(changelist_path, data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count() - n, 0)
@@ -316,7 +319,7 @@ class BaseTestAdmin(object):
         rg = self.radius_group_model.objects
         default = rg.get(default=True)
         response = self.client.post(url, {
-            'action': 'delete_selected',
+            'action': 'delete_selected_batch',
             '_selected_action': str(default.pk),
             'select_across': '0',
             'index': '0',
