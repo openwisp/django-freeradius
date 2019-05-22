@@ -319,7 +319,7 @@ class BaseTestAdmin(object):
         rg = self.radius_group_model.objects
         default = rg.get(default=True)
         response = self.client.post(url, {
-            'action': 'delete_selected_batch',
+            'action': 'delete_selected_groups',
             '_selected_action': str(default.pk),
             'select_across': '0',
             'index': '0',
@@ -334,7 +334,7 @@ class BaseTestAdmin(object):
         rg = self.radius_group_model.objects
         non_default = rg.get(default=False)
         response = self.client.post(url, {
-            'action': 'delete_selected',
+            'action': 'delete_selected_groups',
             '_selected_action': str(non_default.pk),
             'select_across': '0',
             'index': '0',
