@@ -1,9 +1,10 @@
 import swapper
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, StackedInline
-from django.contrib.admin.actions import delete_selected
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin.utils import model_ngettext
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.admin import ReadOnlyAdmin, TimeReadonlyAdminMixin
 
@@ -141,16 +142,32 @@ class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
             return False
         return super().has_delete_permission(request, obj)
 
-    def delete_selected_batch(self, request, queryset):
+    def delete_selected_groups(self, request, queryset):
         if self.get_default_queryset(request, queryset).exists():
             msg = _('Cannot proceed with the delete operation because '
                     'the batch of items contains the default group, '
                     'which cannot be deleted')
             self.message_user(request, msg, messages.ERROR)
             return False
-        return delete_selected(self, request, queryset)
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+        n = queryset.count()
+        if n:
+            queryset.delete()
+            self.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
+                "count": n, "items": model_ngettext(self.opts, n)
+            }, messages.SUCCESS)
+        return None
 
-    actions = ['delete_selected_batch']
+    delete_selected_groups.allowed_permissions = ('delete',)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    actions = ['delete_selected_groups']
 
     def get_default_queryset(self, request, queryset):
         """ overridable """
@@ -272,6 +289,12 @@ class AbstractRadiusBatchAdmin(TimeStampedEditableAdmin):
     def delete_model(self, request, obj):
         obj.users.all().delete()
         super(AbstractRadiusBatchAdmin, self).delete_model(request, obj)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
     actions = ['delete_selected_batches']
 
