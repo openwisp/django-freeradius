@@ -19,8 +19,8 @@ branches:
 
 env:
   matrix:
-   - DJANGO="django>=2.2,<2.2.2" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
-   - DJANGO="django>=2.2,<2.2.2" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
+   - DJANGO="django>=2.2,<2.3" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
+   - DJANGO="django>=2.2,<2.3" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
    - DJANGO="django>=2.1,<2.2" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'
    - DJANGO="django>=2.1,<2.2" DATABASE_URL='postgres://postgres@127.0.0.1/freeradius_test'
    - SAMPLE_APP=1 DJANGO="django>=2.1,<2.2" DATABASE_URL='mysql://root@127.0.0.1/freeradius_test'

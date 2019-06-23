@@ -1,4 +1,4 @@
-django>=2.0,<2.2
+django>=2.0,<2.3
 swapper>=1.1.0,<1.2.0
 # minimum version will have to be 0.3.0
 openwisp-utils>=0.2,<0.3.1
