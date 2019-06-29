@@ -1,8 +1,11 @@
+import swapper
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
 from rest_framework.authtoken.models import Token
+
+RadiusToken = swapper.load_model('django_freeradius', 'RadiusToken')
 
 
 class RedirectCaptivePageView(View):
@@ -35,8 +38,13 @@ class RedirectCaptivePageView(View):
         cp = request.GET.get('cp')
         user = request.user
         Token.objects.filter(user=user).delete()
+        RadiusToken.objects.filter(user=user).delete()
         token = Token.objects.create(user=user)
-        return '{0}?username={1}&token={2}'.format(cp, user.username, token.key)
+        rad_token = RadiusToken.objects.create(user=user)
+        return '{0}?username={1}&token={2}&radius_user_token={3}'.format(cp,
+                                                                         user.username,
+                                                                         token.key,
+                                                                         rad_token.key)
 
 
 redirect_cp = RedirectCaptivePageView.as_view()

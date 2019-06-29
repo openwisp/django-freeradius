@@ -819,3 +819,31 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         path = getattr(self, strategy_filemap.get(self.strategy)).path
         if os.path.isfile(path):
             os.remove(path)
+
+
+class AbstractRadiusToken(TimeStampedEditableModel, models.Model):
+    # key field is a primary key so additional id field will be redundant
+    id = None
+    # tokens are not supposed to be modified, can be regenerated if necessary
+    modified = None
+    key = models.CharField(_('Key'), max_length=40, primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                related_name='radius_token')
+
+    class Meta:
+        db_table = 'radiustoken'
+        verbose_name = _('radius token')
+        verbose_name_plural = _('radius token')
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    def generate_key(self):
+        return get_random_string(length=40)
+
+    def __str__(self):
+        return self.key

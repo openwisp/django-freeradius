@@ -20,6 +20,7 @@ RadiusPostAuth = swapper.load_model('django_freeradius', 'RadiusPostAuth')
 RadiusAccounting = swapper.load_model('django_freeradius', 'RadiusAccounting')
 User = get_user_model()
 RadiusBatch = swapper.load_model('django_freeradius', 'RadiusBatch')
+RadiusToken = swapper.load_model('django_freeradius', 'RadiusToken')
 
 if app_settings.REST_USER_TOKEN_ENABLED:
     from rest_framework.authtoken.models import Token
@@ -80,24 +81,20 @@ class AuthorizeView(APIView):
 
     def check_user_token(self, request, user):
         """
-        if user has no password set and has at least 1 social account
-        this is probably a social login, the password field is the
-        user's personal auth token
+        returns ``True`` if the password value supplied is a valid
+        radius user token
         """
-        if not app_settings.REST_USER_TOKEN_ENABLED:
-            return False
+
         try:
-            token = Token.objects.get(
+            token = RadiusToken.objects.get(
                 user=user,
                 key=request.data.get('password')
             )
-        except Token.DoesNotExist:
+        except RadiusToken.DoesNotExist:
             token = None
-        else:
-            if app_settings.DISPOSABLE_USER_TOKEN:
-                token.delete()
-        finally:
-            return token is not None
+        if app_settings.DISPOSABLE_RADIUS_USER_TOKEN and token is not None:
+            token.delete()
+        return token is not None
 
 
 authorize = AuthorizeView.as_view()
@@ -285,12 +282,20 @@ if app_settings.REST_USER_TOKEN_ENABLED:
         serializer_class = TokenSerializer
         auth_serializer_class = AuthTokenSerializer
         authentication_classes = []
+        radius_token = RadiusToken
 
         def get_user(self, serializer):
             """
             Designed to be overridden by extensions
             """
             return serializer.validated_data['user']
+
+        def get_or_create_radius_token(self, user):
+            """
+            Designed to be overridden by extensions
+            """
+            radius_token, rad_token_created = self.radius_token.objects.get_or_create(user=user)
+            return radius_token
 
         def post(self, request, *args, **kwargs):
             serializer = self.auth_serializer_class(
@@ -300,11 +305,14 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             serializer.is_valid(raise_exception=True)
             user = self.get_user(serializer, *args, **kwargs)
             token, created = Token.objects.get_or_create(user=user)
+            radius_token = self.get_or_create_radius_token(user)
             context = {'view': self,
                        'request': request,
                        'token_login': True}
             serializer = self.serializer_class(instance=token,
                                                context=context)
-            return Response(serializer.data)
+            response = {'radius_user_token': radius_token.key}
+            response.update(serializer.data)
+            return Response(response)
 
     obtain_auth_token = csrf_exempt(ObtainAuthTokenView.as_view())

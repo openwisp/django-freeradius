@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
@@ -5,11 +6,12 @@ from . import settings as app_settings
 from .base.admin import (
     AbstractNasAdmin, AbstractRadiusAccountingAdmin, AbstractRadiusBatchAdmin, AbstractRadiusCheckAdmin,
     AbstractRadiusGroupAdmin, AbstractRadiusGroupCheckAdmin, AbstractRadiusGroupReplyAdmin,
-    AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
+    AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusTokenAdmin,
+    AbstractRadiusUserGroupAdmin, AbstractUserAdmin,
 )
 from .models import (
     Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    RadiusPostAuth, RadiusReply, RadiusToken, RadiusUserGroup,
 )
 
 
@@ -65,6 +67,11 @@ class RadiusPostAuthAdmin(AbstractRadiusPostAuthAdmin):
 class RadiusBatchAdmin(AbstractRadiusBatchAdmin):
     pass
 
+
+if settings.DEBUG:
+    @admin.register(RadiusToken)
+    class RadiusTokenAdmin(AbstractRadiusTokenAdmin):
+        pass
 
 user_model = get_user_model()
 admin.site.unregister(user_model)

@@ -354,3 +354,33 @@ class BaseTestAdmin(object):
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'errors field-number_of_users')
+
+    def test_radius_token_creation_form(self):
+        n = self.radius_token_model.objects.count()
+        url = reverse('admin:{0}_radiustoken_add'.format(self.app_name))
+        user = User.objects.create_user(username='test_user', password='test_password')
+        self.client.post(url, {'user': user.id})
+        self.assertEqual(self.radius_token_model.objects.count() - n, 1)
+
+    def test_radius_token_change(self):
+        user = User.objects.create_user(username='test_user', password='test_password')
+        token = self.radius_token_model.objects.create(user=user)
+        response = self.client.get(reverse(
+            'admin:{0}_radiustoken_change'.format(self.app_name),
+            args=[token.key]))
+        self.assertContains(response, 'ok')
+        self.assertNotContains(response, 'errors')
+
+    def test_radius_token_delete_selected(self):
+        user = User.objects.create_user(username='test_user', password='test_password')
+        token = self.radius_token_model.objects.create(user=user)
+        n = self.radius_token_model.objects.count()
+        url = reverse('admin:{0}_radiustoken_changelist'.format(self.app_name))
+        self.client.post(url, {
+            'action': 'delete_selected',
+            '_selected_action': str(token.key),
+            'select_across': '0',
+            'index': '0',
+            'post': 'yes'
+        }, follow=True)
+        self.assertEqual(n - self.radius_token_model.objects.count(), 1)

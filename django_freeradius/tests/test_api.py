@@ -15,12 +15,14 @@ from .base.test_api import (
 RadiusPostAuth = swapper.load_model('django_freeradius', 'RadiusPostAuth')
 RadiusAccounting = swapper.load_model('django_freeradius', 'RadiusAccounting')
 RadiusBatch = swapper.load_model('django_freeradius', 'RadiusBatch')
+RadiusToken = swapper.load_model('django_freeradius', 'RadiusToken')
 
 
 class ApiTestCase(PostParamsMixin, CreateRadiusObjectsMixin, TestCase):
     radius_postauth_model = RadiusPostAuth
     radius_accounting_model = RadiusAccounting
     radius_batch_model = RadiusBatch
+    radius_token_model = RadiusToken
     user_model = get_user_model()
     radius_usergroup_model = RadiusUserGroup
     auth_header = 'Bearer {}'.format(app_settings.API_TOKEN)

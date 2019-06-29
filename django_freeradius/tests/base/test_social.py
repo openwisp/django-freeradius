@@ -43,26 +43,30 @@ class BaseTestSocial(object):
         r = self.client.get(url, {'cp': 'http://wifi.openwisp.org/cp'})
         self.assertEqual(r.status_code, 302)
         qs = Token.objects.filter(user=u)
+        rs = self.radius_token_model.objects.filter(user=u)
         self.assertEqual(qs.count(), 1)
+        self.assertEqual(rs.count(), 1)
         token = qs.first()
-        querystring = 'username={}&token={}'.format(u.username,
-                                                    token.key)
+        rad_token = rs.first()
+        querystring = 'username={}&token={}&radius_user_token={}'.format(u.username,
+                                                                         token.key,
+                                                                         rad_token.key)
         self.assertIn(querystring, r.url)
 
-    def test_authorize_using_user_token_200(self):
+    def test_authorize_using_radius_user_token_200(self):
         self.test_redirect_cp_301()
-        token = Token.objects.filter(user__username='socialuser').first()
-        self.assertIsNotNone(token)
+        rad_token = self.radius_token_model.objects.filter(user__username='socialuser').first()
+        self.assertIsNotNone(rad_token)
         response = self.client.post(reverse('freeradius:authorize'),
-                                    {'username': 'socialuser', 'password': token.key},
+                                    {'username': 'socialuser', 'password': rad_token.key},
                                     HTTP_AUTHORIZATION=self.auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'control:Auth-Type': 'Accept'})
 
     def test_authorize_using_user_token_403(self):
         self.test_redirect_cp_301()
-        token = Token.objects.filter(user__username='socialuser').first()
-        self.assertIsNotNone(token)
+        rad_token = self.radius_token_model.objects.filter(user__username='socialuser').first()
+        self.assertIsNotNone(rad_token)
         response = self.client.post(reverse('freeradius:authorize'),
                                     {'username': 'socialuser', 'password': 'WRONG'},
                                     HTTP_AUTHORIZATION=self.auth_header)
