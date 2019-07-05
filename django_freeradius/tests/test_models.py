@@ -5,13 +5,13 @@ from django.test import TestCase
 
 from django_freeradius.models import (
     Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    RadiusPostAuth, RadiusReply, RadiusToken, RadiusUserGroup,
 )
 
 from . import CreateRadiusObjectsMixin
 from .base.test_models import (
     BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatch, BaseTestRadiusCheck, BaseTestRadiusGroup,
-    BaseTestRadiusPostAuth, BaseTestRadiusReply,
+    BaseTestRadiusPostAuth, BaseTestRadiusReply, BaseTestRadiusToken,
 )
 
 
@@ -55,3 +55,8 @@ class TestRadiusPostAuth(BaseTestRadiusPostAuth, BaseTests):
 @skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
 class TestRadiusBatch(BaseTestRadiusBatch, BaseTests):
     radius_batch_model = RadiusBatch
+
+
+@skipIf(os.environ.get('SAMPLE_APP', False), 'Running tests on SAMPLE_APP')
+class TestRadiusToken(BaseTestRadiusToken, BaseTests):
+    radius_token_model = RadiusToken

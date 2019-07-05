@@ -393,3 +393,17 @@ class BaseTestRadiusBatch(object):
             self.assertIn('Mixing', str(e))
         else:
             self.fail('ValidationError not raised')
+
+
+class BaseTestRadiusToken(object):
+    def test_string_representation(self):
+        radiustoken = self.radius_token_model(key='test key')
+        self.assertEqual(str(radiustoken), radiustoken.key)
+
+    def test_create_radius_token_model(self):
+        u = get_user_model().objects.create(username='test',
+                                            email='test@test.org',
+                                            password='test')
+        obj = self.radius_token_model.objects.create(user=u)
+        self.assertEqual(str(obj), obj.key)
+        self.assertEqual(obj.user, u)

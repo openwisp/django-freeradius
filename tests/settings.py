@@ -156,6 +156,7 @@ if os.environ.get('SAMPLE_APP', False):
     DJANGO_FREERADIUS_NAS_MODEL = 'sample_radius.Nas'
     DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = 'sample_radius.RadiusPostAuth'
     DJANGO_FREERADIUS_RADIUSBATCH_MODEL = 'sample_radius.RadiusBatch'
+    DJANGO_FREERADIUS_RADIUSTOKEN_MODEL = 'sample_radius.RadiusToken'
 
 if TESTING:
     DJANGO_FREERADIUS_GROUPCHECK_ADMIN = True

@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from django_freeradius.models import (
     Nas, RadiusAccounting, RadiusBatch, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply,
-    RadiusPostAuth, RadiusReply, RadiusUserGroup,
+    RadiusPostAuth, RadiusReply, RadiusToken, RadiusUserGroup,
 )
 
 from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin, PostParamsMixin
@@ -26,3 +26,4 @@ class TestAdmin(FileMixin, CallCommandMixin, PostParamsMixin,
     radius_reply_model = RadiusReply
     radius_group_model = RadiusGroup
     radius_usergroup_model = RadiusUserGroup
+    radius_token_model = RadiusToken

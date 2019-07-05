@@ -758,6 +758,8 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['key'],
                              Token.objects.first().key)
+            self.assertEqual(response.data['radius_user_token'],
+                             self.radius_token_model.objects.first().key)
 
         def test_user_auth_token_400_credentials(self):
             url = self._get_url()

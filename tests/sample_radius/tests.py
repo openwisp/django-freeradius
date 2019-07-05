@@ -13,7 +13,7 @@ from django_freeradius.tests.base.test_batch_add_users import BaseTestCSVUpload
 from django_freeradius.tests.base.test_commands import BaseTestCommands
 from django_freeradius.tests.base.test_models import (
     BaseTestNas, BaseTestRadiusAccounting, BaseTestRadiusBatch, BaseTestRadiusCheck, BaseTestRadiusGroup,
-    BaseTestRadiusPostAuth, BaseTestRadiusReply,
+    BaseTestRadiusPostAuth, BaseTestRadiusReply, BaseTestRadiusToken,
 )
 from django_freeradius.tests.base.test_utils import BaseTestUtils
 
@@ -27,6 +27,7 @@ RadiusPostAuth = swapper.load_model('django_freeradius', 'RadiusPostAuth')
 Nas = swapper.load_model('django_freeradius', 'Nas')
 RadiusAccounting = swapper.load_model('django_freeradius', 'RadiusAccounting')
 RadiusBatch = swapper.load_model('django_freeradius', 'RadiusBatch')
+RadiusToken = swapper.load_model('django_freeradius', 'RadiusToken')
 
 
 _SUPERUSER = {'username': 'gino', 'password': 'cic', 'email': 'giggi_vv@gmail.it'}
@@ -87,6 +88,12 @@ class TestRadiusBatch(BaseTestRadiusBatch, BaseTestCase):
 
 @skipUnless(os.environ.get('SAMPLE_APP', False),
             'Running tests on standard django_freeradius models')
+class TestRadiusToken(BaseTestRadiusToken, BaseTestCase):
+    radius_token_model = RadiusToken
+
+
+@skipUnless(os.environ.get('SAMPLE_APP', False),
+            'Running tests on standard django_freeradius models')
 class TestAdmin(BaseTestAdmin, FileMixin, CallCommandMixin,
                 PostParamsMixin, BaseTestCase):
     app_name = 'sample_radius'
@@ -100,6 +107,7 @@ class TestAdmin(BaseTestAdmin, FileMixin, CallCommandMixin,
     radius_reply_model = RadiusReply
     radius_usergroup_model = RadiusUserGroup
     radius_group_model = RadiusGroup
+    radius_token_model = RadiusToken
 
 
 @skipUnless(os.environ.get('SAMPLE_APP', False),

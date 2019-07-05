@@ -326,3 +326,9 @@ class AbstractUserAdmin(BaseUserAdmin):
                                               self.admin_site)
             inlines.append(usergroup)
         return inlines
+
+
+class AbstractRadiusTokenAdmin(ModelAdmin):
+    list_display = ['key', 'user', 'created']
+    fields = ['user']
+    ordering = ('-created',)
