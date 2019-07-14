@@ -26,6 +26,8 @@ from django_freeradius.utils import (
 
 from .. import settings as app_settings
 
+User = get_user_model()
+
 RADOP_CHECK_TYPES = (('=', '='),
                      (':=', ':='),
                      ('==', '=='),
@@ -740,31 +742,14 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         super(AbstractRadiusBatch, self).clean()
 
     def add(self, reader, password_length=BATCH_DEFAULT_PASSWORD_LENGTH):
-        User = get_user_model()
         users_list = []
         generated_passwords = []
         for row in reader:
             if len(row) == 5:
-                username, password, email, first_name, last_name = row
-                if not username and email:
-                    username = email.split('@')[0]
-                username = find_available_username(username, users_list)
-                user = User(username=username,
-                            email=email,
-                            first_name=first_name,
-                            last_name=last_name)
-                cleartext_delimiter = 'cleartext$'
-                if not password:
-                    password = get_random_string(length=password_length)
-                    user.set_password(password)
-                    generated_passwords.append([username, password, email])
-                elif password and password.startswith(cleartext_delimiter):
-                    password = password[len(cleartext_delimiter):]
-                    user.set_password(password)
-                else:
-                    user.password = password
-                user.full_clean()
+                user, password = self.get_or_create_user(row, users_list, password_length)
                 users_list.append(user)
+                if password:
+                    generated_passwords.append(password)
         for user in users_list:
             self.save_user(user)
         for element in generated_passwords:
@@ -795,6 +780,29 @@ class AbstractRadiusBatch(TimeStampedEditableModel):
         self.pdf = pdf_file
         self.full_clean()
         self.save()
+
+    def get_or_create_user(self, row, users_list, password_length):
+        generated_password = None
+        username, password, email, first_name, last_name = row
+        if not username and email:
+            username = email.split('@')[0]
+        username = find_available_username(username, users_list)
+        user = User(username=username,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name)
+        cleartext_delimiter = 'cleartext$'
+        if not password:
+            password = get_random_string(length=password_length)
+            user.set_password(password)
+            generated_password = ([username, password, email])
+        elif password and password.startswith(cleartext_delimiter):
+            password = password[len(cleartext_delimiter):]
+            user.set_password(password)
+        else:
+            user.password = password
+        user.full_clean()
+        return user, generated_password
 
     def save_user(self, user):
         user.save()

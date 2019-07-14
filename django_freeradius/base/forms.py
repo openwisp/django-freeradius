@@ -65,6 +65,7 @@ class RadiusBatchForm(forms.ModelForm):
         number_of_users = data.get('number_of_users')
         if strategy == 'prefix' and not number_of_users:
             self.add_error('number_of_users', 'This field is required')
+        super().clean()
         return data
 
     def __init__(self, *args, **kwargs):
