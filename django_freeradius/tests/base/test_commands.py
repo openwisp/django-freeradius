@@ -47,16 +47,17 @@ class BaseTestCommands(object):
         radiusbatch = self.radius_batch_model.objects.first()
         self.assertEqual(get_user_model().objects.all().count(), 3)
         self.assertEqual(radiusbatch.expiration_date.strftime('%d-%m-%y'), '28-01-18')
+        path = self._get_path('static/test_batch_new.csv')
         options = dict(file=path, name='test1')
         self._call_command('batch_add_users', **options)
         self.assertEqual(self.radius_batch_model.objects.all().count(), 2)
         self.assertEqual(get_user_model().objects.all().count(), 6)
         invalid_csv_path = self._get_path('static/test_batch_invalid.csv')
         with self.assertRaises(CommandError):
-            options = dict(file='doesnotexist.csv', name='test2')
+            options = dict(file='doesnotexist.csv', name='test3')
             self._call_command('batch_add_users', **options)
         with self.assertRaises(SystemExit):
-            options = dict(file=invalid_csv_path, name='test3')
+            options = dict(file=invalid_csv_path, name='test4')
             self._call_command('batch_add_users', **options)
 
     def test_deactivate_expired_users_command(self):
@@ -71,9 +72,9 @@ class BaseTestCommands(object):
         path = self._get_path('static/test_batch.csv')
         options = dict(file=path, expiration='28-01-1970', name='test')
         self._call_command('batch_add_users', **options)
-        expiration_date = now() - timedelta(days=30 * 15)
-        options['expiration'] = expiration_date.strftime('%d-%m-%Y')
-        options['name'] = 'test1'
+        expiration_date = (now() - timedelta(days=30 * 15)).strftime('%d-%m-%Y')
+        path = self._get_path('static/test_batch_new.csv')
+        options = dict(file=path, expiration=expiration_date, name='test1')
         self._call_command('batch_add_users', **options)
         self.assertEqual(get_user_model().objects.all().count(), 6)
         call_command('delete_old_users')

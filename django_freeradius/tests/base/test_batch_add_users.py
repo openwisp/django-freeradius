@@ -32,7 +32,7 @@ class BaseTestCSVUpload(object):
         hashed_password = 'pbkdf2_sha256$100000$x3DUBnOFwraV$PU2dZZq1FcuBjagxVLPhhFvpicLn18fFCN5xiLsxATc='
         cleartext_password = 'cleartext$password'
         reader = [['rohith', cleartext_password, 'rohith@openwisp.com', 'Rohith', 'ASRK'],
-                  ['rohith', hashed_password, 'rohith@openwisp.com', '', '']]
+                  ['rohith', hashed_password, 'rohith@openwisp.org', '', '']]
         batch = self._create_radius_batch(name='test',
                                           strategy='csv',
                                           csvfile=self._get_csvfile(reader))
