@@ -11,8 +11,11 @@ urlpatterns = [
 ]
 
 if app_settings.REST_USER_TOKEN_ENABLED:
-    urlpatterns.append(
+    urlpatterns += [
         url(r'^account/token/$',
             views.obtain_auth_token,
-            name='user_auth_token')
-    )
+            name='user_auth_token'),
+        url(r'^account/token/validate/$',
+            views.validate_auth_token,
+            name='validate_auth_token')
+    ]

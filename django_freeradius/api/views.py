@@ -278,7 +278,15 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             model = Token
             fields = ('key',)
 
-    class ObtainAuthTokenView(BaseObtainAuthToken):
+    class RadiusTokenMixin(object):
+        def get_or_create_radius_token(self, user):
+            """
+            Designed to be overridden by extensions
+            """
+            radius_token, rad_token_created = self.radius_token.objects.get_or_create(user=user)
+            return radius_token
+
+    class ObtainAuthTokenView(RadiusTokenMixin, BaseObtainAuthToken):
         serializer_class = TokenSerializer
         auth_serializer_class = AuthTokenSerializer
         authentication_classes = []
@@ -289,13 +297,6 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             Designed to be overridden by extensions
             """
             return serializer.validated_data['user']
-
-        def get_or_create_radius_token(self, user):
-            """
-            Designed to be overridden by extensions
-            """
-            radius_token, rad_token_created = self.radius_token.objects.get_or_create(user=user)
-            return radius_token
 
         def post(self, request, *args, **kwargs):
             serializer = self.auth_serializer_class(
@@ -316,3 +317,25 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             return Response(response)
 
     obtain_auth_token = csrf_exempt(ObtainAuthTokenView.as_view())
+
+    class ValidateAuthTokenView(RadiusTokenMixin, generics.CreateAPIView):
+        radius_token = RadiusToken
+
+        def post(self, request, *args, **kwargs):
+            request_token = request.data.get('token')
+            response = {'response_code': 'BLANK_OR_INVALID_TOKEN'}
+            if request_token:
+                try:
+                    token = Token.objects.get(key=request_token)
+                    radius_token = self.get_or_create_radius_token(token.user)
+                    response = {
+                        'response_code': 'AUTH_TOKEN_VALIDATION_SUCCESSFUL',
+                        'auth_token': token.key,
+                        'radius_user_token': radius_token.key
+                    }
+                    return Response(response, 200)
+                except Token.DoesNotExist:
+                    pass
+            return Response(response, 401)
+
+    validate_auth_token = (ValidateAuthTokenView.as_view())

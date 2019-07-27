@@ -769,3 +769,40 @@ if app_settings.REST_USER_TOKEN_ENABLED:
             self.assertEqual(r.status_code, 400)
             self.assertIn('Unable to log in',
                           r.json()['non_field_errors'][0])
+
+    class BaseTestApiValidateToken:
+
+        def _get_url(self):
+            return reverse('freeradius:validate_auth_token')
+
+        def get_user(self):
+            opts = dict(username='tester',
+                        password='tester')
+            user = self._create_user(**opts)
+            return user
+
+        def test_validate_auth_token(self):
+            url = self._get_url()
+            user = self.get_user()
+            token = Token.objects.create(user=user)
+            # empty payload
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.data['response_code'],
+                             'BLANK_OR_INVALID_TOKEN')
+            # invalid token
+            payload = dict(token="some-random-string")
+            response = self.client.post(url, payload)
+            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.data['response_code'],
+                             'BLANK_OR_INVALID_TOKEN')
+            # valid token
+            payload = dict(token=token.key)
+            response = self.client.post(url, payload)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['response_code'],
+                             'AUTH_TOKEN_VALIDATION_SUCCESSFUL')
+            self.assertEqual(response.data['auth_token'],
+                             token.key)
+            self.assertEqual(response.data['radius_user_token'],
+                             self.radius_token_model.objects.first().key)
