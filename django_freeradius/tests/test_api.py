@@ -49,6 +49,10 @@ class TestAutoGroupnameDisabled(BaseTestAutoGroupnameDisabled, ApiTestCase):
 
 if app_settings.REST_USER_TOKEN_ENABLED:
     from .base.test_api import BaseTestApiUserToken
+    from .base.test_api import BaseTestApiValidateToken
 
     class TestApiUserToken(BaseTestApiUserToken, ApiTestCase):
+        pass
+
+    class TestApiValidateToken(BaseTestApiValidateToken, ApiTestCase):
         pass
