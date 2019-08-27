@@ -8,7 +8,7 @@ Create a virtual environment
 Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_.
 It keeps everybody on the same page, helps reproducing bugs and resolving problems.
 
-We highly suggest to use **virtualenvwrapper**, please refer to the official `virtualenvwarpper installation page <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ and come back here when ready to proceed.
+We highly suggest to use **virtualenvwrapper**, please refer to the official `virtualenvwrapper installation page <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ and come back here when ready to proceed.
 
 .. code-block:: shell
 
