@@ -17,7 +17,7 @@ class BaseTestUtils(object):
         with self.assertRaises(ValidationError) as error:
             validate_csvfile(open(invalid_format_path, "rb"))
         self.assertTrue(
-            "Incorrect file format has been uploaded. Please Try Again!"
+            "Unrecognized file format, the supplied file does not look like a CSV file."
             in error.exception.message
         )
 
