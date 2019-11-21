@@ -33,7 +33,7 @@ def validate_csvfile(csvfile):
         csv_data = csv_data.decode("utf-8") if isinstance(csv_data, bytes) else csv_data
     except UnicodeDecodeError:
         raise ValidationError(
-            _("Incorrect file format has been uploaded. Please Try Again!")
+            _("Unrecognized file format, the supplied file does not look like a CSV file.")
         )
     reader = csv.reader(StringIO(csv_data), delimiter=",")
     error_message = "The CSV contains a line with invalid data,\
