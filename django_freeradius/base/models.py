@@ -25,6 +25,7 @@ from django_freeradius.utils import (
 )
 
 from .. import settings as app_settings
+from .validators import ipv6_network_validator
 
 User = get_user_model()
 
@@ -398,12 +399,33 @@ class AbstractRadiusAccounting(models.Model):
                                        blank=True)
     framed_ip_address = models.GenericIPAddressField(verbose_name=_('framed IP address'),
                                                      db_column='framedipaddress',
-                                                     db_index=True,
                                                      # the default MySQL freeradius schema defines
                                                      # this as NOT NULL but defaulting to empty string
                                                      # but that wouldn't work on PostgreSQL
                                                      null=True,
                                                      blank=True)
+    framed_ipv6_address = models.GenericIPAddressField(verbose_name=_('framed IPv6 address'),
+                                                       db_column='framedipv6address',
+                                                       protocol='IPv6',
+                                                       null=True,
+                                                       blank=True)
+    framed_ipv6_prefix = models.CharField(verbose_name=_('framed IPv6 prefix'),
+                                          max_length=44,
+                                          db_column='framedipv6prefix',
+                                          validators=[ipv6_network_validator],
+                                          null=True,
+                                          blank=True)
+    framed_interface_id = models.CharField(verbose_name=_('framed interface ID'),
+                                           max_length=19,
+                                           db_column='framedinterfaceid',
+                                           null=True,
+                                           blank=True)
+    delegated_ipv6_prefix = models.CharField(verbose_name=_('delegated IPv6 prefix'),
+                                             max_length=44,
+                                             db_column='delegatedipv6prefix',
+                                             validators=[ipv6_network_validator],
+                                             null=True,
+                                             blank=True)
 
     def save(self, *args, **kwargs):
         if not self.start_time:

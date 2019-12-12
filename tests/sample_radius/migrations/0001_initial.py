@@ -65,7 +65,11 @@ class Migration(migrations.Migration):
                 ('terminate_cause', models.CharField(blank=True, db_column='acctterminatecause', max_length=32, null=True, verbose_name='termination cause')),
                 ('service_type', models.CharField(blank=True, db_column='servicetype', max_length=32, null=True, verbose_name='service type')),
                 ('framed_protocol', models.CharField(blank=True, db_column='framedprotocol', max_length=32, null=True, verbose_name='framed protocol')),
-                ('framed_ip_address', models.GenericIPAddressField(blank=True, db_column='framedipaddress', db_index=True, null=True, verbose_name='framed IP address')),
+                ('framed_ip_address', models.GenericIPAddressField(blank=True, db_column='framedipaddress', null=True, verbose_name='framed IP address')),
+                ('framed_ipv6_address', models.GenericIPAddressField(blank=True, db_column='framedipv6address', protocol='IPv6', null=True, verbose_name='framed IPv6 address')),
+                ('framed_ipv6_prefix', models.CharField(blank=True, db_column='framedipv6prefix', max_length=44, null=True, validators=[django_freeradius.base.models.ipv6_network_validator], verbose_name='framed IPv6 prefix')),
+                ('framed_interface_id', models.CharField(blank=True, db_column='framedinterfaceid', max_length=19, null=True, verbose_name='framed interface ID')),
+                ('delegated_ipv6_prefix', models.CharField(blank=True, db_column='delegatedipv6prefix', max_length=44, null=True, validators=[django_freeradius.base.models.ipv6_network_validator], verbose_name='delegated IPv6 prefix')),
                 ('details', models.CharField(blank=True, max_length=64, null=True, verbose_name='details')),
             ],
             options={

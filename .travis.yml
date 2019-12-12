@@ -47,7 +47,7 @@ before_script:
   - ./tests/manage.py migrate
   # ensure no migrations pending but show output for easier debugging
   - |
-    if [[ $TRAVIS_PYTHON_VERSION == 3.4 && $SAMPLE_APP != "1" ]]; then
+    if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
       OUTPUT=$(./tests/manage.py makemigrations --dry-run django_freeradius)
       echo $OUTPUT
       echo $OUTPUT | grep "No changes detected"

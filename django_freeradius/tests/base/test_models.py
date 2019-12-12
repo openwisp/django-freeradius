@@ -19,6 +19,19 @@ class BaseTestRadiusAccounting(object):
         radiusaccounting = self.radius_accounting_model(unique_id='entry acctuniqueid')
         self.assertEqual(str(radiusaccounting), radiusaccounting.unique_id)
 
+    def test_ipv6_validator(self):
+        radiusaccounting = self.radius_accounting_model(unique_id='entry acctuniqueid',
+                                                        session_id='entry acctuniqueid',
+                                                        nas_ip_address='192.168.182.3',
+                                                        framed_ipv6_prefix='::/64')
+        radiusaccounting.full_clean()
+
+        radiusaccounting.framed_ipv6_prefix = '192.168.0.0/28'
+        self.assertRaises(ValidationError, radiusaccounting.full_clean)
+
+        radiusaccounting.framed_ipv6_prefix = 'invalid ipv6_prefix'
+        self.assertRaises(ValidationError, radiusaccounting.full_clean)
+
 
 class BaseTestRadiusCheck(object):
     def test_string_representation(self):
