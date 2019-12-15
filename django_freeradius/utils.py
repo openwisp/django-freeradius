@@ -10,7 +10,7 @@ from django.core.validators import validate_email
 from django.template.loader import get_template
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
-from xhtml2pdf import pisa
+from weasyprint import HTML
 
 from django_freeradius.settings import BATCH_PDF_TEMPLATE
 
@@ -72,9 +72,9 @@ def prefix_generate_users(prefix, n, password_length):
 
 def generate_pdf(prefix, data):
     template = get_template(BATCH_PDF_TEMPLATE)
-    html = template.render(data)
+    html = HTML(string=template.render(data))
     f = open("{}/{}.pdf".format(settings.MEDIA_ROOT, prefix), "w+b")
-    pisa.CreatePDF(html.encode("utf-8"), dest=f, encoding="utf-8")
+    html.write_pdf(target=f)
     f.seek(0)
     return File(f)
 
