@@ -37,6 +37,7 @@ STATUS_TYPE_CHOICES = (
 
 class RadiusAccountingSerializer(serializers.ModelSerializer):
     framed_ip_address = serializers.IPAddressField(required=False, allow_blank=True)
+    framed_ipv6_address = serializers.IPAddressField(required=False, allow_blank=True, protocol='IPv6')
     session_time = serializers.IntegerField(required=False, default=0)
     stop_time = serializers.DateTimeField(required=False)
     update_time = serializers.DateTimeField(required=False)

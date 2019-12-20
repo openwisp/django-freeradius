@@ -154,7 +154,11 @@ class BaseTestApi(object):
         'terminate_cause': 'User_Request',
         'service_type': 'Login-User',
         'framed_protocol': 'test',
-        'framed_ip_address': '127.0.0.1'
+        'framed_ip_address': '127.0.0.1',
+        'framed_ipv6_address': '::1',
+        'framed_ipv6_prefix': '0::/64',
+        'framed_interface_id': '0000:0000:0000:0001',
+        'delegated_ipv6_prefix': '0::/64'
     }
 
     @property
@@ -181,7 +185,7 @@ class BaseTestApi(object):
         to ensure they match
         """
         for key, value in data.items():
-            if key == 'status_type':
+            if key in ('status_type', 'framed_ipv6_address'):
                 continue
             ra_value = getattr(ra, key)
             data_value = data[key]
@@ -246,7 +250,11 @@ class BaseTestApi(object):
             'terminate_cause': '',
             'service_type': '',
             'framed_protocol': '',
-            'framed_ip_address': '192.168.182.3'
+            'framed_ip_address': '192.168.182.3',
+            'framed_ipv6_address': '::ffff:c0a8:b603',
+            'framed_ipv6_prefix': '0::/64',
+            'framed_interface_id': '0000:ffff:c0a8:b603',
+            'delegated_ipv6_prefix': '0::/64'
         }
         data = self._get_accounting_params(**data)
         response = self.post_json(data)
@@ -543,7 +551,11 @@ class BaseTestApi(object):
             'terminate_cause': '',
             'service_type': '',
             'framed_protocol': '',
-            'framed_ip_address': ''
+            'framed_ip_address': '',
+            'framed_ipv6_address': '',
+            'framed_ipv6_prefix': '',
+            'framed_interface_id': '',
+            'delegated_ipv6_prefix': ''
         }
         data = self._get_accounting_params(**data)
         response = self.post_json(data)
@@ -572,7 +584,11 @@ class BaseTestApi(object):
             'terminate_cause': '0',
             'service_type': '',
             'framed_protocol': '',
-            'framed_ip_address': ''
+            'framed_ip_address': '',
+            'framed_ipv6_address': '',
+            'framed_ipv6_prefix': '',
+            'framed_interface_id': '',
+            'delegated_ipv6_prefix': ''
         }
         response = self.post_json(data)
         self.assertEqual(response.status_code, 200)
