@@ -1,4 +1,0 @@
-#!/bin/bash
-set -e
-checkmigrations --migration-path ./django_freeradius/migrations/ || exit 1
-checkmigrations --migration-path ./tests/sample_radius/migrations/ || exit 1

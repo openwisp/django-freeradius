@@ -28,42 +28,35 @@ env:
 before_install:
   - pip install -U pip wheel
   - pip install --no-cache-dir -U -r requirements-test.txt
-  - ./runflake8
-  - ./runisort
-  - ./runcheckmigration
   - npm install -g jslint
   - jslint ./django_freeradius/static/django-freeradius/js/*.js
-  - ./runsphinx-build
 
 install:
   - pip install $DJANGO
   - python setup.py -q develop
-  # Temporary: remove when openwisp-utils 0.3 is released
-  - pip install -U https://github.com/openwisp/openwisp-utils/tarball/master
 
 before_script:
   - if [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/freeradius_test' ]; then psql -c "CREATE DATABASE freeradius_test;" -U postgres; fi
   - mysql -e "CREATE DATABASE IF NOT EXISTS freeradius_test;"
-  - ./tests/manage.py migrate
-  # ensure no migrations pending but show output for easier debugging
+  - >
+    openwisp-utils-qa-checks --migration-path "./django_freeradius/migrations ./tests/sample_radius/migrations"
+    --skip-checkmakemigrations 
   - |
     if [[ $TRAVIS_PYTHON_VERSION == 3.5 && $SAMPLE_APP != "1" ]]; then
-      OUTPUT=$(./tests/manage.py makemigrations --dry-run django_freeradius)
-      echo $OUTPUT
-      echo $OUTPUT | grep "No changes detected"
+      openwisp-utils-qa-checks \
+        --skip-isort \
+        --skip-flake8 \
+        --skip-checkmigrations \
+        --skip-checkendline \
+        --skip-checkcommit \
+        --migration-module django_freeradius
     fi
+  - ./runsphinx-build
+  - ./tests/manage.py migrate
 
 # command to run tests, e.g. python setup.py test
 script:
   - coverage run --source=django_freeradius runtests.py
-  - |
-    if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-      # gets commit message of last commit before pull request merge
-      COMMIT_MESSAGE=$(git log $TRAVIS_PULL_REQUEST_SHA --format=%B -n 1)
-      printf "Checking commit message:\n\n"
-      printf "$COMMIT_MESSAGE\n\n"
-      checkcommit --message "$COMMIT_MESSAGE"
-    fi
 
 after_success:
   coveralls
