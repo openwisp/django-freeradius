@@ -18,6 +18,15 @@ We highly suggest to use **virtualenvwrapper**, please refer to the official `vi
 .. note::
     If you encounter an error like ``Python could not import the module virtualenvwrapper``, 
     add ``VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3`` and run ``source virtualenvwrapper.sh`` again :)
+    
+Install required system packages
+--------------------------------
+
+Install packages required by Weasyprint for your OS:
+
+ - `Linux <https://weasyprint.readthedocs.io/en/stable/install.html#linux>`_
+ - `MacOS <https://weasyprint.readthedocs.io/en/stable/install.html#macos>`_
+ - `Windows <https://weasyprint.readthedocs.io/en/stable/install.html#windows>`_
 
 Install stable version from pypi
 --------------------------------
