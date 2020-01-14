@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
-from . import views
 from .. import settings as app_settings
+from . import views
 
 urlpatterns = [
     url(r'^authorize/$', views.authorize, name='authorize'),
