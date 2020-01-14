@@ -22,34 +22,11 @@ Before opening a new issue, try the following steps:
 - announce your intentions by opening a new issue
 - present yourself on the mailing list
 
-Create a virtual environment
-----------------------------
+Setup
+-----
 
-Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_ while
-developing your feature, it keeps everybody on the same page and it helps reproducing bugs
-and resolving problems.
-
-We suggest you to use `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io>`_ for this task
-(consult install instructions in the virtualenvwrapper docs).
-
-.. code-block:: shell
-
-    mkvirtualenv radius  # create virtualenv
-
-.. _install_fork:
-
-Fork repo and install your fork
--------------------------------
-
-Once you have forked this repository to your own github account or organization,
-install your own fork in your development environment:
-
-.. code-block:: shell
-
-    git clone git@github.com:<your_fork>/django-freeradius.git
-    cd django-freeradius
-    workon radius  # activate virtualenv
-    python setup.py develop
+Once you have chosen an issue to work on, `setup your machine for development
+<https://django-freeradius.readthedocs.io/en/latest/general/setup.html#installing-for-development>`_
 
 Ensure test coverage does not decrease
 --------------------------------------
