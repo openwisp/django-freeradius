@@ -3,8 +3,8 @@ from unittest import skipIf
 
 from django.test import TestCase
 
-from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin
 from ..models import RadiusAccounting, RadiusBatch, RadiusPostAuth
+from . import CallCommandMixin, CreateRadiusObjectsMixin, FileMixin
 from .base.test_commands import BaseTestCommands
 
 

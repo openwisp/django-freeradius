@@ -1,10 +1,10 @@
 import swapper
 from django.contrib import messages
 from django.contrib.admin import ModelAdmin, StackedInline
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.utils import model_ngettext
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.core.exceptions import PermissionDenied
+from django.templatetags.static import static
 from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.admin import ReadOnlyAdmin, TimeReadonlyAdminMixin
 
