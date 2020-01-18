@@ -109,6 +109,16 @@ To do work on the docs, proceed with the following steps:
     cd docs
     make html
 
+Note for contributors
+---------------------
+
+Before continuing with your contributing endeavours, please read the
+OpenWISP contributing guidelines to ensure smooth working of the
+freeradius repository.
+
+The guidelines can be found at the following link:
+<http://openwisp.io/docs/developer/contributing.html>
+
 Send pull request
 -----------------
 
