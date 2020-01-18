@@ -109,6 +109,12 @@ To do work on the docs, proceed with the following steps:
     cd docs
     make html
 
+Send pull request
+-----------------
+
+Now is time to push your changes to github and open a `pull request
+<https://github.com/openwisp/django-freeradius/pulls>`_!
+
 Note for contributors
 ---------------------
 
@@ -118,9 +124,3 @@ freeradius repository.
 
 The guidelines can be found at the following link:
 <http://openwisp.io/docs/developer/contributing.html>
-
-Send pull request
------------------
-
-Now is time to push your changes to github and open a `pull request
-<https://github.com/openwisp/django-freeradius/pulls>`_!
