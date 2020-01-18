@@ -16,9 +16,9 @@ We highly suggest to use **virtualenvwrapper**, please refer to the official `vi
     mkvirtualenv radius
 
 .. note::
-    If you encounter an error like ``Python could not import the module virtualenvwrapper``, 
+    If you encounter an error like ``Python could not import the module virtualenvwrapper``,
     add ``VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3`` and run ``source virtualenvwrapper.sh`` again :)
-    
+
 Install required system packages
 --------------------------------
 
@@ -128,8 +128,64 @@ In case you are using `openwisp-radius <https://github.com/openwisp/openwisp-rad
     ./manage.py migrate --fake openwisp_radius 0001_initial_freeradius
     ./manage.py migrate
 
-Installing for development
---------------------------
+
+Automating management commands
+------------------------------
+
+Some management commands are necessary to enable certain
+features and also facilitate database cleanup. In a
+production environment, it is highly recommended to
+automate the usage of these commands by using cron jobs.
+
+Edit the crontab with:
+
+.. code-block:: shell
+
+    crontab -e
+
+Add and modify the following lines accordingly:
+
+.. code-block:: shell
+
+    # This command deletes RADIUS accounting sessions older than 365 days
+    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_radacct 365
+
+    # This command deletes RADIUS post-auth logs older than 365 days
+    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_postauth 365
+
+    # This command closes stale RADIUS sessions that have remained open for 15 days
+    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py cleanup_stale_radacct 15
+
+    # This command deactivates expired user accounts which were created temporarily
+    # (eg: for en event) and have an expiration date set.
+    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py deactivate_expired_users
+
+    # This command deletes users that have expired (and should have
+    # been deactivated by deactivate_expired_users) for more than
+    # 18 months (which is the default duration)
+    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_users
+
+Be sure to replace ``<virtualenv_path>`` with the full path to the Python
+virtual environment.
+
+Also, change ``<full/path/to>`` to the directory where ``manage.py`` is.
+
+To get the full path to ``manage.py`` when django-freeradius is
+installed for development, navigate to the base directory of
+the cloned fork. Then, run:
+
+.. code-block:: shell
+
+    cd tests/
+    pwd
+
+More information can be found at the
+`management commands page <./management_commands.html>`_.
+
+Development setup
+-----------------------
+If you are interested in contributing to this project. You are advised to follow
+the following steps for setting up a development environment.
 
 Install sqlite:
 
@@ -178,56 +234,3 @@ Run tests with:
 .. code-block:: shell
 
     ./runtests.py
-
-Automating management commands
-------------------------------
-
-Some management commands are necessary to enable certain
-features and also facilitate database cleanup. In a
-production environment, it is highly recommended to 
-automate the usage of these commands by using cron jobs.
-
-Edit the crontab with:
-
-.. code-block:: shell
-
-    crontab -e
-
-Add and modify the following lines accordingly:
-
-.. code-block:: shell
-
-    # This command deletes RADIUS accounting sessions older than 365 days
-    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_radacct 365
-
-    # This command deletes RADIUS post-auth logs older than 365 days
-    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_postauth 365
-
-    # This command closes stale RADIUS sessions that have remained open for 15 days
-    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py cleanup_stale_radacct 15
-
-    # This command deactivates expired user accounts which were created temporarily
-    # (eg: for en event) and have an expiration date set.
-    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py deactivate_expired_users
-
-    # This command deletes users that have expired (and should have 
-    # been deactivated by deactivate_expired_users) for more than 
-    # 18 months (which is the default duration)
-    30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_users
-
-Be sure to replace ``<virtualenv_path>`` with the full path to the Python
-virtual environment. 
-
-Also, change ``<full/path/to>`` to the directory where ``manage.py`` is.
-
-To get the full path to ``manage.py`` when django-freeradius is 
-installed for development, navigate to the base directory of 
-the cloned fork. Then, run:
-
-.. code-block:: shell
-    
-    cd tests/
-    pwd
-
-More information can be found at the 
-`management commands page <./management_commands.html>`_.
