@@ -10,17 +10,9 @@ Follow these guidelines to speed up the process.
   :backlinks: none
   :depth: 3
 
-Reach out before you start
---------------------------
-
-Before opening a new issue, try the following steps:
-
-- look if somebody else has already started working on the same issue
-  by looking in the `github issues <https://github.com/openwisp/django-freeradius/issues>`_
-  and `pull requests <https://github.com/openwisp/django-freeradius/pulls>`_
-- look also in the `OpenWISP mailing list <https://groups.google.com/d/forum/openwisp/join>`_
-- announce your intentions by opening a new issue
-- present yourself on the mailing list
+.. note::
+    **In order to have your contribution accepted faster**, please read the
+    `OpenWISP contributing guidelines <http://openwisp.io/docs/developer/contributing.html>`_ and make sure to follow its guidelines.
 
 Create a virtual environment
 ----------------------------
