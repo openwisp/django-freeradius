@@ -10,17 +10,24 @@ Follow these guidelines to speed up the process.
   :backlinks: none
   :depth: 3
 
+Note for contributors
+---------------------
+
+Before continuing with your contributing endeavours, please read the
+OpenWISP contributing guidelines to ensure smooth working of the
+freeradius repository.
+
+The guidelines can be found at the following link:
+<http://openwisp.io/docs/developer/contributing.html>
+
 Reach out before you start
 --------------------------
 
-Before opening a new issue, try the following steps:
+Before opening a new issue, try to look if somebody else has already started working on the same issue
+by looking in the `github issues <https://github.com/openwisp/django-freeradius/issues>`_
+and `pull requests <https://github.com/openwisp/django-freeradius/pulls>`_
 
-- look if somebody else has already started working on the same issue
-  by looking in the `github issues <https://github.com/openwisp/django-freeradius/issues>`_
-  and `pull requests <https://github.com/openwisp/django-freeradius/pulls>`_
-- look also in the `OpenWISP mailing list <https://groups.google.com/d/forum/openwisp/join>`_
-- announce your intentions by opening a new issue
-- present yourself on the mailing list
+Also check the OpenWISP guidelines for further steps.
 
 Create a virtual environment
 ----------------------------
@@ -69,15 +76,6 @@ When you introduce changes, ensure test coverage is not decreased with:
 
 Follow style conventions (PEP8, isort, JSLint)
 ----------------------------------------------
-
-First of all, install the test requirements:
-
-.. code-block:: shell
-
-    workon radius  # activate virtualenv
-    pip install --no-cache-dir -U -r requirements-test.txt
-    npm install -g jslint
-
 Before committing your work check that your changes are not breaking the style conventions with:
 
 .. code-block:: shell
@@ -85,11 +83,6 @@ Before committing your work check that your changes are not breaking the style c
     ./runflake8
     ./runisort
     jslint ./django_freeradius/static/django-freeradius/js/*.js
-
-For more information, please see:
-
-- `PEP8: Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_
-- `isort: a python utility / library to sort imports <https://github.com/timothycrosley/isort>`_
 
 Update the documentation
 ------------------------
@@ -114,13 +107,3 @@ Send pull request
 
 Now is time to push your changes to github and open a `pull request
 <https://github.com/openwisp/django-freeradius/pulls>`_!
-
-Note for contributors
----------------------
-
-Before continuing with your contributing endeavours, please read the
-OpenWISP contributing guidelines to ensure smooth working of the
-freeradius repository.
-
-The guidelines can be found at the following link:
-<http://openwisp.io/docs/developer/contributing.html>
