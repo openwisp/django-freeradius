@@ -182,7 +182,7 @@ the cloned fork. Then, run:
 More information can be found at the
 `management commands page <./management_commands.html>`_.
 
-Note: Development setup
+Development setup
 -----------------------
 If you are interested in contributing to this project. You are advised to follow
 the following steps for setting up a development environment.
