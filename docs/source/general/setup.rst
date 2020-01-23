@@ -205,6 +205,7 @@ Install your forked repo:
 
     git clone git://github.com/<your_username>/django-freeradius
     cd django-freeradius/
+    workon radius  # activate virtualenv
     python setup.py develop
 
 Install test requirements:

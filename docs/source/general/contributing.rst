@@ -16,44 +16,6 @@ Follow these guidelines to speed up the process.
     OpenWISP contributing guidelines to ensure smooth working of the
     freeradius repository. The guidelines can be found at the following `link here <http://openwisp.io/docs/developer/contributing.html>`_
 
-Reach out before you start
---------------------------
-
-Before opening a new issue, try to look if somebody else has already started working on the same issue
-by looking in the `github issues <https://github.com/openwisp/django-freeradius/issues>`_
-and `pull requests <https://github.com/openwisp/django-freeradius/pulls>`_
-
-Also check the OpenWISP guidelines for further steps.
-
-Create a virtual environment
-----------------------------
-
-Please use a `python virtual environment <https://docs.python.org/3/library/venv.html>`_ while
-developing your feature, it keeps everybody on the same page and it helps reproducing bugs
-and resolving problems.
-
-We suggest you to use `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io>`_ for this task
-(consult install instructions in the virtualenvwrapper docs).
-
-.. code-block:: shell
-
-    mkvirtualenv radius  # create virtualenv
-
-.. _install_fork:
-
-Fork repo and install your fork
--------------------------------
-
-Once you have forked this repository to your own github account or organization,
-install your own fork in your development environment:
-
-.. code-block:: shell
-
-    git clone git@github.com:<your_fork>/django-freeradius.git
-    cd django-freeradius
-    workon radius  # activate virtualenv
-    python setup.py develop
-
 Ensure test coverage does not decrease
 --------------------------------------
 
