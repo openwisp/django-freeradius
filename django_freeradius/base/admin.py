@@ -138,7 +138,7 @@ class AbstractRadiusGroupAdmin(TimeStampedEditableAdmin):
                RadiusGroupReplyInline]
 
     def has_delete_permission(self, request, obj=None):
-        if obj and obj.default:
+        if not request.user.is_superuser and obj and obj.default:
             return False
         return super().has_delete_permission(request, obj)
 

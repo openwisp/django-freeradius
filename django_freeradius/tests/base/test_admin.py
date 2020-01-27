@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 
 from django_freeradius import settings
@@ -305,7 +306,21 @@ class BaseTestAdmin(object):
                 'prefix': 'openwisp', 'number_of_users': 10, 'name': 'test2'}
         return data
 
-    def test_radius_group_delete_default(self):
+    def test_radius_group_delete_default_by_superuser(self):
+        rg = self.radius_group_model.objects
+        default = rg.get(default=True)
+        url_name = 'admin:{0}_radiusgroup_delete'.format(self.app_name)
+        delete_url = reverse(url_name, args=[default.pk])
+        response = self.client.get(delete_url)
+        self.assertEqual(rg.filter(default=True).count(), 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_radius_group_delete_default_by_non_superuser(self):
+        user = User.objects.get(username='admin')
+        user.is_superuser = False
+        user.save()
+        for permission in Permission.objects.all():
+            user.user_permissions.add(permission)
         rg = self.radius_group_model.objects
         default = rg.get(default=True)
         url_name = 'admin:{0}_radiusgroup_delete'.format(self.app_name)
