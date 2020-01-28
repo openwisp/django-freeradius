@@ -16,9 +16,9 @@ We highly suggest to use **virtualenvwrapper**, please refer to the official `vi
     mkvirtualenv radius
 
 .. note::
-    If you encounter an error like ``Python could not import the module virtualenvwrapper``, 
+    If you encounter an error like ``Python could not import the module virtualenvwrapper``,
     add ``VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3`` and run ``source virtualenvwrapper.sh`` again :)
-    
+
 Install required system packages
 --------------------------------
 
@@ -131,17 +131,26 @@ In case you are using `openwisp-radius <https://github.com/openwisp/openwisp-rad
 Installing for development
 --------------------------
 
+Install python3-dev and gcc:
+
+.. code-block:: shell
+
+    sudo apt-get install python3-dev gcc
+
 Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt-get install sqlite3 libsqlite3-dev
+    sudo apt-get install sqlite3 libsqlite3-dev libpq-dev
 
 Install mysqlclient:
 
 .. code-block:: shell
 
-    sudo apt-get install libmysqlclient-dev
+    sudo apt-get install libmysqlclient-dev libssl-dev
+
+.. note::
+    If you are on Debian 10 or 9 you may need to install ``default-libmysqlclient-dev`` instead
 
 Install your forked repo:
 
@@ -184,7 +193,7 @@ Automating management commands
 
 Some management commands are necessary to enable certain
 features and also facilitate database cleanup. In a
-production environment, it is highly recommended to 
+production environment, it is highly recommended to
 automate the usage of these commands by using cron jobs.
 
 Edit the crontab with:
@@ -210,24 +219,24 @@ Add and modify the following lines accordingly:
     # (eg: for en event) and have an expiration date set.
     30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py deactivate_expired_users
 
-    # This command deletes users that have expired (and should have 
-    # been deactivated by deactivate_expired_users) for more than 
+    # This command deletes users that have expired (and should have
+    # been deactivated by deactivate_expired_users) for more than
     # 18 months (which is the default duration)
     30 04 * * * <virtualenv_path>/bin/python <full/path/to>/manage.py delete_old_users
 
-Be sure to replace ``<virtualenv_path>`` with the full path to the Python
-virtual environment. 
+Be sure to replace ``<virtualenv_path>`` with the absolute path to the Python
+virtual environment.
 
 Also, change ``<full/path/to>`` to the directory where ``manage.py`` is.
 
-To get the full path to ``manage.py`` when django-freeradius is 
-installed for development, navigate to the base directory of 
+To get the absolute path to ``manage.py`` when django-freeradius is
+installed for development, navigate to the base directory of
 the cloned fork. Then, run:
 
 .. code-block:: shell
-    
+
     cd tests/
     pwd
 
-More information can be found at the 
+More information can be found at the
 `management commands page <./management_commands.html>`_.
