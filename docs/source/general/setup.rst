@@ -188,6 +188,18 @@ Run tests with:
 
     ./runtests.py
 
+Troubleshooting
+---------------
+
+If you encounter any issue during installation, run:
+
+.. code-block:: shell
+
+    pip install -r requirements.txt -r requirements-test.txt instead of pip install -r requirements-test.txt
+
+instead of ``pip install -r requirements-test.txt``
+
+
 Automating management commands
 ------------------------------
 
