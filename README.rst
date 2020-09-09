@@ -1,30 +1,33 @@
 django-freeradius
 =================
 
-.. image:: https://travis-ci.org/openwisp/django-freeradius.svg
-   :target: https://travis-ci.org/openwisp/django-freeradius
+**WARNING**: The development of this project has moved to `openwisp-radius <https://github.com/openwisp/openwisp-radius>`_, we advise all users of *django-freeradius* to follow the tutorial below to migrate their existing database:
 
-.. image:: https://coveralls.io/repos/openwisp/django-freeradius/badge.svg
-  :target: https://coveralls.io/r/openwisp/django-freeradius
+1. Take a backup of your database.
+2. Create JSON backup of data that's required for migration with the following command:
 
-.. image:: https://requires.io/github/openwisp/django-freeradius/requirements.svg?branch=master
-   :target: https://requires.io/github/openwisp/django-freeradius/requirements/?branch=master
-   :alt: Requirements Status
+.. code-block:: shell
 
-.. image:: https://badge.fury.io/py/django-freeradius.svg
-   :target: http://badge.fury.io/py/django-freeradius
+    # Go to the django-freeradius repository (or installed app)
+    cd tests/
+    python manage.py dumpdata auth.user > user.json
+    python manage.py dumpdata auth.group > group.json
+    python manage.py dumpdata auth.permission > permission.json
+    python manage.py dumpdata contenttypes > contenttype.json
+    python manage.py dumpdata sites > site.json
+    python manage.py dumpdata socialaccount > social.json
+    python manage.py dumpdata django_freeradius > freeradius.json
+    pwd # copy output of the command
 
-------------
+3. `Setup openwisp-radius <https://openwisp-radius.readthedocs.io/en/latest/developer/setup.html#setup-integrate-in-an-existing-django-project>`_
 
-Django-freeradius is part of the `OpenWISP project <http://openwisp.org>`_.
+4. `Use the upgrader script <https://openwisp-radius.readthedocs.io/en/latest/user/management_commands.html#upgrade-from-django-freeradius>`_:
 
-.. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
-  :target: http://openwisp.org
+.. code-block:: shell
 
-**django-freeradius** is Django reusable app that provides an admin interface to a `freeradius <http://freeradius.org/>`_ database.
+    # In the openwisp-radius repository
+    python tests/manage.py upgrade_from_django_freeradius --backup <output-copied-in-step-2>
 
-`Documentation <http://django-freeradius.readthedocs.io/en/latest/>`_ |
-`Change log <https://github.com/openwisp/django-freeradius/blob/master/CHANGES.rst>`_ |
-`Support channels <http://openwisp.org/support.html>`_ |
-`Issue Tracker <https://github.com/openwisp/django-freeradius/issues>`_ |
-`License <https://github.com/openwisp/django-freeradius/blob/master/LICENSE>`_
+For any support, please reach out to us on `the chat channel on gitter <https://gitter.im/openwisp/general>`_ or `use the mailing list <https://groups.google.com/forum/#!forum/openwisp>`_.
+
+**The development of django-freeradius is discontinued and this repository is archived.**
