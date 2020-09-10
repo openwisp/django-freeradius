@@ -1,3 +1,5 @@
+.. include:: ../_moved.rst
+
 ===============================
 How to extend django-freeradius
 ===============================
@@ -12,7 +14,7 @@ Update the settings to trigger the swapper:
 .. code-block:: python
 
     # In settings.py of your project
-        
+
     DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "my_radius_app.RadiusReply"
     DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "my_radius_app.RadiusGroupReply"
     DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "my_radius_app.RadiusCheck"
@@ -38,7 +40,7 @@ Example:
 
     from django.db import models
     from django_freeradius.base.models import AbstractRadiusCheck
-    
+
     class RadiusCheck(AbstractRadiusCheck):
         # modify/extend the default behavour here
         custom_field = models.TextField()
@@ -53,8 +55,8 @@ Similar to models, abstract admin classes from ``django_freeradius.base.admin`` 
 .. code-block:: python
 
     # In my_radius_app/admin.py
-    
-    from django.contrib import admin 
+
+    from django.contrib import admin
     from .models import RadiusCheck
     from django_freeradius.base.admin import AbstractRadiusAccountingAdmin
 
@@ -72,12 +74,12 @@ Similar to models, abstract admin classes from ``django_freeradius.base.admin`` 
 Extend AppConfig
 ----------------
 
-You can also extend AppConfig class from ``django_freeradius.apps.DjangoFreeradiusConfig`` and provide support for your signals and hooks. 
+You can also extend AppConfig class from ``django_freeradius.apps.DjangoFreeradiusConfig`` and provide support for your signals and hooks.
 
 .. code-block:: python
 
     # In my_radius_app/apps.py
-    
+
     from django.conf import settings
     from django_freeradius.apps import DjangoFreeradiusConfig
     from django.core.exceptions import ImproperlyConfigured
@@ -96,7 +98,7 @@ You can also extend AppConfig class from ``django_freeradius.apps.DjangoFreeradi
                 def check_settings(self):
         if API_TOKEN and len(API_TOKEN) < 20 or not API_TOKEN:
             raise ImproperlyConfigured(
-                'Security error: DJANGO_FREERADIUS_API_TOKEN is either not set or is less than 20 characters.')   
+                'Security error: DJANGO_FREERADIUS_API_TOKEN is either not set or is less than 20 characters.')
 
 
 Extend API views
@@ -122,5 +124,3 @@ You can also extend API views from ``django_freeradius.api.views`` to your suit 
 
 .. note::
     For a real world implementation of extending ``django-freeradius.api``, refer `openwisp-radius.api <https://github.com/openwisp/openwisp-radius/tree/master/openwisp_radius/api>`_
-
-

@@ -1,3 +1,5 @@
+.. include:: ../_moved.rst
+
 ==============================================
 Installation and configuration of Freeradius 3
 ==============================================
@@ -302,7 +304,7 @@ Also make sure that this server runs on the port specified in
 ``/etc/freeradius/mods-enabled/rest``.
 
 You may also want to take a look at the `Freeradius documentation
-<http://freeradius.org/doc/>`_ for further information that is freeradius specific. 
+<http://freeradius.org/doc/>`_ for further information that is freeradius specific.
 
 Reconfigure the development environment using PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

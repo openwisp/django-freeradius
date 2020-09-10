@@ -1,3 +1,5 @@
+.. include:: ../_moved.rst
+
 ========================
 Enforcing session limits
 ========================

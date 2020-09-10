@@ -1,3 +1,5 @@
+.. include:: ../_moved.rst
+
 ================
 Generating users
 ================
@@ -19,7 +21,7 @@ This command generates users whose usernames start with a particular prefix. Usa
 
     ./manage.py prefix_add_users --name <name_of_batch> \
                                  --prefix <prefix> \
-                                 --n <number_of_users>  
+                                 --n <number_of_users>
                                  --expiration <expiration_date> \
                                  --password-length <password_length>
 
